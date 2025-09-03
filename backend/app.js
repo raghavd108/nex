@@ -27,6 +27,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+const _dirname = path.resolve();
 
 // ✅ Use default namespace (no custom .of("/classic"))
 videoCallSocketHandler(io);
@@ -53,6 +54,10 @@ app.use("/api/likes", likeRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/messages", messageRoutes);
+app.use(express.static(path.join(_dirname, "/frontend/build")));
+app.get(/.*/, (_, res) => {
+  res.sendFile(path.resolve(_dirname, "frontend", "build", "index.html"));
+});
 
 // ✅ Example API Route
 app.use("/api/auth", require("./routes/auth"));
