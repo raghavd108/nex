@@ -22,7 +22,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ✅ Setup Socket.IO server (changed)
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000"], // frontend URL
+    origin: ["https://nex-pjq3.onrender.com"], // frontend URL
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -36,7 +36,7 @@ chatSocket(io);
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://nex-pjq3.onrender.com",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -45,9 +45,9 @@ app.use(
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Video call signaling server running 🚀");
-});
+// app.get("/", (req, res) => {
+//   res.send("Video call signaling server running 🚀");
+// });
 
 app.use("/api/profile", profileRoutes);
 app.use("/api/likes", likeRoutes);

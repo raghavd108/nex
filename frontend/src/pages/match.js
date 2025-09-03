@@ -6,7 +6,9 @@ import "../css/MatchPage.css";
 import { FiArrowLeft } from "react-icons/fi";
 
 // 🔗 Connect socket
-const socket = io("http://localhost:5001", { transports: ["websocket"] });
+const socket = io("https://nex-pjq3.onrender.com", {
+  transports: ["websocket"],
+});
 
 export default function LikedProfilesPage() {
   const [likedProfiles, setLikedProfiles] = useState([]);
@@ -26,7 +28,7 @@ export default function LikedProfilesPage() {
     const fetchLikedProfiles = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5001/api/likes/${userId}`
+          `https://nex-pjq3.onrender.com/api/likes/${userId}`
         );
         setLikedProfiles(response.data);
       } catch (err) {
@@ -85,7 +87,7 @@ export default function LikedProfilesPage() {
 
     try {
       const res = await axios.get(
-        `http://localhost:5001/api/messages/${userId}/${profile.userId}`
+        `https://nex-pjq3.onrender.com/api/messages/${userId}/${profile.userId}`
       );
 
       if (res.data.length > 0) setConversationId(res.data[0].conversationId);
@@ -165,7 +167,7 @@ export default function LikedProfilesPage() {
                   onClick={() => openChat(profile)}
                 >
                   <img
-                    src={`http://localhost:5001${profile.avatar}`}
+                    src={`https://nex-pjq3.onrender.com${profile.avatar}`}
                     alt="Profile"
                     className="avatar"
                   />
@@ -196,7 +198,7 @@ export default function LikedProfilesPage() {
                 </button>
 
                 <img
-                  src={`http://localhost:5001${selectedProfile.avatar}`}
+                  src={`https://nex-pjq3.onrender.com${selectedProfile.avatar}`}
                   alt="Profile"
                   className="details-avatar"
                 />

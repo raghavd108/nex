@@ -5,7 +5,8 @@ import { Mic, MicOff, PhoneOff } from "lucide-react"; // modern icons
 import "../css/VideoRoom.css";
 
 // Function to create new socket
-const createSocket = () => io("http://localhost:5001", { autoConnect: true });
+const createSocket = () =>
+  io("https://nex-pjq3.onrender.com", { autoConnect: true });
 
 // STUN server
 const ICE_SERVERS = {

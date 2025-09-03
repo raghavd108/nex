@@ -13,7 +13,7 @@ import { PhoneOff, SkipForward, Heart } from "lucide-react";
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("userId");
 
-const socket = io("http://localhost:5001", {
+const socket = io("https://nex-pjq3.onrender.com", {
   auth: { token },
   autoConnect: false,
 });

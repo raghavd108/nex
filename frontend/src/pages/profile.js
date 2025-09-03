@@ -18,15 +18,18 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/api/profile/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+          "https://nex-pjq3.onrender.com/api/profile/me",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const avatarUrl = res.data.avatar?.startsWith("http")
           ? res.data.avatar
-          : `http://localhost:5001${res.data.avatar}`;
+          : `https://nex-pjq3.onrender.com${res.data.avatar}`;
 
         setUser({ ...res.data, avatar: avatarUrl });
         setEditData({ ...res.data, avatar: avatarUrl });
@@ -58,7 +61,7 @@ export default function ProfilePage() {
       };
 
       const res = await axios.put(
-        "http://localhost:5001/api/profile/me",
+        "https://nex-pjq3.onrender.com/api/profile/me",
         payload,
         {
           headers: {
@@ -69,7 +72,7 @@ export default function ProfilePage() {
 
       const avatarUrl = res.data.avatar?.startsWith("http")
         ? res.data.avatar
-        : `http://localhost:5001${res.data.avatar}`;
+        : `https://nex-pjq3.onrender.com${res.data.avatar}`;
 
       setUser({ ...res.data, avatar: avatarUrl });
       setEditData({ ...res.data, avatar: avatarUrl });
@@ -88,7 +91,7 @@ export default function ProfilePage() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5001/api/profile/me/photo",
+        "https://nex-pjq3.onrender.com/api/profile/me/photo",
         formData,
         {
           headers: {
@@ -98,7 +101,7 @@ export default function ProfilePage() {
         }
       );
 
-      const avatarUrl = `http://localhost:5001${res.data.avatar}`;
+      const avatarUrl = `https://nex-pjq3.onrender.com${res.data.avatar}`;
       setUser((prev) => ({ ...prev, avatar: avatarUrl }));
       setEditData((prev) => ({ ...prev, avatar: avatarUrl }));
       setPreviewAvatar(avatarUrl);

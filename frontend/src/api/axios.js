@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5001/api",
+  baseURL: "https://nex-pjq3.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },

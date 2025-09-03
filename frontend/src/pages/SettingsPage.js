@@ -15,7 +15,7 @@ import {
 } from "react-icons/fa";
 import styles from "../css/SettingsPage.module.css";
 
-const BASE_URL = "http://localhost:5001"; // Change to production URL when deployed
+const BASE_URL = "https://nex-pjq3.onrender.com"; // Change to production URL when deployed
 
 export default function SettingsPage() {
   const navigate = useNavigate();
