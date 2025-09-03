@@ -1,0 +1,275 @@
+/* --- Global Page Styles --- */
+.match-page {
+  font-family: "Poppins", sans-serif;
+  background-color: #000;
+  height: 100vh;
+  display: flex;
+  color: #e5e7eb;
+  overflow: hidden;
+  padding-bottom: 60px; /* reserve space for bottom navbar */
+}
+
+/* --- Left Sidebar --- */
+.profile-list-panel {
+  width: 320px;
+  background: #121212;
+  border-right: 1px solid #2c2c3a;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.liked-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #2c2c3a;
+}
+
+.liked-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f3f4f6;
+}
+
+.profile-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #2c2c3a;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.profile-card:hover {
+  background: #1f1f2b;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #6a0dad;
+}
+
+.profile-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.profile-info h3 {
+  font-size: 14px;
+  margin: 0;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #f3f4f6;
+}
+
+.profile-info p {
+  font-size: 12px;
+  margin: 2px 0 0;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Unread badge */
+.unread-badge {
+  background: #6a0dad;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 12px;
+  margin-left: 6px;
+}
+
+/* --- Right Panel --- */
+.details-panel {
+  flex: 1;
+  background: #121212;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Chat header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid #2c2c3a;
+  background: #1f1f2b;
+  flex-shrink: 0;
+}
+
+.back-btn {
+  display: none; /* visible only on mobile */
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.details-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #6a0dad;
+}
+
+.profile-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #f3f4f6;
+}
+
+/* Chat area */
+.chat-area {
+  flex: 1;
+  padding: 20px;
+  background: #1a1a1a;
+  overflow-y: auto;
+  min-height: 0;
+  padding-bottom: 70px; /* reserve space for input */
+}
+
+/* Chat bubbles */
+.chat-bubble {
+  max-width: 65%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.chat-bubble.user {
+  background: #6a0dad;
+  color: #fff;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-bubble.other {
+  background: #2c2c3a;
+  color: #f3f4f6;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+}
+
+/* Message input */
+.message-input {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid #2c2c3a;
+  background: #1f1f2b;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 60px; /* sits above bottom navbar */
+  z-index: 5;
+}
+
+.message-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 20px;
+  outline: none;
+  font-size: 14px;
+  background: #121212;
+  color: #f3f4f6;
+}
+
+.message-input button {
+  background: #6a0dad;
+  border: none;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.message-input button:hover {
+  background: #9333ea;
+}
+
+/* Empty state */
+.details-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  color: #9ca3af;
+  font-size: 15px;
+}
+
+/* Typing indicator */
+.typing-indicator {
+  font-style: italic;
+  color: gray;
+  opacity: 0.8;
+}
+
+/* --- Responsive (Mobile) --- */
+@media (max-width: 768px) {
+  .match-page {
+    flex-direction: column;
+    height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  .profile-list-panel {
+    width: 100%;
+    flex: none;
+  }
+
+  /* Chat as full page like WhatsApp */
+  .details-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: #121212;
+    z-index: 20;
+    display: none; /* hidden until chat is active */
+  }
+
+  .details-panel.active {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-area {
+    padding-bottom: 70px;
+  }
+
+  .message-input {
+    bottom: 60px;
+  }
+
+  /* Show back button only on mobile */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

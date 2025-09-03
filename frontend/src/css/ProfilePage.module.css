@@ -1,0 +1,158 @@
+.profileContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  min-height: 100vh;
+  background: #000;
+}
+
+.profileCard {
+  background: #1a1a1a; /* dark card background */
+  border: 1px solid #333; /* subtle border */
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  padding: 30px;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+}
+
+.profileAvatar {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #9b59b6; /* bright accent */
+  margin-bottom: 15px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.profileAvatar:hover {
+  transform: scale(1.05);
+}
+
+.profileCard h2 {
+  margin: 10px 0 5px;
+  font-size: 24px;
+  color: #fff; /* white text for dark card */
+}
+
+.profileBio {
+  font-size: 15px;
+  color: #ccc; /* lighter grey text */
+  margin-bottom: 20px;
+}
+
+.profileOptions {
+  display: flex;
+  justify-content: space-around;
+  margin: 25px 0;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.optionBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #9b59b6; /* accent color */
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.optionBox:hover {
+  transform: scale(1.1);
+}
+
+.optionIcon {
+  font-size: 22px;
+  margin-bottom: 5px;
+}
+
+.profileInfo {
+  margin-top: 20px;
+  text-align: left;
+  color: #ddd; /* light grey info text */
+  font-size: 15px;
+}
+
+.profileInfo p {
+  margin: 8px 0;
+}
+
+.editForm {
+  text-align: left;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  font-weight: 600;
+  color: #fff; /* white labels */
+  margin-bottom: 6px;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #555; /* dark input border */
+  border-radius: 10px;
+  outline: none;
+  font-size: 15px;
+  background: #222; /* dark input background */
+  color: #fff; /* white text */
+  transition: border-color 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  border-color: #9b59b6; /* accent on focus */
+}
+
+textarea {
+  resize: vertical;
+}
+
+.saveBtn {
+  background-color: #9b59b6; /* accent button */
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s;
+}
+
+.saveBtn:hover {
+  background-color: #8e44ad;
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+  .profileCard {
+    padding: 20px;
+  }
+
+  .profileAvatar {
+    width: 110px;
+    height: 110px;
+  }
+
+  .optionBox span {
+    font-size: 13px;
+  }
+
+  .profileOptions {
+    justify-content: space-between;
+  }
+}

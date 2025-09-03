@@ -1,0 +1,201 @@
+body {
+  background: #000;
+  color: #e5e7eb; /* light text for readability */
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* ===== SETTINGS CONTAINER ===== */
+.settingsContainer {
+  max-width: 720px;
+  margin: 60px auto;
+  padding: 2.5rem 2rem;
+  background: #1f1f2b; /* slightly lighter dark for card */
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.8);
+  position: relative;
+  animation: fadeInUp 0.6s ease both;
+}
+
+/* ===== CLOSE BUTTON ===== */
+.closeBtn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  background: none;
+  border: none;
+  color: #9ca3af; /* soft grey */
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.closeBtn:hover {
+  color: #a855f7; /* purple accent */
+}
+
+/* ===== HEADINGS ===== */
+.settingsContainer h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #f3f4f6; /* bright white text */
+  border-bottom: 1px solid #374151;
+  padding-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.settingsSection {
+  margin-bottom: 2rem;
+}
+
+.settingsSection h2 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #d1d5db; /* light grey */
+  font-weight: 600;
+  border-left: 4px solid #a855f7; /* purple accent */
+  padding-left: 0.8rem;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.settingItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.settingItem label {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #e5e7eb;
+}
+
+.settingItem input,
+.settingItem select,
+.settingItem button {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid #374151; /* dark border */
+  background: #2c2c3a; /* input background dark */
+  color: #f3f4f6; /* light text */
+  transition: border-color 0.2s ease, background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.settingItem input:focus,
+.settingItem select:focus {
+  border-color: #a855f7; /* purple highlight */
+  background: #1f1f2b;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.3);
+  outline: none;
+}
+
+.settingItem button {
+  background-color: #a855f7;
+  color: #fff;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  align-self: start;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.settingItem button:hover {
+  background-color: #9333ea; /* darker purple */
+  transform: translateY(-1px);
+}
+
+/* ===== DANGER ZONE ===== */
+.dangerZone h2 {
+  color: #f87171; /* red */
+  border-left-color: #f87171;
+}
+
+.deleteBtn,
+.logoutBtn {
+  width: 100%;
+  padding: 0.85rem 0;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.deleteBtn {
+  background-color: #ef4444; /* red */
+  color: #fff;
+}
+.deleteBtn:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+}
+
+.logoutBtn {
+  background-color: #a855f7; /* purple */
+  color: #fff;
+}
+.logoutBtn:hover {
+  background-color: #9333ea;
+  transform: translateY(-2px);
+}
+
+/* ===== FOOTER SAVE BUTTON ===== */
+.settingsFooter {
+  text-align: right;
+  margin-top: 2rem;
+}
+
+.saveBtn {
+  padding: 0.9rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: #a855f7;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.3s ease;
+}
+.saveBtn:hover {
+  background-color: #9333ea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .settingsContainer {
+    margin: 40px 1rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .settingsContainer h1 {
+    font-size: 1.5rem;
+  }
+
+  .settingsSection h2 {
+    font-size: 1rem;
+  }
+
+  .settingItem input,
+  .settingItem select,
+  .settingItem button,
+  .saveBtn {
+    font-size: 0.95rem;
+  }
+}

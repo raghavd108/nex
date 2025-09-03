@@ -1,0 +1,351 @@
+/* Base Styles */
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background-color: #000; /* Dark background */
+  color: #e5e7eb; /* Light text for readability */
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #f3f4f6;
+  overflow: hidden;
+}
+
+/* Background video styles */
+.background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+/* Semi-transparent overlay */
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); /* Darker overlay for readability */
+  z-index: 0;
+}
+
+/* Hero Content */
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+}
+
+.hero-logo {
+  width: 80px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: #fff;
+  animation: fadeInUp 0.8s ease;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.85;
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+  color: #d1d5db;
+}
+
+.cta-button {
+  background-color: #6a0dad; /* Purple accent */
+  color: #fff;
+  padding: 1rem 2.5rem;
+  font-size: 1.125rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(106, 13, 173, 0.4);
+}
+
+.cta-button:hover {
+  background-color: #9333ea; /* Darker purple on hover */
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.5);
+}
+
+/* Journey Section */
+.journey-section {
+  padding: 80px 20px;
+  background: #121212; /* Darker section background */
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 4rem;
+  color: #f3f4f6;
+}
+
+.journey-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 3rem;
+  justify-content: center;
+}
+
+.journey-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background-color: #1f1f2b; /* Dark card */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+}
+
+.journey-card img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: brightness(0.8);
+}
+
+.journey-card:hover img {
+  transform: scale(1.1);
+  filter: brightness(0.9);
+}
+
+.journey-card .overlay {
+  position: absolute;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  color: #f3f4f6;
+  width: 100%;
+  padding: 30px 20px;
+  text-align: left;
+  transition: background 0.5s ease;
+}
+
+.journey-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.journey-card p {
+  font-size: 1rem;
+  margin-bottom: 15px;
+  opacity: 0.85;
+}
+
+.journey-card button {
+  padding: 10px 20px;
+  background-color: #6a0dad;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.journey-card button:hover {
+  background-color: #9333ea;
+}
+
+/* Community Section */
+.community-section {
+  padding: 80px 20px;
+  background: #181818;
+  text-align: center;
+}
+
+.community-text {
+  max-width: 700px;
+  margin: 1rem auto 3rem;
+  color: #d1d5db;
+  font-size: 1.1rem;
+}
+
+.avatars-marquee {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.avatars-marquee img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #6a0dad; /* Accent border */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.avatars-marquee img:hover {
+  transform: translateY(-5px);
+}
+
+/* Features Section */
+.features-section {
+  padding: 80px 20px;
+  background: #121212;
+  text-align: center;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  max-width: 700px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  color: #d1d5db;
+}
+
+.features-list li {
+  padding: 15px 0;
+  border-bottom: 1px solid #2c2c3a;
+  text-align: left;
+  transition: background 0.3s ease;
+}
+
+.features-list li:first-child {
+  border-top: 1px solid #2c2c3a;
+}
+
+/* Testimonials */
+.testimonials-section {
+  padding: 80px 20px;
+  background: #181818;
+  text-align: center;
+}
+
+.testimonial-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  background: #1f1f2b;
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  text-align: left;
+  border-left: 5px solid #6a0dad;
+}
+
+.testimonial-text {
+  font-size: 1.1rem;
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: #f3f4f6;
+}
+
+.testimonial-name {
+  font-weight: bold;
+  color: #d1d5db;
+}
+
+/* Final CTA Section */
+.final-cta {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #6a0dad, #9333ea);
+  color: white;
+  text-align: center;
+}
+
+.final-cta h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.final-cta p {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin-bottom: 2rem;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  .section-title {
+    font-size: 2rem;
+  }
+  .cta-button {
+    padding: 12px 24px;
+    font-size: 1rem;
+  }
+  .journey-card img {
+    height: 250px;
+  }
+  .testimonial-cards {
+    gap: 20px;
+  }
+  .avatars-marquee img {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+  .cta-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  .journey-section,
+  .community-section,
+  .features-section,
+  .testimonials-section,
+  .final-cta {
+    padding: 40px 15px;
+  }
+  .journey-card img {
+    height: 180px;
+  }
+}

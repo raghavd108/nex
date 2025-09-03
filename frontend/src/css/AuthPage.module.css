@@ -1,0 +1,303 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  padding: 20px;
+  box-sizing: border-box;
+  gap: 40px; /* spacing between photos & form */
+}
+
+/* ====== Photo Section (Balanced Stacked Cards) ====== */
+.photoSection {
+  position: relative;
+  width: 320px;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photoFrame {
+  position: absolute;
+  width: 200px;
+  height: 300px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #111;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  transition: transform 0.4s ease;
+}
+
+.photoFrame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Symmetrical stacked layout */
+.photoFrame:nth-child(1) {
+  transform: rotate(-6deg) translateX(-60px);
+  z-index: 1;
+}
+.photoFrame:nth-child(2) {
+  transform: rotate(0deg);
+  z-index: 3;
+}
+.photoFrame:nth-child(3) {
+  transform: rotate(6deg) translateX(60px);
+  z-index: 2;
+}
+
+/* ====== Floating Emojis ====== */
+.reaction {
+  position: absolute;
+  font-size: 28px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.reaction.heart {
+  bottom: 15%;
+  left: -30px;
+  color: #ff2d75;
+}
+
+.reaction.star {
+  top: 12%;
+  right: -30px;
+  color: #00ff80;
+}
+
+.reaction.bubble {
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #000;
+  font-size: 16px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ====== Auth Container (Symmetrical with Photos) ====== */
+.authContainer {
+  flex: 1;
+  max-width: 360px;
+  padding: 30px 25px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #1f2937, #111827);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+  color: #f9fafb;
+}
+
+.authContainer:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+.brand {
+  font-family: "Brush Script MT", cursive;
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+/* ====== Auth Form ====== */
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.authForm input {
+  padding: 10px 14px;
+  font-size: 15px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  background: #111827;
+  color: #f9fafb;
+  transition: 0.3s;
+}
+
+.authForm input::placeholder {
+  color: #9ca3af;
+}
+
+.authForm input:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.authForm button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.authForm button:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+}
+
+/* ====== Divider & Links ====== */
+.divider {
+  margin: 15px 0;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.fbLogin {
+  background: transparent;
+  border: none;
+  color: #3b82f6;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.fbLogin:hover {
+  text-decoration: underline;
+}
+
+.forgot {
+  display: block;
+  margin: 12px 0;
+  font-size: 12px;
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.forgot:hover {
+  text-decoration: underline;
+}
+
+/* ====== Toggle Text ====== */
+.toggleText {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.toggleLink {
+  color: #3b82f6;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 5px;
+  transition: color 0.3s ease;
+}
+
+.toggleLink:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* ====== Error Styling ====== */
+.error {
+  color: #f87171;
+  font-weight: 500;
+  font-size: 13px;
+  margin-top: -8px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .photoSection {
+    width: 100%;
+    height: 320px;
+  }
+
+  .photoFrame {
+    width: 160px;
+    height: 240px;
+  }
+
+  .photoFrame:nth-child(1) {
+    transform: rotate(-5deg) translateX(-40px);
+  }
+  .photoFrame:nth-child(3) {
+    transform: rotate(5deg) translateX(40px);
+  }
+
+  .authContainer {
+    width: 100%;
+    max-width: 360px;
+  }
+}
+
+@media (max-width: 480px) {
+  .photoSection {
+    height: 260px;
+  }
+
+  .photoFrame {
+    width: 130px;
+    height: 200px;
+  }
+
+  .photoFrame:nth-child(1) {
+    transform: rotate(-4deg) translateX(-25px);
+  }
+  .photoFrame:nth-child(3) {
+    transform: rotate(4deg) translateX(25px);
+  }
+
+  .authContainer {
+    padding: 20px 15px;
+  }
+
+  .authForm {
+    gap: 12px;
+  }
+
+  .authForm input,
+  .authForm button {
+    font-size: 13px;
+    padding: 9px 10px;
+  }
+
+  .toggleText {
+    font-size: 12px;
+  }
+
+  .error {
+    font-size: 12px;
+  }
+}

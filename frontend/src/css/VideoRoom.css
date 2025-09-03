@@ -1,0 +1,255 @@
+/* === Global === */
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  color: #f5f5f5;
+  overflow-x: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* === Video Room Container === */
+.video-room {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  /* 👇 Local background */
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+
+  /* Prevent child elements from causing scroll */
+  overflow: hidden;
+}
+/* === Header === */
+.video-room-header {
+  text-align: center;
+  padding: 12px 0;
+  z-index: 5;
+}
+
+.video-room-header h2 {
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  font-weight: 600;
+  margin: 0;
+  color: #f8f9fa;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.5px;
+  animation: fadeInDown 0.6s ease;
+}
+
+.video-room-header span {
+  color: #4dd0e1;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Main Content (Video Grid) === */
+.video-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  place-items: center;
+  margin-bottom: 90px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+/* === Video Tile === */
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.video-wrapper:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+}
+
+.video-player {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #111;
+  border-radius: 14px;
+}
+
+.video-label {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* === Own Video (Floating Window) === */
+.own-video {
+  position: fixed;
+  bottom: 110px;
+  right: 20px;
+  width: 220px;
+  height: 160px;
+  z-index: 15;
+  border: 2px solid #4dd0e1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+  animation: floatIn 0.5s ease;
+}
+
+.own-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* === Controls Bar === */
+.video-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 22px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  border-radius: 40px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  z-index: 20;
+  animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Control Buttons */
+.control-btn {
+  width: 55px;
+  height: 55px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.12);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* End Call Button */
+.control-btn.end {
+  background: #e53935;
+  box-shadow: 0 0 12px rgba(229, 57, 53, 0.6);
+}
+
+.control-btn.end:hover {
+  background: #c62828;
+  box-shadow: 0 0 20px rgba(229, 57, 53, 0.9);
+}
+
+/* === Responsive Tweaks === */
+@media (max-width: 1024px) {
+  .video-grid {
+    gap: 12px;
+  }
+  .own-video {
+    width: 180px;
+    height: 130px;
+  }
+}
+
+@media (max-width: 768px) {
+  .video-grid {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    margin-bottom: 100px;
+  }
+
+  .own-video {
+    width: 130px;
+    height: 100px;
+    bottom: 95px;
+    right: 12px;
+  }
+
+  .video-controls {
+    gap: 14px;
+    padding: 12px 18px;
+  }
+
+  .control-btn {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-room-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .own-video {
+    width: 110px;
+    height: 80px;
+  }
+
+  .control-btn {
+    width: 46px;
+    height: 46px;
+  }
+}
