@@ -7,7 +7,7 @@ const profileSchema = new mongoose.Schema({
     required: true,
   },
   name: String,
-  avatar: { type: String, default: "/images/default-avatar.png" },
+  avatar: { type: String, default: "/uploads/default-avatar.png" },
   bio: String,
   age: Number,
   location: String,
