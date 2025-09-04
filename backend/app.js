@@ -48,19 +48,18 @@ app.use(express.json());
 // app.get("/", (req, res) => {
 //   res.send("Video call signaling server running 🚀");
 // });
-
+// ✅ Example API Route
 app.use("/api/profile", profileRoutes);
 app.use("/api/likes", likeRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/auth", require("./routes/auth"));
+
 app.use(express.static(path.join(_dirname, "/frontend/build")));
 app.get(/.*/, (_, res) => {
   res.sendFile(path.resolve(_dirname, "frontend", "build", "index.html"));
 });
-
-// ✅ Example API Route
-app.use("/api/auth", require("./routes/auth"));
 
 // ✅ MongoDB + Server Start
 const MONGO_URI = process.env.MONGO_URI;
