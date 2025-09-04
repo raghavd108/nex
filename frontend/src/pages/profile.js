@@ -20,7 +20,7 @@ export default function ProfilePage() {
 
   // ✅ helper for avatar URL
   const formatAvatarUrl = (avatar) => {
-    if (!avatar) return "/images/default-avatar.png";
+    if (!avatar) return `${API_URL}/uploads/default-avatar.png`;
     return avatar.startsWith("http") ? avatar : `${API_URL}${avatar}`;
   };
 
@@ -115,7 +115,7 @@ export default function ProfilePage() {
           {!isEditing ? (
             <>
               <img
-                src={previewAvatar || "/images/default-avatar.png"}
+                src={previewAvatar || `${API_URL}/uploads/default-avatar.png`}
                 alt="avatar"
                 className={styles.profileAvatar}
               />
