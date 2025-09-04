@@ -15,21 +15,23 @@ export default function ProfilePage() {
 
   const token = localStorage.getItem("token");
 
+  // 🔗 API base
+  const API_URL = "https://nex-pjq3.onrender.com";
+
+  // ✅ helper for avatar URL
+  const formatAvatarUrl = (avatar) => {
+    if (!avatar) return "/images/default-avatar.png";
+    return avatar.startsWith("http") ? avatar : `${API_URL}${avatar}`;
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(
-          "https://nex-pjq3.onrender.com/api/profile/me",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.get(`${API_URL}/api/profile/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        const avatarUrl = res.data.avatar?.startsWith("http")
-          ? res.data.avatar
-          : `https://nex-pjq3.onrender.com${res.data.avatar}`;
+        const avatarUrl = formatAvatarUrl(res.data.avatar);
 
         setUser({ ...res.data, avatar: avatarUrl });
         setEditData({ ...res.data, avatar: avatarUrl });
@@ -60,22 +62,15 @@ export default function ProfilePage() {
             : editData.interests,
       };
 
-      const res = await axios.put(
-        "https://nex-pjq3.onrender.com/api/profile/me",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axios.put(`${API_URL}/api/profile/me`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      const avatarUrl = res.data.avatar?.startsWith("http")
-        ? res.data.avatar
-        : `https://nex-pjq3.onrender.com${res.data.avatar}`;
+      const avatarUrl = formatAvatarUrl(res.data.avatar);
 
       setUser({ ...res.data, avatar: avatarUrl });
       setEditData({ ...res.data, avatar: avatarUrl });
+      setPreviewAvatar(avatarUrl);
       setIsEditing(false);
     } catch (err) {
       console.error("Error saving profile", err);
@@ -91,7 +86,7 @@ export default function ProfilePage() {
 
     try {
       const res = await axios.post(
-        "https://nex-pjq3.onrender.com/api/profile/me/photo",
+        `${API_URL}/api/profile/me/photo`,
         formData,
         {
           headers: {
@@ -101,7 +96,7 @@ export default function ProfilePage() {
         }
       );
 
-      const avatarUrl = `https://nex-pjq3.onrender.com${res.data.avatar}`;
+      const avatarUrl = formatAvatarUrl(res.data.avatar);
       setUser((prev) => ({ ...prev, avatar: avatarUrl }));
       setEditData((prev) => ({ ...prev, avatar: avatarUrl }));
       setPreviewAvatar(avatarUrl);

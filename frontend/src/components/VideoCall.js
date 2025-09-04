@@ -195,7 +195,7 @@ export default function VideoCall() {
         socket.emit("like", { fromUserId: userId, toUserId: matchedUserId });
 
         const response = await axios.post(
-          "http://localhost:5001/api/likes/like",
+          "https://nex-pjq3.onrender.com/api/likes/like",
           { fromUserId: userId, toUserId: matchedUserId }
         );
 

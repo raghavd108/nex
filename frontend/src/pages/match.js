@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 import "../css/MatchPage.css";
 import { FiArrowLeft } from "react-icons/fi";
 
-// 🔗 Connect socket
+// 🔗 Connect socket (LIVE URL)
 const socket = io("https://nex-pjq3.onrender.com", {
   transports: ["websocket"],
 });
