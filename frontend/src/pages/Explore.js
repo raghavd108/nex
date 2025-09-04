@@ -23,7 +23,7 @@ export default function Explore() {
   });
 
   const navigate = useNavigate();
-  const API_BASE = "http://localhost:5001/api/rooms";
+  const API_BASE = "https://nex-pjq3.onrender.com/api/rooms";
 
   // Get auth headers
   const getAuthHeaders = () => {
