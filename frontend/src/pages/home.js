@@ -3,7 +3,7 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 
-import "../css/Home.css"; // The CSS is imported here
+import "../css/Home.css";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -11,13 +11,6 @@ export default function Home() {
     <div className="home-page">
       {/* Hero Section */}
       <header className="hero-section">
-        {/* The video element is added here */}
-        <video autoPlay loop muted className="background-video">
-          <source
-            src="https://res.cloudinary.com/dwn4lzyyf/video/upload/v1756745847/nex-backgrounds/back_df9qt3.mp4"
-            type="video/mp4"
-          />
-        </video>
         <div className="hero-content">
           <img src="/assets/logo.png" alt="Nex Logo" className="hero-logo" />
           <h1 className="hero-title">Nex: Where Real Connections Begin ✨</h1>
@@ -57,9 +50,7 @@ export default function Home() {
 
       {/* Community Proof Section */}
       <section className="community-section">
-        <h2 className="section-title">
-          Backed by a Vibrant Global Community 🌍
-        </h2>
+        <h2 className="section-title">Global Community 🌍</h2>
         <p className="community-text">
           Thousands of meaningful connections every day across 50+ countries.
         </p>
@@ -68,7 +59,6 @@ export default function Home() {
           <img src="/assets/users/u2.jpg" alt="User 2" />
           <img src="/assets/users/u3.jpg" alt="User 3" />
           <img src="/assets/users/u4.jpg" alt="User 4" />
-          {/* More avatars... */}
         </div>
       </section>
 
@@ -103,6 +93,9 @@ export default function Home() {
       <section className="final-cta">
         <h2>Ready to meet your people?</h2>
         <p>Real. Intentional. Global. Nex is where it starts.</p>
+        <button className="cta-button" onClick={() => navigate("/signup")}>
+          Join Now
+        </button>
       </section>
 
       <Navbar />
