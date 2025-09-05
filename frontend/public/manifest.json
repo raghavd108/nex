@@ -3,12 +3,12 @@
   "name": "Nex - Smart Social Platform",
   "icons": [
     {
-      "src": "mylogo.png",
+      "src": "assets/logo.png",
       "sizes": "16x16 24x24 32x32 64x64",
       "type": "image/png"
     },
     {
-      "src": "mylogo.png",
+      "src": "assets/logo.png",
       "sizes": "192x192",
       "type": "image/png"
     },
