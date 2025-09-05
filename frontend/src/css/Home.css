@@ -25,6 +25,7 @@ body {
 .hero-logo {
   width: 80px;
   margin-bottom: 20px;
+  border-radius: 30px;
 }
 
 .hero-title {
@@ -42,7 +43,7 @@ body {
 }
 
 .cta-button {
-  background: linear-gradient(135deg, #7c4dff, #9d6bff);
+  background: linear-gradient(135deg, #6a42d8, #543c85);
   color: #fff;
   padding: 1rem 2.5rem;
   font-size: 1.1rem;

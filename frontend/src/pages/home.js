@@ -48,20 +48,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Community Proof Section */}
-      <section className="community-section">
-        <h2 className="section-title">Global Community 🌍</h2>
-        <p className="community-text">
-          Thousands of meaningful connections every day across 50+ countries.
-        </p>
-        <div className="avatars-marquee">
-          <img src="/assets/users/u1.jpg" alt="User 1" />
-          <img src="/assets/users/u2.jpg" alt="User 2" />
-          <img src="/assets/users/u3.jpg" alt="User 3" />
-          <img src="/assets/users/u4.jpg" alt="User 4" />
-        </div>
-      </section>
-
       {/* Features Section */}
       <section className="features-section">
         <h2 className="section-title">Why Nex is Different</h2>
@@ -89,15 +75,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer CTA */}
-      <section className="final-cta">
-        <h2>Ready to meet your people?</h2>
-        <p>Real. Intentional. Global. Nex is where it starts.</p>
-        <button className="cta-button" onClick={() => navigate("/signup")}>
-          Join Now
-        </button>
-      </section>
-
       <Navbar />
     </div>
   );
@@ -112,15 +89,6 @@ function JourneyCard({ image, title, text, buttonText }) {
         <p>{text}</p>
         <button>{buttonText}</button>
       </div>
-    </div>
-  );
-}
-
-function Testimonial({ name, text }) {
-  return (
-    <div className="testimonial-card">
-      <p className="testimonial-text">“{text}”</p>
-      <p className="testimonial-name">— {name}</p>
     </div>
   );
 }
