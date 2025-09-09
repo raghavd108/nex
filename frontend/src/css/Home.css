@@ -1,14 +1,14 @@
 :root {
-  --bg-dark: #0f0f10;
-  --bg-card: #2a2a2e;
-  --bg-header: #1a1a1d;
+  --bg-dark: #ffffff; /* light background */
+  --bg-card: #f3f4f6; /* light card background */
+  --bg-header: #f9fafb; /* header bar background */
 
-  --text-primary: #e5e7eb;
-  --text-secondary: #9ca3af;
+  --text-primary: #111827; /* dark text */
+  --text-secondary: #6b7280; /* muted text */
 
   --accent: #4ade80; /* green accent */
-  --accent-alt: #8b5cf6; /* purple accent */
-  --accent-light: #c084fc;
+  --accent-alt: #6366f1; /* indigo accent */
+  --accent-light: #818cf8; /* lighter indigo */
 }
 
 /* ---------- Page ---------- */
@@ -28,13 +28,13 @@
   align-items: center;
   padding: 12px 20px;
   background: var(--bg-header);
-  border-bottom: 1px solid var(--bg-card);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .home-page .top-bar .logo {
   font-size: 1.4rem;
   font-weight: bold;
-  color: var(--accent);
+  color: var(--accent-alt);
 }
 
 .home-page .top-bar .icon {
@@ -74,7 +74,7 @@
 
 .home-page .match-card:hover {
   transform: scale(1.05);
-  box-shadow: 0px 4px 15px rgba(139, 92, 246, 0.5);
+  box-shadow: 0px 4px 15px rgba(99, 102, 241, 0.4);
 }
 
 .home-page .match-icon {

@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../css/Home.css";
-import { FaSearch, FaBars, FaVideo } from "react-icons/fa"; // ✅ Font Awesome icons
+import { FaSearch, FaVideo } from "react-icons/fa"; // ✅ Font Awesome icons
 
 export default function Home() {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ export default function Home() {
         <div className="logo">Nex</div>
         <div className="top-icons">
           <FaSearch className="icon" />
-          <FaBars className="icon" />
         </div>
       </header>
 
