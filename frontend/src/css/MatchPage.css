@@ -2,11 +2,10 @@
 .match-page {
   font-family: "Poppins", sans-serif;
   background-color: #f9f9f9;
-  height: 100vh;
+  height: 100vh; /* full height */
   display: flex;
   color: #222;
-  overflow: hidden;
-  padding-bottom: 60px; /* reserve space for bottom navbar */
+  overflow: hidden; /* prevent double scroll */
 }
 
 /* --- Left Sidebar --- */
@@ -36,6 +35,7 @@
 .profile-list {
   flex: 1;
   overflow-y: auto;
+  min-height: 0; /* ensures it shrinks properly */
 }
 
 .profile-card {
@@ -95,13 +95,14 @@
   margin-left: 6px;
 }
 
-/* --- Right Panel --- */
+/* --- Right Panel (Chat) --- */
 .details-panel {
   flex: 1;
   background: #fff;
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-width: 0; /* prevents overflow */
 }
 
 /* Chat header */
@@ -145,7 +146,7 @@
   padding: 20px;
   background: #f4f4f8;
   overflow-y: auto;
-  min-height: 0;
+  min-height: 0; /* critical fix */
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -184,10 +185,6 @@
   border-top: 1px solid #ddd;
   background: #fff;
   flex-shrink: 0;
-  position: sticky;
-  bottom: 0; /* always at bottom */
-  z-index: 10;
-  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .message-input input {
@@ -241,38 +238,32 @@
 @media (max-width: 768px) {
   .match-page {
     flex-direction: column;
-    height: 100vh;
-    padding-bottom: 60px;
   }
 
   .profile-list-panel {
     width: 100%;
     flex: none;
+    height: auto;
   }
 
-  /* Chat as full page like WhatsApp */
+  /* Chat full screen like WhatsApp */
   .details-panel {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     background: #fff;
     z-index: 20;
-    display: none; /* hidden until chat is active */
+    display: none; /* hidden until active */
   }
 
   .details-panel.active {
     display: flex;
-    flex-direction: column;
   }
 
   .chat-area {
-    padding-bottom: 80px; /* safe space for input */
-  }
-
-  .message-input {
-    bottom: 0;
+    padding-bottom: 80px; /* safe space above input */
   }
 
   /* Show back button only on mobile */

@@ -182,7 +182,7 @@ export default function ProfilePage() {
                 handleSave();
               }}
             >
-              <div className={styles.formGroup}>
+              <div className={styles.editInput}>
                 <label>Name:</label>
                 <input
                   type="text"
@@ -191,7 +191,7 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={styles.editInput}>
                 <label>Bio:</label>
                 <textarea
                   rows="3"
@@ -200,7 +200,7 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={styles.editInput}>
                 <label>Age:</label>
                 <input
                   type="number"
@@ -209,7 +209,7 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={styles.editInput}>
                 <label>Location:</label>
                 <input
                   type="text"
@@ -220,7 +220,7 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={styles.editInput}>
                 <label>Interests (comma separated):</label>
                 <input
                   type="text"

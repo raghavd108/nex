@@ -1,158 +1,203 @@
+/* ========== Base Container ========== */
 .profileContainer {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
   min-height: 100vh;
-  background: #000;
+  background: linear-gradient(135deg, #fdfbfb, #f4f4f8);
 }
 
+/* ========== Profile Card ========== */
 .profileCard {
-  background: #1a1a1a; /* dark card background */
-  border: 1px solid #333; /* subtle border */
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  padding: 30px;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  padding: 32px;
   width: 100%;
-  max-width: 500px;
+  max-width: 520px;
   text-align: center;
-  transition: all 0.3s ease-in-out;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+.profileCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* ========== Avatar ========== */
 .profileAvatar {
-  width: 130px;
-  height: 130px;
+  width: 140px;
+  height: 140px;
   object-fit: cover;
   border-radius: 50%;
-  border: 4px solid #9b59b6; /* bright accent */
-  margin-bottom: 15px;
-  transition: transform 0.3s ease-in-out;
+  border: 4px solid #6a0dad;
+  margin-bottom: 18px;
+  transition: transform 0.3s ease;
 }
 
 .profileAvatar:hover {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 
+/* ========== Text Styles ========== */
 .profileCard h2 {
-  margin: 10px 0 5px;
-  font-size: 24px;
-  color: #fff; /* white text for dark card */
+  margin: 12px 0 6px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #111;
 }
 
 .profileBio {
   font-size: 15px;
-  color: #ccc; /* lighter grey text */
-  margin-bottom: 20px;
+  color: #555;
+  margin-bottom: 22px;
+  line-height: 1.5;
 }
 
+/* ========== Options ========== */
 .profileOptions {
   display: flex;
-  justify-content: space-around;
-  margin: 25px 0;
+  justify-content: space-between;
+  margin: 25px 0 28px;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 18px;
 }
 
 .optionBox {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #9b59b6; /* accent color */
+  color: #6a0dad;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .optionBox:hover {
-  transform: scale(1.1);
+  transform: scale(1.12);
+  color: #8225d1;
 }
 
 .optionIcon {
-  font-size: 22px;
-  margin-bottom: 5px;
+  font-size: 24px;
+  margin-bottom: 6px;
 }
 
+/* ========== Profile Info ========== */
 .profileInfo {
   margin-top: 20px;
   text-align: left;
-  color: #ddd; /* light grey info text */
+  color: #333;
   font-size: 15px;
+  line-height: 1.5;
 }
 
 .profileInfo p {
   margin: 8px 0;
 }
 
+/* ========== Edit Form ========== */
 .editForm {
   text-align: left;
 }
 
 .formGroup {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .formGroup label {
   display: block;
   font-weight: 600;
-  color: #fff; /* white labels */
+  color: #222;
   margin-bottom: 6px;
 }
 
-.formGroup input,
-.formGroup textarea {
+/* Unified input/textarea design */
+.editInput {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #555; /* dark input border */
+  padding: 12px 14px;
+  border: 1px solid #ccc;
   border-radius: 10px;
   outline: none;
   font-size: 15px;
-  background: #222; /* dark input background */
-  color: #fff; /* white text */
-  transition: border-color 0.2s;
+  background: #fafafa;
+  color: #222;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
-.formGroup input:focus,
-.formGroup textarea:focus {
-  border-color: #9b59b6; /* accent on focus */
+.editInput:focus {
+  border-color: #6a0dad;
+  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.15);
 }
 
-textarea {
+textarea.editInput {
   resize: vertical;
+  min-height: 90px;
 }
 
+/* ========== Save Button ========== */
 .saveBtn {
-  background-color: #9b59b6; /* accent button */
-  color: white;
+  background: #6a0dad;
+  color: #fff;
   border: none;
-  padding: 12px 20px;
+  padding: 13px 20px;
   font-size: 15px;
+  font-weight: 600;
   border-radius: 10px;
   cursor: pointer;
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 8px;
-  transition: background-color 0.3s;
+  width: 100%; /* 🔥 full width button */
+  transition: background-color 0.25s, transform 0.2s;
 }
 
 .saveBtn:hover {
-  background-color: #8e44ad;
+  background: #8225d1;
+  transform: translateY(-2px);
 }
 
-/* Responsive */
+/* ========== Responsive ========== */
+@media screen and (max-width: 900px) {
+  .profileCard {
+    max-width: 450px;
+    padding: 28px;
+  }
+  .profileAvatar {
+    width: 120px;
+    height: 120px;
+  }
+}
+
 @media screen and (max-width: 600px) {
   .profileCard {
-    padding: 20px;
+    padding: 22px;
+    border-radius: 15px;
   }
 
   .profileAvatar {
-    width: 110px;
-    height: 110px;
+    width: 100px;
+    height: 100px;
   }
 
-  .optionBox span {
-    font-size: 13px;
+  .profileCard h2 {
+    font-size: 22px;
   }
 
   .profileOptions {
-    justify-content: space-between;
+    gap: 12px;
+    justify-content: space-evenly;
+  }
+
+  .optionIcon {
+    font-size: 20px;
+  }
+
+  .saveBtn {
+    font-size: 14px;
+    padding: 11px 16px;
   }
 }

@@ -1,8 +1,8 @@
 body {
   margin: 0;
   font-family: "Inter", sans-serif;
-  background: white;
-  color: white;
+  background: #f8f9fb; /* light background */
+  color: #222; /* dark text */
   overflow-x: hidden;
 }
 
@@ -15,8 +15,8 @@ body {
   margin: 2vh auto;
   border-radius: 24px;
   overflow: hidden;
-  background: linear-gradient(135deg, #1b1b2f, #0f0c29);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  background: linear-gradient(135deg, #ffffff, #f0f0f5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,7 +31,7 @@ body {
   top: 0;
   left: 0;
   z-index: 1;
-  filter: brightness(1.1);
+  filter: brightness(1.02);
 }
 
 /* ---------- Local Video ---------- */
@@ -44,15 +44,15 @@ body {
   object-fit: cover;
   z-index: 2;
   border-radius: 20px;
-  backdrop-filter: blur(12px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease;
 }
 
 .video-reel.local:hover {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
 /* ---------- Matched Name ---------- */
@@ -61,15 +61,17 @@ body {
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.7);
   padding: 10px 20px;
   font-size: 1.1rem;
-  border-radius: 18px;
+  border-radius: 16px;
   font-weight: 600;
   letter-spacing: 0.5px;
   z-index: 10;
   backdrop-filter: blur(10px);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  color: #222;
+  text-shadow: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* ---------- Searching Overlay ---------- */
@@ -78,7 +80,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.7);
   padding: 20px 30px;
   border-radius: 14px;
   text-align: center;
@@ -86,11 +88,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
   font-size: 0.95rem;
   font-weight: 500;
+  color: #333;
   width: 160px;
   animation: pulseFade 1.8s ease-in-out infinite;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes pulseFade {
@@ -100,7 +104,7 @@ body {
   }
   50% {
     transform: translate(-50%, -50%) scale(1.05);
-    opacity: 0.9;
+    opacity: 0.95;
   }
   100% {
     transform: translate(-50%, -50%) scale(1);
@@ -135,18 +139,17 @@ body {
   border-radius: 14px;
   border: none;
   cursor: pointer;
-  background: linear-gradient(to right, #7e4fff, #5b2dcf);
+  background: linear-gradient(to right, #7b5cff, #9f7bff);
   color: white;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 16px rgba(123, 92, 255, 0.3);
   transition: transform 0.2s ease, opacity 0.2s ease;
   min-width: 140px;
   text-align: center;
-  overflow: hidden; /* ensure round version hides overflow */
 }
 
 .join-btn:hover {
   transform: translateY(-2px);
-  opacity: 0.92;
+  opacity: 0.9;
 }
 
 .join-btn .icon {
@@ -160,16 +163,19 @@ body {
 
 /* ---------- Variant Buttons ---------- */
 .join-btn.danger {
-  background: linear-gradient(135deg, #ff4d4f, #d9363e);
+  background: linear-gradient(135deg, #ff5a5f, #ff7b82);
+  box-shadow: 0 6px 16px rgba(255, 90, 95, 0.3);
 }
 
 .join-btn.skip {
-  background: linear-gradient(135deg, #f39c12, #e67e22);
-  color: black;
+  background: linear-gradient(135deg, #f7c948, #f0a500);
+  color: #222;
+  box-shadow: 0 6px 16px rgba(247, 201, 72, 0.3);
 }
 
 .join-btn.like {
-  background: linear-gradient(135deg, #ff69b4, #e91e63);
+  background: linear-gradient(135deg, #ff85b3, #ff477e);
+  box-shadow: 0 6px 16px rgba(255, 133, 179, 0.3);
 }
 
 /* ---------- Responsive Design ---------- */
@@ -192,25 +198,22 @@ body {
     bottom: 16px;
     gap: 14px;
     width: 100%;
-    left: 50%;
-    transform: translateX(-50%);
     justify-content: center;
   }
 
-  /* 🎨 Round button style for mobile */
+  /* 🎨 Round buttons on mobile */
   .join-btn {
     width: 56px;
     height: 56px;
     border-radius: 50%;
     min-width: unset;
-    max-width: unset;
     padding: 0;
-    font-size: 0; /* hide text spacing */
+    font-size: 0;
     gap: 0;
   }
 
   .join-btn .btn-text {
-    display: none; /* hide labels, only icons */
+    display: none;
   }
 
   .join-btn .icon {
@@ -222,7 +225,6 @@ body {
     font-size: 0.9rem;
     padding: 6px 14px;
     max-width: 85%;
-    text-align: center;
   }
 
   .searching-overlay {
