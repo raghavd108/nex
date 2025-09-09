@@ -1,13 +1,13 @@
-/* === Explore Page (Dark Theme) === */
+/* === Explore Page (Light Theme) === */
 .explore-page {
   font-family: "Poppins", sans-serif;
-  background: #000;
+  background: #fafafa;
   min-height: 100vh;
   padding: 16px;
   display: flex;
   flex-direction: column;
   padding-bottom: 60px; /* for safe area */
-  color: #f5f5f5;
+  color: #222;
 }
 
 /* Header */
@@ -17,14 +17,16 @@
   gap: 12px;
   align-items: flex-start;
   padding: 16px;
-  background: #111;
-  border-bottom: 1px solid #222;
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .explore-title {
   font-size: 22px;
   font-weight: 700;
-  color: #f5f5f5;
+  color: #222;
   margin: 0;
 }
 
@@ -38,7 +40,7 @@
   color: #fff;
   border: none;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -62,7 +64,7 @@
 .explore-section h2 {
   font-size: 20px;
   margin-bottom: 16px;
-  color: #e5e5e5;
+  color: #333;
   font-weight: 600;
   text-align: left;
 }
@@ -71,19 +73,19 @@
 .room-search-input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #333;
-  border-radius: 8px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
   font-size: 14px;
   margin-bottom: 20px;
-  background: #1a1a1a;
-  color: #f5f5f5;
+  background: #fff;
+  color: #333;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .room-search-input:focus {
   border-color: #6a0dad;
   outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(106, 13, 173, 0.35);
+  box-shadow: 0 0 0 0.2rem rgba(106, 13, 173, 0.25);
 }
 
 /* Room Cards */
@@ -94,10 +96,11 @@
 }
 
 .room-card {
-  background: #111;
-  border-radius: 12px;
+  background: #fff;
+  border-radius: 14px;
   padding: 16px;
-  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.4);
+  border: 1px solid #eee;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
@@ -106,7 +109,7 @@
 
 .room-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .room-card-header {
@@ -121,20 +124,20 @@
   height: 44px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #333;
+  border: 2px solid #ddd;
 }
 
 .room-name {
   font-size: 16px;
   font-weight: 600;
   margin: 0;
-  color: #fff;
+  color: #111;
 }
 
 .room-theme,
 .room-host {
   font-size: 13px;
-  color: #bbb;
+  color: #666;
   margin: 2px 0;
 }
 
@@ -144,7 +147,7 @@
   color: #fff;
   border: none;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -158,8 +161,8 @@
 }
 
 .join-btnn:disabled {
-  background-color: #444;
-  color: #999;
+  background-color: #ccc;
+  color: #777;
   cursor: not-allowed;
 }
 
@@ -170,7 +173,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(34, 34, 34, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -178,23 +181,23 @@
 }
 
 .modal {
-  background: #111;
+  background: #fff;
   padding: 24px;
-  border-radius: 12px;
+  border-radius: 14px;
   width: 90%;
   max-width: 420px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
   animation: fadeIn 0.3s ease;
   display: flex;
   flex-direction: column;
-  color: #f5f5f5;
+  color: #333;
 }
 
 .modal h2 {
   margin: 0 0 16px;
   font-size: 18px;
   font-weight: 600;
-  color: #fff;
+  color: #111;
   text-align: center;
 }
 
@@ -202,11 +205,11 @@
 .modal select {
   padding: 10px;
   margin-bottom: 16px;
-  border: 1px solid #333;
-  border-radius: 8px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
   font-size: 14px;
-  background: #1a1a1a;
-  color: #f5f5f5;
+  background: #fafafa;
+  color: #333;
   line-height: 1.4;
   transition: border-color 0.3s, box-shadow 0.3s;
   appearance: none;
@@ -216,11 +219,11 @@
 .modal select:focus {
   border-color: #6a0dad;
   outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(106, 13, 173, 0.35);
+  box-shadow: 0 0 0 0.2rem rgba(106, 13, 173, 0.25);
 }
 
 .modal select {
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%23bbb' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23666' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
   background-repeat: no-repeat;
   background-position: right 14px center;
   background-size: 16px;
@@ -239,7 +242,7 @@
 .modal-actions button {
   padding: 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -263,17 +266,15 @@
 
 /* Secondary Button */
 .cancel-btn {
-  background-color: #333;
-  color: #f5f5f5;
+  background-color: #eee;
+  color: #333;
 }
 
 .cancel-btn:hover {
-  background-color: #444;
+  background-color: #ddd;
 }
 
 /* === Responsive Tweaks Remain Same === */
-
-/* Fade In Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -297,7 +298,7 @@
   .create-btn {
     width: auto;
     min-width: 120px;
-    border-radius: 10px;
+    border-radius: 12px;
   }
 
   .room-list {

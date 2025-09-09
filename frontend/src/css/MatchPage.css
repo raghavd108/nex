@@ -1,10 +1,10 @@
 /* --- Global Page Styles --- */
 .match-page {
   font-family: "Poppins", sans-serif;
-  background-color: #000;
+  background-color: #f9f9f9;
   height: 100vh;
   display: flex;
-  color: #e5e7eb;
+  color: #222;
   overflow: hidden;
   padding-bottom: 60px; /* reserve space for bottom navbar */
 }
@@ -12,8 +12,8 @@
 /* --- Left Sidebar --- */
 .profile-list-panel {
   width: 320px;
-  background: #121212;
-  border-right: 1px solid #2c2c3a;
+  background: #fff;
+  border-right: 1px solid #e5e5e5;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -24,13 +24,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid #2c2c3a;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .liked-header h2 {
   font-size: 18px;
   font-weight: 700;
-  color: #f3f4f6;
+  color: #111;
 }
 
 .profile-list {
@@ -43,13 +43,13 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border-bottom: 1px solid #2c2c3a;
+  border-bottom: 1px solid #eee;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .profile-card:hover {
-  background: #1f1f2b;
+  background: #f3f3f3;
 }
 
 .avatar {
@@ -72,13 +72,13 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #f3f4f6;
+  color: #111;
 }
 
 .profile-info p {
   font-size: 12px;
   margin: 2px 0 0;
-  color: #9ca3af;
+  color: #666;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -98,7 +98,7 @@
 /* --- Right Panel --- */
 .details-panel {
   flex: 1;
-  background: #121212;
+  background: #fff;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -110,8 +110,8 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  border-bottom: 1px solid #2c2c3a;
-  background: #1f1f2b;
+  border-bottom: 1px solid #e5e5e5;
+  background: #fafafa;
   flex-shrink: 0;
 }
 
@@ -119,7 +119,7 @@
   display: none; /* visible only on mobile */
   background: none;
   border: none;
-  color: #fff;
+  color: #333;
   font-size: 20px;
   cursor: pointer;
 }
@@ -136,17 +136,20 @@
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #f3f4f6;
+  color: #111;
 }
 
 /* Chat area */
 .chat-area {
   flex: 1;
   padding: 20px;
-  background: #1a1a1a;
+  background: #f4f4f8;
   overflow-y: auto;
   min-height: 0;
-  padding-bottom: 70px; /* reserve space for input */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
 }
 
 /* Chat bubbles */
@@ -154,9 +157,9 @@
   max-width: 65%;
   padding: 10px 14px;
   border-radius: 16px;
-  margin-bottom: 12px;
   font-size: 14px;
   line-height: 1.4;
+  word-wrap: break-word;
 }
 
 .chat-bubble.user {
@@ -167,8 +170,8 @@
 }
 
 .chat-bubble.other {
-  background: #2c2c3a;
-  color: #f3f4f6;
+  background: #e5e5e5;
+  color: #111;
   margin-right: auto;
   border-bottom-left-radius: 4px;
 }
@@ -178,23 +181,29 @@
   display: flex;
   gap: 10px;
   padding: 12px 16px;
-  border-top: 1px solid #2c2c3a;
-  background: #1f1f2b;
+  border-top: 1px solid #ddd;
+  background: #fff;
   flex-shrink: 0;
   position: sticky;
-  bottom: 60px; /* sits above bottom navbar */
-  z-index: 5;
+  bottom: 0; /* always at bottom */
+  z-index: 10;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .message-input input {
   flex: 1;
   padding: 10px;
-  border: 1px solid #333;
+  border: 1px solid #ddd;
   border-radius: 20px;
   outline: none;
   font-size: 14px;
-  background: #121212;
-  color: #f3f4f6;
+  background: #fafafa;
+  color: #222;
+}
+
+.message-input input:focus {
+  border-color: #6a0dad;
+  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
 }
 
 .message-input button {
@@ -208,7 +217,7 @@
 }
 
 .message-input button:hover {
-  background: #9333ea;
+  background: #8225d1;
 }
 
 /* Empty state */
@@ -217,14 +226,14 @@
   justify-content: center;
   align-items: center;
   flex: 1;
-  color: #9ca3af;
+  color: #888;
   font-size: 15px;
 }
 
 /* Typing indicator */
 .typing-indicator {
   font-style: italic;
-  color: gray;
+  color: #666;
   opacity: 0.8;
 }
 
@@ -248,7 +257,7 @@
     left: 0;
     width: 100%;
     height: 100vh;
-    background: #121212;
+    background: #fff;
     z-index: 20;
     display: none; /* hidden until chat is active */
   }
@@ -259,11 +268,11 @@
   }
 
   .chat-area {
-    padding-bottom: 70px;
+    padding-bottom: 80px; /* safe space for input */
   }
 
   .message-input {
-    bottom: 60px;
+    bottom: 0;
   }
 
   /* Show back button only on mobile */
