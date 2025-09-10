@@ -32,15 +32,24 @@ export default function Home() {
         <h2 className="section-title">Themed Rooms</h2>
         <div className="room-grid">
           <div className="room-card">
-            <img src="/assets/users/u1.jpg" alt="Debate" />
+            <img
+              src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474349/nex-backgrounds/istockphoto-967283668-612x612_g8rgz1.jpg"
+              alt="Debate"
+            />
             <p>Debate Room</p>
           </div>
           <div className="room-card">
-            <img src="/assets/users/u2.jpg" alt="Comedy" />
+            <img
+              src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
+              alt="Comedy"
+            />
             <p>Comedy Club</p>
           </div>
           <div className="room-card">
-            <img src="/assets/users/u3.jpg" alt="Book" />
+            <img
+              src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474337/nex-backgrounds/0d1ef5572e0ecc7dad7cf62e5778ea8b_jza6lz.jpg"
+              alt="Book"
+            />
             <p>Book Club</p>
           </div>
         </div>
