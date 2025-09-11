@@ -1,5 +1,6 @@
 const Profile = require("../models/Profile");
 const cloudinary = require("../config/cloudinary"); // ✅ import cloudinary config
+const { v2: cloudinary } = require("cloudinary");
 
 exports.getProfile = async (req, res) => {
   try {
@@ -34,12 +35,17 @@ exports.uploadPhoto = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // ✅ Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "nex_avatars", // keeps images organized in Cloudinary
+    // Convert buffer to a data URI
+    const dataUri = `data:${
+      req.file.mimetype
+    };base64,${req.file.buffer.toString("base64")}`;
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder: "nex_avatars",
     });
 
-    // ✅ Save secure URL in DB
+    // Save URL to DB
     const updated = await Profile.findOneAndUpdate(
       { userId: req.userId },
       { avatar: result.secure_url },
@@ -48,6 +54,7 @@ exports.uploadPhoto = async (req, res) => {
 
     res.json(updated);
   } catch (err) {
+    console.error("Cloudinary upload error:", err);
     res.status(500).json({ message: err.message });
   }
 };
