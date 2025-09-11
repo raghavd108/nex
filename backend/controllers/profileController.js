@@ -1,5 +1,5 @@
 const Profile = require("../models/Profile");
-const path = require("path");
+const cloudinary = require("../config/cloudinary"); // ✅ import cloudinary config
 
 exports.getProfile = async (req, res) => {
   try {
@@ -30,12 +30,22 @@ exports.updateProfile = async (req, res) => {
 
 exports.uploadPhoto = async (req, res) => {
   try {
-    const avatarPath = `/uploads/${req.file.filename}`;
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // ✅ Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "nex_avatars", // keeps images organized in Cloudinary
+    });
+
+    // ✅ Save secure URL in DB
     const updated = await Profile.findOneAndUpdate(
       { userId: req.userId },
-      { avatar: avatarPath },
+      { avatar: result.secure_url },
       { new: true }
     );
+
     res.json(updated);
   } catch (err) {
     res.status(500).json({ message: err.message });

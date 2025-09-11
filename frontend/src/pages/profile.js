@@ -17,11 +17,13 @@ export default function ProfilePage() {
 
   // 🔗 API base
   const API_URL = "https://nex-pjq3.onrender.com";
+  const DEFAULT_AVATAR =
+    "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp";
 
   // ✅ helper for avatar URL
   const formatAvatarUrl = (avatar) => {
-    if (!avatar) return `${API_URL}/uploads/default-avatar.png`;
-    return avatar.startsWith("http") ? avatar : `${API_URL}${avatar}`;
+    if (!avatar) return DEFAULT_AVATAR;
+    return avatar.startsWith("http") ? avatar : avatar;
   };
 
   useEffect(() => {
@@ -115,10 +117,7 @@ export default function ProfilePage() {
           {!isEditing ? (
             <>
               <img
-                src={
-                  previewAvatar ||
-                  formatAvatarUrl("/uploads/default-avatar.png")
-                }
+                src={previewAvatar || formatAvatarUrl(user.avatar)}
                 alt="avatar"
                 className={styles.profileAvatar}
               />

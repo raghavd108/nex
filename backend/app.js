@@ -17,7 +17,10 @@ require("dotenv").config(); // Load .env variables
 
 const app = express();
 const server = http.createServer(app);
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// ensure tmp folder exists
+const fs = require("fs");
+const tmpDir = path.join(__dirname, "tmp");
+if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
 
 // ✅ Setup Socket.IO server (changed)
 const io = new Server(server, {
