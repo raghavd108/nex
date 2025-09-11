@@ -115,7 +115,10 @@ export default function ProfilePage() {
           {!isEditing ? (
             <>
               <img
-                src={previewAvatar || `${API_URL}/uploads/default-avatar.png`}
+                src={
+                  previewAvatar ||
+                  formatAvatarUrl("/uploads/default-avatar.png")
+                }
                 alt="avatar"
                 className={styles.profileAvatar}
               />
