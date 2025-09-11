@@ -1,6 +1,5 @@
 const Profile = require("../models/Profile");
 const cloudinary = require("../config/cloudinary"); // ✅ import cloudinary config
-const { v2: cloudinary } = require("cloudinary");
 
 exports.getProfile = async (req, res) => {
   try {
