@@ -200,16 +200,16 @@ export default function LikedProfilesPage() {
                 <button className="back-btn" onClick={closeChat}>
                   <FiArrowLeft size={22} /> {/* Proper back icon */}
                 </button>
-
                 <img
                   src={
                     profile.avatar?.startsWith("http")
                       ? profile.avatar
-                      : `https://nex-pjq3.onrender.com${profile.avatar}`
+                      : `https://nex-pjq3.onrender.com${selectedProfile.avatar}`
                   }
                   alt="Profile"
-                  className="details-avatar"
+                  className="avatar"
                 />
+
                 <h3>{selectedProfile.name}</h3>
               </div>
 
