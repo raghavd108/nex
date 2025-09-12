@@ -353,3 +353,26 @@
     min-width: 120px;
   }
 }
+/* Floating Create Button for Mobile */
+@media (max-width: 600px) {
+  .create-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px; /* bigger icon/text */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1500;
+  }
+
+  .create-btn span {
+    display: none; /* hide text on mobile, keep only icon */
+  }
+}

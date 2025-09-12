@@ -112,7 +112,7 @@ export default function Explore() {
             className="create-btn"
             onClick={() => setShowCreateModal(true)}
           >
-            <FaPlus /> Create Room
+            <FaPlus /> <span>Create Room</span>
           </button>
         </div>
       </div>
