@@ -167,7 +167,11 @@ export default function LikedProfilesPage() {
                   onClick={() => openChat(profile)}
                 >
                   <img
-                    src={`https://nex-pjq3.onrender.com${profile.avatar}`}
+                    src={
+                      profile.avatar?.startsWith("http")
+                        ? profile.avatar
+                        : `https://nex-pjq3.onrender.com${profile.avatar}`
+                    }
                     alt="Profile"
                     className="avatar"
                   />
