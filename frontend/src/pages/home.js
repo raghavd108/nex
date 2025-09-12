@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../css/Home.css";
-import { FaSearch, FaVideo, FaBell, FaUserCircle } from "react-icons/fa";
+import { FaSearch, FaVideo, FaBell } from "react-icons/fa";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ export default function Home() {
         <div className="top-icons">
           <FaSearch className="icon" />
           <FaBell className="icon" />
-          <FaUserCircle className="icon" />
         </div>
       </header>
 
