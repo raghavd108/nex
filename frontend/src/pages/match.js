@@ -202,7 +202,11 @@ export default function LikedProfilesPage() {
                 </button>
 
                 <img
-                  src={`https://nex-pjq3.onrender.com${selectedProfile.avatar}`}
+                  src={
+                    profile.avatar?.startsWith("http")
+                      ? profile.avatar
+                      : `https://nex-pjq3.onrender.com${profile.avatar}`
+                  }
                   alt="Profile"
                   className="details-avatar"
                 />
