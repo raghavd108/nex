@@ -1,4 +1,3 @@
-// src/pages/Home.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -20,9 +19,9 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Stories / Themed Rooms */}
+      {/* Themed Rooms / Stories */}
       <section className="stories-section">
-        <h2 className="section-title">Themed Rooms</h2>
+        <h2 className="section-title">Discover Rooms</h2>
         <div className="stories-row">
           <div className="story-card">
             <img
@@ -41,18 +40,17 @@ export default function Home() {
           <div className="story-card">
             <img
               src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474337/nex-backgrounds/0d1ef5572e0ecc7dad7cf62e5778ea8b_jza6lz.jpg"
-              alt="Book"
+              alt="Books"
             />
             <p>Books</p>
           </div>
-        </div>
-      </section>
-
-      {/* Quick Match Highlight */}
-      <section className="highlight-section">
-        <div className="highlight-card" onClick={() => navigate("/video")}>
-          <FaVideo className="highlight-icon" />
-          <span className="highlight-text">Start 1 on 1 Match</span>
+          <div className="story-card">
+            <img
+              src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
+              alt="Travel"
+            />
+            <p>Travel</p>
+          </div>
         </div>
       </section>
 
@@ -69,7 +67,7 @@ export default function Home() {
             />
             <div>
               <h4>Alex</h4>
-              <span>in Comedy Club</span>
+              <span className="feed-room">in Comedy Club</span>
             </div>
           </div>
           <p className="feed-text">
@@ -87,7 +85,7 @@ export default function Home() {
             />
             <div>
               <h4>Sophia</h4>
-              <span>in Debate Room</span>
+              <span className="feed-room">in Debate Room</span>
             </div>
           </div>
           <p className="feed-text">
@@ -96,6 +94,12 @@ export default function Home() {
           <span className="feed-comments">102 comments</span>
         </div>
       </section>
+
+      {/* Floating Match Button */}
+      <button className="match-btn" onClick={() => navigate("/video")}>
+        <FaVideo className="match-icon" />
+        <span>Start Match</span>
+      </button>
 
       {/* Bottom Navbar */}
       <Navbar />
