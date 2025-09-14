@@ -17,6 +17,16 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
+    if (req.body.username) {
+      const existing = await Profile.findOne({
+        username: req.body.username,
+        userId: { $ne: req.userId }, // not the same user
+      });
+      if (existing) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
+    }
+
     const updated = await Profile.findOneAndUpdate(
       { userId: req.userId },
       req.body,

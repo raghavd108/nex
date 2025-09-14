@@ -12,15 +12,14 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [editData, setEditData] = useState(null);
   const [previewAvatar, setPreviewAvatar] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const token = localStorage.getItem("token");
 
-  // 🔗 API base
   const API_URL = "https://nex-pjq3.onrender.com";
   const DEFAULT_AVATAR =
     "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp";
 
-  // ✅ helper for avatar URL
   const formatAvatarUrl = (avatar) => {
     if (!avatar) return DEFAULT_AVATAR;
     return avatar.startsWith("http") ? avatar : avatar;
@@ -56,6 +55,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     try {
+      setErrorMsg("");
       const payload = {
         ...editData,
         interests:
@@ -76,6 +76,9 @@ export default function ProfilePage() {
       setIsEditing(false);
     } catch (err) {
       console.error("Error saving profile", err);
+      if (err.response?.data?.message) {
+        setErrorMsg(err.response.data.message);
+      }
     }
   };
 
@@ -122,6 +125,7 @@ export default function ProfilePage() {
                 className={styles.profileAvatar}
               />
               <h2>{user.name}</h2>
+              <p className={styles.username}>@{user.username}</p>
               <p className={styles.profileBio}>{user.bio}</p>
 
               <div className={styles.profileOptions}>
@@ -184,12 +188,26 @@ export default function ProfilePage() {
                 handleSave();
               }}
             >
+              {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
+
               <div className={styles.editInput}>
                 <label>Name:</label>
                 <input
                   type="text"
                   value={editData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
+                />
+              </div>
+
+              <div className={styles.editInput}>
+                <label>Username:</label>
+                <input
+                  type="text"
+                  value={editData.username || ""}
+                  onChange={(e) =>
+                    handleInputChange("username", e.target.value)
+                  }
+                  placeholder="Choose a unique username"
                 />
               </div>
 
