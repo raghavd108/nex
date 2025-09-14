@@ -3,9 +3,45 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../css/Home.css";
 import { FaSearch, FaVideo, FaBell } from "react-icons/fa";
+import axios from "axios";
 
 export default function Home() {
   const navigate = useNavigate();
+
+  // Search state
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+
+  const token = localStorage.getItem("token");
+  const API_URL = "https://nex-pjq3.onrender.com";
+
+  const handleSearch = async (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.trim() === "") {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const res = await axios.get(`${API_URL}/api/profile/search`, {
+        params: { username: query },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSearchResults(res.data);
+    } catch (err) {
+      console.error("Search failed", err);
+    }
+  };
+
+  const handleSelectUser = (userId) => {
+    setIsSearchOpen(false);
+    setSearchQuery("");
+    setSearchResults([]);
+    navigate(`/profile/${userId}`);
+  };
 
   // Feed data
   const feedData = [
@@ -58,10 +94,46 @@ export default function Home() {
       <header className="top-bar">
         <div className="logo">Nex</div>
         <div className="top-icons">
-          <FaSearch className="icon" />
+          <FaSearch
+            className="icon"
+            onClick={() => setIsSearchOpen(!isSearchOpen)}
+          />
           <FaBell className="icon" />
         </div>
       </header>
+
+      {/* Search Box */}
+      {isSearchOpen && (
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search by username..."
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+          {searchResults.length > 0 && (
+            <ul className="search-results">
+              {searchResults.map((user) => (
+                <li
+                  key={user._id}
+                  className="search-item"
+                  onClick={() => handleSelectUser(user._id)}
+                >
+                  <img
+                    src={
+                      user.avatar ||
+                      "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
+                    }
+                    alt={user.username}
+                    className="search-avatar"
+                  />
+                  <span>@{user.username}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* Themed Rooms / Stories */}
       <section className="stories-section">

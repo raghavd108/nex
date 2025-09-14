@@ -11,6 +11,8 @@ const upload = multer({ storage });
 // 🔒 Protected Routes
 router.get("/me", auth, profileController.getProfile);
 router.put("/me", auth, profileController.updateProfile);
+// 🔍 Search users by username
+router.get("/search", auth, profileController.searchProfiles);
 
 // ✅ Upload photo (buffer passed to controller → Cloudinary)
 router.post(

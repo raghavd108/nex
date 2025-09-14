@@ -67,3 +67,20 @@ exports.uploadPhoto = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+// Search profiles by username (case-insensitive, partial match)
+exports.searchProfiles = async (req, res) => {
+  try {
+    const query = req.query.q;
+    if (!query) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    const results = await Profile.find({
+      username: { $regex: query, $options: "i" }, // case-insensitive match
+    }).select("username name avatar _id"); // return only useful fields
+
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
