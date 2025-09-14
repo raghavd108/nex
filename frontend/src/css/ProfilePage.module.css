@@ -201,3 +201,19 @@ textarea.editInput {
     padding: 11px 16px;
   }
 }
+.username {
+  font-size: 16px;
+  font-weight: 500;
+  color: #6a0dad; /* purple shade to match your Nex theme */
+  margin-top: -8px;
+  margin-bottom: 12px;
+  text-align: center;
+  letter-spacing: 0.3px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  transition: color 0.3s ease;
+}
+
+.username:hover {
+  color: #9b59b6; /* lighter purple on hover */
+  cursor: pointer;
+}
