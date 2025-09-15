@@ -17,21 +17,40 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    if (req.body.username) {
-      const existing = await Profile.findOne({
-        username: req.body.username,
-        userId: { $ne: req.userId }, // not the same user
-      });
+    const profile = await Profile.findOne({ userId: req.userId });
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    if (
+      profile.username &&
+      req.body.username &&
+      req.body.username !== profile.username
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Username cannot be changed once set" });
+    }
+
+    if (!profile.username && req.body.username) {
+      const existing = await Profile.findOne({ username: req.body.username });
       if (existing) {
         return res.status(400).json({ message: "Username already taken" });
       }
     }
 
+    const updateData = { ...req.body };
+    if (profile.username) {
+      delete updateData.username; // prevent overwrite
+    }
+
     const updated = await Profile.findOneAndUpdate(
       { userId: req.userId },
-      req.body,
-      { new: true, upsert: true }
+      updateData,
+      { new: true }
     );
+
     res.json(updated);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -82,5 +101,21 @@ exports.searchProfiles = async (req, res) => {
     res.json(results);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+// ✅ Get profile by username
+exports.getProfileByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const profile = await Profile.findOne({ username });
+
+    if (!profile) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(profile);
+  } catch (error) {
+    console.error("Error fetching profile by username:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaCamera, FaUserEdit, FaUsers, FaCog, FaSave } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import axios from "axios";
@@ -7,12 +7,14 @@ import styles from "../css/ProfilePage.module.css";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
+  const { username } = useParams();
 
   const [isEditing, setIsEditing] = useState(false);
   const [user, setUser] = useState(null);
   const [editData, setEditData] = useState(null);
   const [previewAvatar, setPreviewAvatar] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isOwnProfile, setIsOwnProfile] = useState(false); // ✅ NEW
 
   const token = localStorage.getItem("token");
 
@@ -28,15 +30,36 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/profile/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        let res;
+
+        if (username) {
+          // ✅ Fetch another user's profile by username
+          res = await axios.get(`${API_URL}/api/profile/${username}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        } else {
+          // ✅ Fetch your own profile
+          res = await axios.get(`${API_URL}/api/profile/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        }
 
         const avatarUrl = formatAvatarUrl(res.data.avatar);
 
         setUser({ ...res.data, avatar: avatarUrl });
         setEditData({ ...res.data, avatar: avatarUrl });
         setPreviewAvatar(avatarUrl);
+
+        // ✅ Check if logged-in user is viewing their own profile
+        const meRes = await axios.get(`${API_URL}/api/profile/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!username || meRes.data.username === username) {
+          setIsOwnProfile(true);
+        } else {
+          setIsOwnProfile(false);
+        }
       } catch (err) {
         console.error("Failed to load profile", err);
       }
@@ -47,7 +70,7 @@ export default function ProfilePage() {
     } else {
       navigate("/login");
     }
-  }, [token, navigate]);
+  }, [username, token, navigate]);
 
   const handleInputChange = (field, value) => {
     setEditData({ ...editData, [field]: value });
@@ -128,43 +151,49 @@ export default function ProfilePage() {
               <p className={styles.username}>@{user.username}</p>
               <p className={styles.profileBio}>{user.bio}</p>
 
+              {/* ✅ Only show options if it's your own profile */}
+              {isOwnProfile && (
+                <div className={styles.profileOptions}>
+                  <div className={styles.optionBox}>
+                    <label htmlFor="photo-upload" style={{ cursor: "pointer" }}>
+                      <FaCamera className={styles.optionIcon} />
+                      <input
+                        id="photo-upload"
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={handlePhotoUpload}
+                      />
+                    </label>
+                    <span>Photo</span>
+                  </div>
+
+                  <div
+                    className={styles.optionBox}
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <FaUserEdit className={styles.optionIcon} />
+                    <span>Edit</span>
+                  </div>
+
+                  <div
+                    className={styles.optionBox}
+                    onClick={() => navigate("/settings")}
+                  >
+                    <FaCog className={styles.optionIcon} />
+                    <span>Settings</span>
+                  </div>
+                </div>
+              )}
+
+              {/* ✅ Networks visible for all */}
               <div className={styles.profileOptions}>
-                <div className={styles.optionBox}>
-                  <label htmlFor="photo-upload" style={{ cursor: "pointer" }}>
-                    <FaCamera className={styles.optionIcon} />
-                    <input
-                      id="photo-upload"
-                      type="file"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handlePhotoUpload}
-                    />
-                  </label>
-                  <span>Photo</span>
-                </div>
-
-                <div
-                  className={styles.optionBox}
-                  onClick={() => setIsEditing(true)}
-                >
-                  <FaUserEdit className={styles.optionIcon} />
-                  <span>Edit</span>
-                </div>
-
                 <div
                   className={styles.optionBox}
                   onClick={() => alert("Open Network Panel")}
                 >
                   <FaUsers className={styles.optionIcon} />
                   <span>Networks</span>
-                </div>
-
-                <div
-                  className={styles.optionBox}
-                  onClick={() => navigate("/settings")}
-                >
-                  <FaCog className={styles.optionIcon} />
-                  <span>Settings</span>
                 </div>
               </div>
 
@@ -181,86 +210,89 @@ export default function ProfilePage() {
               </div>
             </>
           ) : (
-            <form
-              className={styles.editForm}
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSave();
-              }}
-            >
-              {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
+            // ✅ Editing allowed only for your own profile
+            isOwnProfile && (
+              <form
+                className={styles.editForm}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSave();
+                }}
+              >
+                {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
 
-              <div className={styles.editInput}>
-                <label>Name:</label>
-                <input
-                  type="text"
-                  value={editData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                />
-              </div>
+                <div className={styles.editInput}>
+                  <label>Name:</label>
+                  <input
+                    type="text"
+                    value={editData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                  />
+                </div>
 
-              <div className={styles.editInput}>
-                <label>Username:</label>
-                <input
-                  type="text"
-                  value={editData.username || ""}
-                  onChange={(e) =>
-                    handleInputChange("username", e.target.value)
-                  }
-                  placeholder="Choose a unique username"
-                />
-              </div>
+                <div className={styles.editInput}>
+                  <label>Username:</label>
+                  <input
+                    type="text"
+                    value={editData.username || ""}
+                    onChange={(e) =>
+                      handleInputChange("username", e.target.value)
+                    }
+                    placeholder="Choose a unique username"
+                  />
+                </div>
 
-              <div className={styles.editInput}>
-                <label>Bio:</label>
-                <textarea
-                  rows="3"
-                  value={editData.bio}
-                  onChange={(e) => handleInputChange("bio", e.target.value)}
-                />
-              </div>
+                <div className={styles.editInput}>
+                  <label>Bio:</label>
+                  <textarea
+                    rows="3"
+                    value={editData.bio}
+                    onChange={(e) => handleInputChange("bio", e.target.value)}
+                  />
+                </div>
 
-              <div className={styles.editInput}>
-                <label>Age:</label>
-                <input
-                  type="number"
-                  value={editData.age}
-                  onChange={(e) => handleInputChange("age", e.target.value)}
-                />
-              </div>
+                <div className={styles.editInput}>
+                  <label>Age:</label>
+                  <input
+                    type="number"
+                    value={editData.age}
+                    onChange={(e) => handleInputChange("age", e.target.value)}
+                  />
+                </div>
 
-              <div className={styles.editInput}>
-                <label>Location:</label>
-                <input
-                  type="text"
-                  value={editData.location}
-                  onChange={(e) =>
-                    handleInputChange("location", e.target.value)
-                  }
-                />
-              </div>
+                <div className={styles.editInput}>
+                  <label>Location:</label>
+                  <input
+                    type="text"
+                    value={editData.location}
+                    onChange={(e) =>
+                      handleInputChange("location", e.target.value)
+                    }
+                  />
+                </div>
 
-              <div className={styles.editInput}>
-                <label>Interests (comma separated):</label>
-                <input
-                  type="text"
-                  value={
-                    typeof editData.interests === "string"
-                      ? editData.interests
-                      : editData.interests.join(", ")
-                  }
-                  onChange={(e) =>
-                    handleInputChange("interests", e.target.value)
-                  }
-                />
-              </div>
+                <div className={styles.editInput}>
+                  <label>Interests (comma separated):</label>
+                  <input
+                    type="text"
+                    value={
+                      typeof editData.interests === "string"
+                        ? editData.interests
+                        : editData.interests.join(", ")
+                    }
+                    onChange={(e) =>
+                      handleInputChange("interests", e.target.value)
+                    }
+                  />
+                </div>
 
-              <div className={styles.formGroup}>
-                <button type="submit" className={styles.saveBtn}>
-                  <FaSave /> Save
-                </button>
-              </div>
-            </form>
+                <div className={styles.formGroup}>
+                  <button type="submit" className={styles.saveBtn}>
+                    <FaSave /> Save
+                  </button>
+                </div>
+              </form>
+            )
           )}
         </div>
       </div>

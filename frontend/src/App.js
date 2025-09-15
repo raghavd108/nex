@@ -8,14 +8,14 @@ import {
 } from "react-router-dom";
 import AuthPage from "./components/AuthPage";
 import Explore from "./pages/Explore";
-import Profile from "./pages/profile";
-import Match from "./pages/match";
+import Profile from "./pages/profile"; // ✅ make sure file name matches case
+import Match from "./pages/Match";
 import Home from "./pages/home";
-import Video from "./pages/video";
+import Video from "./pages/Video";
 import SettingsPage from "./pages/SettingsPage";
 import { AuthProvider } from "./components/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
-import ThemedRoom from "./pages/ThemedRoom"; // ✅ import
+import ThemedRoom from "./pages/ThemedRoom";
 
 function App() {
   return (
@@ -42,6 +42,8 @@ function App() {
               </PrivateRoute>
             }
           />
+
+          {/* ✅ Profile routes */}
           <Route
             path="/profile"
             element={
@@ -50,6 +52,15 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/profile/:username"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/match"
             element={

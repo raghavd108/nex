@@ -13,6 +13,8 @@ router.get("/me", auth, profileController.getProfile);
 router.put("/me", auth, profileController.updateProfile);
 // 🔍 Search users by username
 router.get("/search", auth, profileController.searchProfiles);
+// ✅ Get profile by username (public or protected, depending on your needs)
+router.get("/:username", auth, profileController.getProfileByUsername);
 
 // ✅ Upload photo (buffer passed to controller → Cloudinary)
 router.post(
