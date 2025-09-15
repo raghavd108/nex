@@ -5,16 +5,16 @@
   align-items: center;
   padding: 40px 20px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #fdfbfb, #f4f4f8);
+  background: linear-gradient(135deg, #fafafa, #f4f1fb);
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
 /* ========== Profile Card ========== */
 .profileCard {
   background: #fff;
-  border: 1px solid #e6e6e6;
-  border-radius: 18px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 36px 32px;
   width: 100%;
   max-width: 520px;
   text-align: center;
@@ -22,8 +22,8 @@
 }
 
 .profileCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
 }
 
 /* ========== Avatar ========== */
@@ -34,14 +34,32 @@
   border-radius: 50%;
   border: 4px solid #6a0dad;
   margin-bottom: 18px;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .profileAvatar:hover {
-  transform: scale(1.06);
+  transform: scale(1.08);
+  box-shadow: 0 6px 18px rgba(106, 13, 173, 0.3);
 }
 
-/* ========== Text Styles ========== */
+/* ========== Username ========== */
+.username {
+  font-size: 16px;
+  font-weight: 500;
+  color: #6a0dad;
+  margin-top: -8px;
+  margin-bottom: 12px;
+  text-align: center;
+  letter-spacing: 0.4px;
+  transition: color 0.3s ease;
+}
+
+.username:hover {
+  color: #9b59b6;
+  cursor: pointer;
+}
+
+/* ========== Name & Bio ========== */
 .profileCard h2 {
   margin: 12px 0 6px;
   font-size: 26px;
@@ -53,55 +71,58 @@
   font-size: 15px;
   color: #555;
   margin-bottom: 22px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* ========== Options (Fixed Alignment) ========== */
+/* ========== Options (Actions) ========== */
 .profileOptions {
   display: flex;
-  justify-content: center; /* ✅ center aligned */
+  justify-content: center;
   flex-wrap: wrap;
-  gap: 24px; /* ✅ consistent spacing */
-  margin: 25px 0 28px;
+  gap: 28px;
+  margin: 28px 0 30px;
 }
 
 .optionBox {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 70px; /* ✅ prevents uneven shrinking */
+  min-width: 70px;
   color: #6a0dad;
   cursor: pointer;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: transform 0.25s ease, color 0.25s ease;
   text-align: center;
 }
 
 .optionBox:hover {
-  transform: scale(1.12);
+  transform: translateY(-3px) scale(1.08);
   color: #8225d1;
 }
 
 .optionIcon {
-  font-size: 24px;
+  font-size: 26px;
   margin-bottom: 6px;
 }
 
-/* ========== Profile Info ========== */
+/* ========== Profile Info Section ========== */
 .profileInfo {
-  margin-top: 20px;
+  margin-top: 22px;
   text-align: left;
   color: #333;
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.6;
+  border-top: 1px solid #eee;
+  padding-top: 18px;
 }
 
 .profileInfo p {
-  margin: 8px 0;
+  margin: 10px 0;
 }
 
 /* ========== Edit Form ========== */
 .editForm {
   text-align: left;
+  margin-top: 20px;
 }
 
 .formGroup {
@@ -115,7 +136,6 @@
   margin-bottom: 6px;
 }
 
-/* Unified input/textarea design */
 .editInput {
   width: 100%;
   padding: 12px 14px;
@@ -136,7 +156,7 @@
 
 textarea.editInput {
   resize: vertical;
-  min-height: 90px;
+  min-height: 100px;
 }
 
 /* ========== Save Button ========== */
@@ -147,25 +167,26 @@ textarea.editInput {
   padding: 13px 20px;
   font-size: 15px;
   font-weight: 600;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
-  width: 100%; /* 🔥 full width button */
-  transition: background-color 0.25s, transform 0.2s;
+  width: 100%;
+  transition: background-color 0.25s, transform 0.2s, box-shadow 0.25s;
 }
 
 .saveBtn:hover {
   background: #8225d1;
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 13, 173, 0.3);
 }
 
 /* ========== Responsive ========== */
 @media screen and (max-width: 900px) {
   .profileCard {
-    max-width: 450px;
+    max-width: 460px;
     padding: 28px;
   }
   .profileAvatar {
@@ -177,7 +198,7 @@ textarea.editInput {
 @media screen and (max-width: 600px) {
   .profileCard {
     padding: 22px;
-    border-radius: 15px;
+    border-radius: 16px;
   }
 
   .profileAvatar {
@@ -190,8 +211,7 @@ textarea.editInput {
   }
 
   .profileOptions {
-    gap: 18px; /* ✅ smaller gap on mobile */
-    justify-content: center; /* ✅ stay centered */
+    gap: 20px;
   }
 
   .optionBox {
@@ -199,29 +219,11 @@ textarea.editInput {
   }
 
   .optionIcon {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .saveBtn {
     font-size: 14px;
     padding: 11px 16px;
   }
-}
-
-/* ========== Username ========== */
-.username {
-  font-size: 16px;
-  font-weight: 500;
-  color: #6a0dad; /* purple shade to match your Nex theme */
-  margin-top: -8px;
-  margin-bottom: 12px;
-  text-align: center;
-  letter-spacing: 0.3px;
-  font-family: "Segoe UI", Arial, sans-serif;
-  transition: color 0.3s ease;
-}
-
-.username:hover {
-  color: #9b59b6; /* lighter purple on hover */
-  cursor: pointer;
 }
