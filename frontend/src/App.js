@@ -9,7 +9,7 @@ import {
 import AuthPage from "./components/AuthPage";
 import Explore from "./pages/Explore";
 import Profile from "./pages/profile"; // ✅ make sure file name matches case
-import Match from "./pages/Match";
+import Match from "./pages/match";
 import Home from "./pages/home";
 import Video from "./pages/Video";
 import SettingsPage from "./pages/SettingsPage";
