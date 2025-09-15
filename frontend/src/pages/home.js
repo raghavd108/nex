@@ -37,11 +37,11 @@ export default function Home() {
     }
   };
 
-  const handleSelectUser = (userId) => {
+  const handleSelectUser = (username) => {
     setIsSearchOpen(false);
     setSearchQuery("");
     setSearchResults([]);
-    navigate(`/profile/${userId}`);
+    navigate(`/profile/${username}`);
   };
 
   // Feed data (demo)
@@ -128,7 +128,7 @@ export default function Home() {
               <div
                 key={user._id}
                 className="profile-preview"
-                onClick={() => handleSelectUser(user._id)}
+                onClick={() => handleSelectUser(user.username)}
               >
                 <img
                   src={
