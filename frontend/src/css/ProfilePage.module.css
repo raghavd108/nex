@@ -56,22 +56,24 @@
   line-height: 1.5;
 }
 
-/* ========== Options ========== */
+/* ========== Options (Fixed Alignment) ========== */
 .profileOptions {
   display: flex;
-  justify-content: space-between;
-  margin: 25px 0 28px;
+  justify-content: center; /* ✅ center aligned */
   flex-wrap: wrap;
-  gap: 18px;
+  gap: 24px; /* ✅ consistent spacing */
+  margin: 25px 0 28px;
 }
 
 .optionBox {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 70px; /* ✅ prevents uneven shrinking */
   color: #6a0dad;
   cursor: pointer;
   transition: transform 0.2s ease, color 0.2s ease;
+  text-align: center;
 }
 
 .optionBox:hover {
@@ -188,8 +190,12 @@ textarea.editInput {
   }
 
   .profileOptions {
-    gap: 12px;
-    justify-content: space-evenly;
+    gap: 18px; /* ✅ smaller gap on mobile */
+    justify-content: center; /* ✅ stay centered */
+  }
+
+  .optionBox {
+    min-width: 60px;
   }
 
   .optionIcon {
@@ -201,6 +207,8 @@ textarea.editInput {
     padding: 11px 16px;
   }
 }
+
+/* ========== Username ========== */
 .username {
   font-size: 16px;
   font-weight: 500;
