@@ -11,7 +11,7 @@ import Explore from "./pages/Explore";
 import Profile from "./pages/profile"; // ✅ make sure file name matches case
 import Match from "./pages/match";
 import Home from "./pages/home";
-import Video from "./pages/Video";
+import Video from "./pages/video";
 import SettingsPage from "./pages/SettingsPage";
 import { AuthProvider } from "./components/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
