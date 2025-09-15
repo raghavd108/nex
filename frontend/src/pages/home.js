@@ -27,9 +27,10 @@ export default function Home() {
 
     try {
       const res = await axios.get(`${API_URL}/api/profile/search`, {
-        params: { username: query },
+        params: { q: query },
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setSearchResults(res.data);
     } catch (err) {
       console.error("Search failed", err);
@@ -43,7 +44,7 @@ export default function Home() {
     navigate(`/profile/${userId}`);
   };
 
-  // Feed data
+  // Feed data (demo)
   const feedData = [
     {
       id: 1,
@@ -94,122 +95,144 @@ export default function Home() {
       <header className="top-bar">
         <div className="logo">Nex</div>
         <div className="top-icons">
-          <FaSearch
-            className="icon"
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-          />
+          <FaSearch className="icon" onClick={() => setIsSearchOpen(true)} />
           <FaBell className="icon" />
         </div>
       </header>
 
-      {/* Search Box */}
+      {/* ✅ Full-Screen Search Overlay */}
       {isSearchOpen && (
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search by username..."
-            value={searchQuery}
-            onChange={handleSearch}
-          />
-          {searchResults.length > 0 && (
-            <ul className="search-results">
-              {searchResults.map((user) => (
-                <li
-                  key={user._id}
-                  className="search-item"
-                  onClick={() => handleSelectUser(user._id)}
-                >
-                  <img
-                    src={
-                      user.avatar ||
-                      "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
-                    }
-                    alt={user.username}
-                    className="search-avatar"
-                  />
-                  <span>@{user.username}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="search-overlay">
+          <div className="search-header">
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={handleSearch}
+              autoFocus
+            />
+            <button
+              className="close-btn"
+              onClick={() => setIsSearchOpen(false)}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="search-results-container">
+            {searchResults.length === 0 && searchQuery !== "" && (
+              <p className="no-results">No users found</p>
+            )}
+
+            {searchResults.map((user) => (
+              <div
+                key={user._id}
+                className="profile-preview"
+                onClick={() => handleSelectUser(user._id)}
+              >
+                <img
+                  src={
+                    user.avatar ||
+                    "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
+                  }
+                  alt={user.username}
+                />
+                <div className="profile-info">
+                  <span className="name">{user.name || "Unnamed"}</span>
+                  <span className="username">@{user.username}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Themed Rooms / Stories */}
-      <section className="stories-section">
-        <h2 className="section-title">Discover Rooms</h2>
-        <div className="stories-row">
-          <div className="story-card">
-            <img
-              src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474349/nex-backgrounds/istockphoto-967283668-612x612_g8rgz1.jpg"
-              alt="Debate"
-            />
-            <p>Debate</p>
-          </div>
-          <div className="story-card">
-            <img
-              src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
-              alt="Comedy"
-            />
-            <p>Comedy</p>
-          </div>
-          <div className="story-card">
-            <img
-              src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474337/nex-backgrounds/0d1ef5572e0ecc7dad7cf62e5778ea8b_jza6lz.jpg"
-              alt="Books"
-            />
-            <p>Books</p>
-          </div>
-          <div className="story-card">
-            <img
-              src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
-              alt="Travel"
-            />
-            <p>Travel</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Slim Scrollable Filter Bar */}
-      <div className="filter-bar">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            className={`filter-btn ${selectedCategory === cat ? "active" : ""}`}
-            onClick={() => setSelectedCategory(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Social Feed */}
-      <section className="feed-section">
-        <h2 className="section-title">Trending Now</h2>
-
-        {filteredFeed.map((item) => (
-          <div className="feed-card" key={item.id}>
-            <div className="feed-header">
-              <img src={item.avatar} alt={item.user} className="feed-avatar" />
-              <div>
-                <h4>{item.user}</h4>
-                <span className="feed-room">in {item.room} Room</span>
+      {/* ✅ Hide rest of feed when search is open */}
+      {!isSearchOpen && (
+        <>
+          {/* Themed Rooms / Stories */}
+          <section className="stories-section">
+            <h2 className="section-title">Discover Rooms</h2>
+            <div className="stories-row">
+              <div className="story-card">
+                <img
+                  src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474349/nex-backgrounds/istockphoto-967283668-612x612_g8rgz1.jpg"
+                  alt="Debate"
+                />
+                <p>Debate</p>
+              </div>
+              <div className="story-card">
+                <img
+                  src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
+                  alt="Comedy"
+                />
+                <p>Comedy</p>
+              </div>
+              <div className="story-card">
+                <img
+                  src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474337/nex-backgrounds/0d1ef5572e0ecc7dad7cf62e5778ea8b_jza6lz.jpg"
+                  alt="Books"
+                />
+                <p>Books</p>
+              </div>
+              <div className="story-card">
+                <img
+                  src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
+                  alt="Travel"
+                />
+                <p>Travel</p>
               </div>
             </div>
-            <p className="feed-text">{item.text}</p>
-            <span className="feed-comments">{item.comments} comments</span>
+          </section>
+
+          {/* Slim Scrollable Filter Bar */}
+          <div className="filter-bar">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                className={`filter-btn ${
+                  selectedCategory === cat ? "active" : ""
+                }`}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
-        ))}
-      </section>
 
-      {/* Floating Match Button */}
-      <button className="match-btn" onClick={() => navigate("/video")}>
-        <FaVideo className="match-icon" />
-        <span>Start Match</span>
-      </button>
+          {/* Social Feed */}
+          <section className="feed-section">
+            <h2 className="section-title">Trending Now</h2>
 
-      {/* Bottom Navbar */}
-      <Navbar />
+            {filteredFeed.map((item) => (
+              <div className="feed-card" key={item.id}>
+                <div className="feed-header">
+                  <img
+                    src={item.avatar}
+                    alt={item.user}
+                    className="feed-avatar"
+                  />
+                  <div>
+                    <h4>{item.user}</h4>
+                    <span className="feed-room">in {item.room} Room</span>
+                  </div>
+                </div>
+                <p className="feed-text">{item.text}</p>
+                <span className="feed-comments">{item.comments} comments</span>
+              </div>
+            ))}
+          </section>
+
+          {/* Floating Match Button */}
+          <button className="match-btn" onClick={() => navigate("/video")}>
+            <FaVideo className="match-icon" />
+            <span>Start Match</span>
+          </button>
+
+          {/* Bottom Navbar */}
+          <Navbar />
+        </>
+      )}
     </div>
   );
 }
