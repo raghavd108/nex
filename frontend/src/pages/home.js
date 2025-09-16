@@ -150,41 +150,6 @@ export default function Home() {
       {/* ✅ Hide rest of feed when search is open */}
       {!isSearchOpen && (
         <>
-          {/* Themed Rooms / Stories */}
-          <section className="stories-section">
-            <h2 className="section-title">Discover Rooms</h2>
-            <div className="stories-row">
-              <div className="story-card">
-                <img
-                  src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474349/nex-backgrounds/istockphoto-967283668-612x612_g8rgz1.jpg"
-                  alt="Debate"
-                />
-                <p>Debate</p>
-              </div>
-              <div className="story-card">
-                <img
-                  src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
-                  alt="Comedy"
-                />
-                <p>Comedy</p>
-              </div>
-              <div className="story-card">
-                <img
-                  src="https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474337/nex-backgrounds/0d1ef5572e0ecc7dad7cf62e5778ea8b_jza6lz.jpg"
-                  alt="Books"
-                />
-                <p>Books</p>
-              </div>
-              <div className="story-card">
-                <img
-                  src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
-                  alt="Travel"
-                />
-                <p>Travel</p>
-              </div>
-            </div>
-          </section>
-
           {/* Slim Scrollable Filter Bar */}
           <div className="filter-bar">
             {categories.map((cat) => (
