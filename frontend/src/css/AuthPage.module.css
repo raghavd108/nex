@@ -4,8 +4,8 @@
   justify-content: center;
   min-height: 100vh;
   width: 100%;
-  background: #000;
-  color: #fff;
+  background: #f9fafb; /* light background */
+  color: #111;
   padding: 20px;
   box-sizing: border-box;
   gap: 40px; /* spacing between photos & form */
@@ -27,8 +27,8 @@
   height: 300px;
   border-radius: 20px;
   overflow: hidden;
-  background: #111;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   transition: transform 0.4s ease;
 }
 
@@ -62,25 +62,25 @@
 .reaction.heart {
   bottom: 15%;
   left: -30px;
-  color: #ff2d75;
+  color: #e11d48; /* pinkish red */
 }
 
 .reaction.star {
   top: 12%;
   right: -30px;
-  color: #00ff80;
+  color: #16a34a; /* green */
 }
 
 .reaction.bubble {
   top: -20px;
   left: 50%;
   transform: translateX(-50%);
-  background: #fff;
-  color: #000;
+  background: #111;
+  color: #fff;
   font-size: 16px;
   padding: 6px 12px;
   border-radius: 20px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
 @keyframes float {
@@ -99,23 +99,23 @@
   max-width: 360px;
   padding: 30px 25px;
   border-radius: 18px;
-  background: linear-gradient(145deg, #1f2937, #111827);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(145deg, #ffffff, #f3f4f6); /* light gradient */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
   text-align: center;
   transition: all 0.3s ease-in-out;
-  color: #f9fafb;
+  color: #111;
 }
 
 .authContainer:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
 }
 
 .brand {
   font-family: "Brush Script MT", cursive;
   font-size: 36px;
   margin-bottom: 20px;
-  color: white;
+  color: #111;
 }
 
 /* ====== Auth Form ====== */
@@ -128,21 +128,21 @@
 .authForm input {
   padding: 10px 14px;
   font-size: 15px;
-  border: 1px solid #374151;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  background: #111827;
-  color: #f9fafb;
+  background: #fff;
+  color: #111;
   transition: 0.3s;
 }
 
 .authForm input::placeholder {
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 .authForm input:focus {
   border-color: #3b82f6;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
 .authForm button {
@@ -165,13 +165,13 @@
 .divider {
   margin: 15px 0;
   font-size: 13px;
-  color: #aaa;
+  color: #6b7280;
 }
 
 .fbLogin {
   background: transparent;
   border: none;
-  color: #3b82f6;
+  color: #2563eb;
   font-size: 14px;
   cursor: pointer;
 }
@@ -184,7 +184,7 @@
   display: block;
   margin: 12px 0;
   font-size: 12px;
-  color: #3b82f6;
+  color: #2563eb;
   text-decoration: none;
 }
 
@@ -196,11 +196,11 @@
 .toggleText {
   margin-top: 15px;
   font-size: 13px;
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 .toggleLink {
-  color: #3b82f6;
+  color: #2563eb;
   cursor: pointer;
   font-weight: bold;
   margin-left: 5px;
@@ -208,13 +208,13 @@
 }
 
 .toggleLink:hover {
-  color: #2563eb;
+  color: #1d4ed8;
   text-decoration: underline;
 }
 
 /* ====== Error Styling ====== */
 .error {
-  color: #f87171;
+  color: #dc2626;
   font-weight: 500;
   font-size: 13px;
   margin-top: -8px;
