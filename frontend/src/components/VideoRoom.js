@@ -247,32 +247,58 @@ export default function VideoRoom({ roomId }) {
       {/* Main Room Layout */}
       <div className="room-layout">
         {/* Video Section */}
-        <main className="video-grid">
-          <div className="video-wrapper local">
-            <video
-              ref={localVideoRef}
-              autoPlay
-              playsInline
-              muted
-              className="video-player"
-            />
-            <span className="video-label">You</span>
-          </div>
-
-          {peers.map((peer) => (
-            <div key={peer.socketId} className="video-wrapper remote">
+        <div className="video-area">
+          {/* Main Grid: show up to 4 participants including local */}
+          <div
+            className={`video-grid dynamic-${Math.min(peers.length + 1, 4)}`}
+          >
+            {/* Local Video */}
+            <div className="video-wrapper local">
               <video
+                ref={localVideoRef}
                 autoPlay
                 playsInline
+                muted
                 className="video-player"
-                ref={(v) => v && peer.stream && (v.srcObject = peer.stream)}
               />
-              <span className="video-label">
-                {peer.name || "Guest"} {peer.emoji || ""}
-              </span>
+              <span className="video-label">You</span>
             </div>
-          ))}
-        </main>
+
+            {/* Remote Participants (first 3 max) */}
+            {peers.slice(0, 3).map((peer) => (
+              <div key={peer.socketId} className="video-wrapper remote">
+                <video
+                  autoPlay
+                  playsInline
+                  className="video-player"
+                  ref={(v) => v && peer.stream && (v.srcObject = peer.stream)}
+                />
+                <span className="video-label">
+                  {peer.name || "Guest"} {peer.emoji || ""}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Sidebar: remaining participants */}
+          {peers.length > 3 && (
+            <div className="video-sidebar">
+              {peers.slice(3).map((peer) => (
+                <div key={peer.socketId} className="video-wrapper">
+                  <video
+                    autoPlay
+                    playsInline
+                    className="video-player"
+                    ref={(v) => v && peer.stream && (v.srcObject = peer.stream)}
+                  />
+                  <span className="video-label">
+                    {peer.name || "Guest"} {peer.emoji || ""}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Chat Section */}
         <aside className="chat-section">

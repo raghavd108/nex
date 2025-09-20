@@ -44,17 +44,50 @@ body {
   overflow: hidden;
 }
 
-/* === Video Grid === */
+/* === Video Area === */
+.video-area {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  gap: 12px;
+  position: relative;
+}
+
+/* === Main Video Grid === */
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-  padding: 20px;
-  place-items: center;
-  width: 100%;
+  gap: 12px;
+  width: calc(100% - 120px); /* leave space for sidebar */
   height: 100%;
+}
+
+/* Dynamic grid layouts based on number of participants */
+.video-grid.dynamic-1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+.video-grid.dynamic-2 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+.video-grid.dynamic-3,
+.video-grid.dynamic-4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+/* === Sidebar for extra participants === */
+.video-sidebar {
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.03);
+}
+
+.video-sidebar .video-wrapper {
+  width: 100%;
+  aspect-ratio: 16/9;
 }
 
 /* === Video Tile === */
@@ -78,6 +111,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 12px;
 }
 
 .video-label {
@@ -242,96 +276,69 @@ body {
 }
 
 /* === Responsive Tweaks === */
-/* === Mobile Layout (up to 768px) === */
+@media (max-width: 1024px) {
+  .video-area {
+    flex-direction: column;
+  }
+
+  .video-grid {
+    width: 100%;
+  }
+
+  .video-sidebar {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .video-sidebar .video-wrapper {
+    flex: 0 0 120px;
+    aspect-ratio: 16/9;
+  }
+}
+
 @media (max-width: 768px) {
-  /* Reset room layout into vertical stacking */
   .room-layout {
     display: flex;
     flex-direction: column;
     height: 100%;
   }
 
-  /* === Video Grid Mobile === */
   .video-grid {
     grid-template-columns: 1fr;
     gap: 12px;
     padding: 10px;
     overflow-y: auto;
+    width: 100%;
   }
 
   .video-wrapper {
-    aspect-ratio: 3 / 4; /* taller video tiles for mobile */
+    aspect-ratio: 3 / 4;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   }
 
   .video-player {
     border-radius: 12px;
   }
 
-  /* === Chat Section (Twitter-like feed) === */
   .chat-section {
     width: 100%;
-    height: 45%; /* bottom portion */
-    background: #111;
+    height: 45%;
     border-top: 1px solid rgba(255, 255, 255, 0.15);
-    display: flex;
-    flex-direction: column;
   }
 
-  .chat-feed {
-    flex: 1;
-    overflow-y: auto;
-    padding: 12px;
-  }
-
-  .chat-msg {
-    background: rgba(255, 255, 255, 0.08);
-    padding: 10px 12px;
-    border-radius: 12px;
-    margin: 8px 0;
-    font-size: 0.9rem;
-    line-height: 1.4;
-  }
-  .chat-msg b {
-    color: #4dd0e1;
-  }
-  .chat-msg.meme img {
-    max-width: 100%;
-    border-radius: 10px;
-    margin-top: 6px;
-  }
-
-  .chat-input {
-    display: flex;
-    gap: 8px;
-    padding: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    background: #0f0f0f;
-  }
   .chat-input input {
-    flex: 1;
     padding: 8px 10px;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-  }
-  .chat-input button {
-    background: #4dd0e1;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: #fff;
-    font-weight: 500;
   }
 
-  /* === Action Bar Mobile === */
+  .chat-input button {
+    padding: 8px 14px;
+  }
+
   .action-bar {
-    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
@@ -340,17 +347,10 @@ body {
     padding: 10px;
     border-radius: 0;
     background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.6);
   }
 
   .control-btn {
     width: 42px;
     height: 42px;
-  }
-
-  .action-bar button {
-    padding: 8px;
-    border-radius: 10px;
   }
 }
