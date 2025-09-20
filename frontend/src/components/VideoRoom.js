@@ -1,7 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
-import { Mic, MicOff, PhoneOff } from "lucide-react"; // modern icons
+import {
+  Mic,
+  MicOff,
+  PhoneOff,
+  Video,
+  Image as ImageIcon,
+  HeartHandshake,
+  MicVocal,
+  HandClap,
+} from "lucide-react"; // 👈 added new icons
+// modern icons
 import "../css/VideoRoom.css";
 
 // Function to create new socket
@@ -287,11 +297,21 @@ export default function VideoRoom({ roomId }) {
 
       {/* Action Bar */}
       <footer className="action-bar">
-        <button>🎥 Share Reel</button>
-        <button>📸 Share Meme</button>
-        <button>💌 Match 1-on-1</button>
-        <button>🎙 Request to Speak</button>
-        <button>👏 React</button>
+        <button className="control-btn">
+          <Video size={22} />
+        </button>
+        <button className="control-btn">
+          <ImageIcon size={22} />
+        </button>
+        <button className="control-btn">
+          <HeartHandshake size={22} />
+        </button>
+        <button className="control-btn">
+          <MicVocal size={22} />
+        </button>
+        <button className="control-btn">
+          <HandClap size={22} />
+        </button>
 
         {/* Call Controls (Mic + End Call) */}
         <button onClick={handleToggleMic} className="control-btn">
