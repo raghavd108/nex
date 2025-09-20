@@ -9,7 +9,7 @@ import {
   Image as ImageIcon,
   HeartHandshake,
   MicVocal,
-  HandClap,
+  Hand,
 } from "lucide-react"; // 👈 added new icons
 // modern icons
 import "../css/VideoRoom.css";
@@ -310,7 +310,7 @@ export default function VideoRoom({ roomId }) {
           <MicVocal size={22} />
         </button>
         <button className="control-btn">
-          <HandClap size={22} />
+          <Hand size={22} />
         </button>
 
         {/* Call Controls (Mic + End Call) */}
