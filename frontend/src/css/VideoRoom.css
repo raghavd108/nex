@@ -15,15 +15,10 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  /* 👇 Local background */
   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-
-  /* Prevent child elements from causing scroll */
   overflow: hidden;
 }
+
 /* === Header === */
 .video-room-header {
   text-align: center;
@@ -56,17 +51,25 @@ body {
   }
 }
 
-/* === Main Content (Video Grid) === */
-.video-grid {
+/* === Room Layout (Videos + Chat) === */
+.room-layout {
   flex: 1;
+  display: grid;
+  grid-template-columns: 70% 30%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* === Video Grid === */
+.video-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
   padding: 16px;
   place-items: center;
-  margin-bottom: 90px;
   transition: all 0.3s ease;
   width: 100%;
+  overflow-y: auto;
 }
 
 /* === Video Tile === */
@@ -107,41 +110,67 @@ body {
   font-weight: 500;
 }
 
-/* === Own Video (Floating Window) === */
-.own-video {
-  position: fixed;
-  bottom: 110px;
-  right: 20px;
-  width: 220px;
-  height: 160px;
-  z-index: 15;
-  border: 2px solid #4dd0e1;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-  animation: floatIn 0.5s ease;
-}
-
-.own-video video {
-  width: 100%;
+/* === Chat Section === */
+.chat-section {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
   height: 100%;
-  object-fit: cover;
 }
 
-@keyframes floatIn {
-  from {
-    opacity: 0;
-    transform: scale(0.85) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+.chat-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
 }
 
-/* === Controls Bar === */
-.video-controls {
+.chat-msg {
+  margin: 8px 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.chat-msg b {
+  color: #4dd0e1;
+}
+.chat-msg.meme img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 6px 0;
+}
+
+.chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.chat-input input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.chat-input button {
+  background: #4dd0e1;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 500;
+  transition: 0.2s;
+}
+.chat-input button:hover {
+  background: #26c6da;
+}
+
+/* === Action Bar === */
+.action-bar {
   position: fixed;
   bottom: 20px;
   left: 50%;
@@ -149,34 +178,37 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 18px;
-  padding: 14px 22px;
+  gap: 14px;
+  padding: 12px 20px;
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(12px);
   border-radius: 40px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
   z-index: 20;
-  animation: fadeUp 0.5s ease;
 }
 
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 20px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
+.action-bar button {
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+.action-bar button:hover {
+  background: #4dd0e1;
+  color: #fff;
+  transform: scale(1.08);
 }
 
-/* Control Buttons */
+/* === Mic / End Call inside Action Bar === */
 .control-btn {
-  width: 55px;
-  height: 55px;
+  width: 50px;
+  height: 50px;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
   display: flex;
   justify-content: center;
@@ -184,72 +216,76 @@ body {
   cursor: pointer;
   transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
-
 .control-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   transform: scale(1.12);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
 }
-
-/* End Call Button */
 .control-btn.end {
   background: #e53935;
   box-shadow: 0 0 12px rgba(229, 57, 53, 0.6);
 }
-
 .control-btn.end:hover {
   background: #c62828;
   box-shadow: 0 0 20px rgba(229, 57, 53, 0.9);
 }
 
+/* === Floating Emoji Reactions === */
+.reaction {
+  position: absolute;
+  font-size: 2rem;
+  animation: floatUp 2s ease forwards;
+  pointer-events: none;
+}
+@keyframes floatUp {
+  from {
+    opacity: 0.9;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-120px) scale(1.6);
+  }
+}
+
 /* === Responsive Tweaks === */
 @media (max-width: 1024px) {
-  .video-grid {
-    gap: 12px;
-  }
-  .own-video {
-    width: 180px;
-    height: 130px;
+  .room-layout {
+    grid-template-columns: 65% 35%;
   }
 }
-
 @media (max-width: 768px) {
-  .video-grid {
+  .room-layout {
     grid-template-columns: 1fr;
-    padding: 10px;
-    margin-bottom: 100px;
   }
-
-  .own-video {
-    width: 130px;
-    height: 100px;
-    bottom: 95px;
-    right: 12px;
+  .chat-section {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    width: 70%;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 30;
   }
-
-  .video-controls {
-    gap: 14px;
-    padding: 12px 18px;
+  .chat-section.open {
+    transform: translateX(0);
   }
-
-  .control-btn {
-    width: 50px;
-    height: 50px;
+  .action-bar {
+    gap: 10px;
+    padding: 10px 16px;
   }
 }
-
 @media (max-width: 480px) {
   .video-room-header h2 {
     font-size: 1.2rem;
   }
-
-  .own-video {
-    width: 110px;
-    height: 80px;
+  .action-bar button {
+    padding: 8px 10px;
+    font-size: 0.85rem;
   }
-
   .control-btn {
-    width: 46px;
-    height: 46px;
+    width: 44px;
+    height: 44px;
   }
 }

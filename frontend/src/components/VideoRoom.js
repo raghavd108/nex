@@ -224,6 +224,7 @@ export default function VideoRoom({ roomId }) {
   return (
     <div className="video-room">
       <h1>🎥 Themed Room</h1>
+
       {/* Notifications */}
       <div className="notifications">
         {notifications.map((n, idx) => (
@@ -233,32 +234,66 @@ export default function VideoRoom({ roomId }) {
         ))}
       </div>
 
-      <main className="video-grid">
-        <div className="video-wrapper local">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            playsInline
-            muted
-            className="video-player"
-          />
-          <span className="video-label">You</span>
-        </div>
-
-        {peers.map((peer) => (
-          <div key={peer.socketId} className="video-wrapper remote">
+      {/* Main Room Layout */}
+      <div className="room-layout">
+        {/* Video Section */}
+        <main className="video-grid">
+          <div className="video-wrapper local">
             <video
+              ref={localVideoRef}
               autoPlay
               playsInline
+              muted
               className="video-player"
-              ref={(v) => v && peer.stream && (v.srcObject = peer.stream)}
             />
-            <span className="video-label">{peer.name || "Guest"}</span>
+            <span className="video-label">You</span>
           </div>
-        ))}
-      </main>
 
-      <footer className="video-controls">
+          {peers.map((peer) => (
+            <div key={peer.socketId} className="video-wrapper remote">
+              <video
+                autoPlay
+                playsInline
+                className="video-player"
+                ref={(v) => v && peer.stream && (v.srcObject = peer.stream)}
+              />
+              <span className="video-label">
+                {peer.name || "Guest"} {peer.emoji || ""}
+              </span>
+            </div>
+          ))}
+        </main>
+
+        {/* Chat Section */}
+        <aside className="chat-section">
+          <div className="chat-feed">
+            <div className="chat-msg">
+              <b>Arjun:</b> Bro this pitch is sus 😂
+            </div>
+            <div className="chat-msg meme">
+              <b>Aditi:</b>
+              <img src="/elon-meme.jpg" alt="Meme" />
+              <span>😂🔥</span>
+            </div>
+          </div>
+
+          {/* Chat Input */}
+          <div className="chat-input">
+            <input type="text" placeholder="Type a message..." />
+            <button>Send</button>
+          </div>
+        </aside>
+      </div>
+
+      {/* Action Bar */}
+      <footer className="action-bar">
+        <button>🎥 Share Reel</button>
+        <button>📸 Share Meme</button>
+        <button>💌 Match 1-on-1</button>
+        <button>🎙 Request to Speak</button>
+        <button>👏 React</button>
+
+        {/* Call Controls (Mic + End Call) */}
         <button onClick={handleToggleMic} className="control-btn">
           {micMuted ? <MicOff size={22} /> : <Mic size={22} />}
         </button>
