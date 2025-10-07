@@ -1,12 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../css/Home.css";
 import { FaSearch, FaVideo, FaBell } from "react-icons/fa";
 import axios from "axios";
+import MoodPopup from "../components/MoodPopup";
 
 export default function Home() {
   const navigate = useNavigate();
+
+  // 🔹 Mood state
+  const [selectedMood, setSelectedMood] = useState(
+    localStorage.getItem("lastMood") || "Neutral"
+  );
+
+  // 🔹 Dynamic theme colors per mood
+  const moodThemes = {
+    Creative: "#FFB6C1",
+    Ambitious: "#FF6347",
+    Chill: "#87CEEB",
+    Brainstorm: "#FFD700",
+    Debate: "#8A2BE2",
+    Neutral: "#f5f5f5",
+  };
+
+  // 🔹 Suggested people per mood
+  const moodSuggestions = {
+    Creative: ["Ava (Designer)", "Leo (Musician)", "Zara (Photographer)"],
+    Ambitious: ["Arjun (Founder)", "Maya (Marketer)", "Ethan (Coder)"],
+    Chill: ["Lia (Gamer)", "Noah (Streamer)", "Tia (Traveler)"],
+    Brainstorm: ["Nina (Innovator)", "Ray (Thinker)", "Sam (Strategist)"],
+    Debate: ["Aiden (Law Student)", "Clara (Analyst)", "Dev (Political Buff)"],
+    Neutral: ["Alex (Explorer)", "Emma (Learner)", "Ryan (Creator)"],
+  };
+
+  // 🔹 Handle mood selection
+  const handleMoodSelect = (mood) => {
+    setSelectedMood(mood.name);
+    document.body.style.background = moodThemes[mood.name];
+  };
 
   // Search state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -44,53 +76,22 @@ export default function Home() {
     navigate(`/profile/${username}`);
   };
 
-  // Feed data (demo)
-  const feedData = [
-    {
-      id: 1,
-      user: "Alex",
-      room: "Comedy",
-      text: "😂 That punchline had the whole room laughing!",
-      comments: 87,
-      avatar: "/assets/users/user1.jpg",
-    },
-    {
-      id: 2,
-      user: "Sophia",
-      room: "Debate",
-      text: "🔥 Today’s debate about AI ethics got intense!",
-      comments: 102,
-      avatar: "/assets/users/user2.jpg",
-    },
-    {
-      id: 3,
-      user: "Liam",
-      room: "Travel",
-      text: "🌍 Just shared my backpacking story across Europe!",
-      comments: 45,
-      avatar: "/assets/users/user3.jpg",
-    },
-    {
-      id: 4,
-      user: "Emma",
-      room: "Books",
-      text: "📚 Just finished ‘Atomic Habits’ – highly recommend!",
-      comments: 64,
-      avatar: "/assets/users/user4.jpg",
-    },
-  ];
-
-  const categories = ["All", "Comedy", "Debate", "Travel", "Books"];
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
-  // Filtered feed
-  const filteredFeed =
-    selectedCategory === "All"
-      ? feedData
-      : feedData.filter((item) => item.room === selectedCategory);
+  // Set theme color when page loads
+  useEffect(() => {
+    document.body.style.background = moodThemes[selectedMood];
+  }, [selectedMood]);
 
   return (
-    <div className="home-page">
+    <div
+      className="home-page"
+      style={{
+        background: moodThemes[selectedMood],
+        transition: "background 0.5s ease",
+      }}
+    >
+      {/* 🧠 Mood Greeting Popup */}
+      <MoodPopup onSelect={handleMoodSelect} />
+
       {/* Top Bar */}
       <header className="top-bar">
         <div className="logo">Nex</div>
@@ -147,45 +148,25 @@ export default function Home() {
         </div>
       )}
 
-      {/* ✅ Hide rest of feed when search is open */}
+      {/* ✅ Hide rest when search is open */}
       {!isSearchOpen && (
         <>
-          {/* Slim Scrollable Filter Bar */}
-          <div className="filter-bar">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                className={`filter-btn ${
-                  selectedCategory === cat ? "active" : ""
-                }`}
-                onClick={() => setSelectedCategory(cat)}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Social Feed */}
-          <section className="feed-section">
-            <h2 className="section-title">Trending Now</h2>
-
-            {filteredFeed.map((item) => (
-              <div className="feed-card" key={item.id}>
-                <div className="feed-header">
+          {/* Suggested People Section */}
+          <section className="suggested-section">
+            <h3>
+              Suggested for You <span>({selectedMood} Mood)</span>
+            </h3>
+            <div className="suggested-list">
+              {moodSuggestions[selectedMood]?.map((person, index) => (
+                <div key={index} className="suggested-card">
                   <img
-                    src={item.avatar}
-                    alt={item.user}
-                    className="feed-avatar"
+                    src={`/assets/users/user${(index % 4) + 1}.jpg`}
+                    alt={person}
                   />
-                  <div>
-                    <h4>{item.user}</h4>
-                    <span className="feed-room">in {item.room} Room</span>
-                  </div>
+                  <span>{person}</span>
                 </div>
-                <p className="feed-text">{item.text}</p>
-                <span className="feed-comments">{item.comments} comments</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </section>
 
           {/* Floating Match Button */}
