@@ -32,7 +32,7 @@ export default function MoodPopup({ onSelect }) {
   return (
     <div className="mood-popup-overlay">
       <div className="mood-popup-card">
-        <h2>Hey Raghav 👋</h2>
+        <h2>Hey 👋</h2>
         <p>What’s your vibe today?</p>
         <div className="mood-options">
           {moods.map((mood) => (

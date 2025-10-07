@@ -170,10 +170,15 @@ export default function Home() {
           </section>
 
           {/* Floating Match Button */}
-          <button className="match-btn" onClick={() => navigate("/video")}>
-            <FaVideo className="match-icon" />
-            <span>Start Match</span>
-          </button>
+          <div className="match-card">
+            <span className="card-title">Meet Someone Like You</span>
+            <span className="card-subtitle">
+              Your next connection is waiting!
+            </span>
+            <button className="card-btn" onClick={() => navigate("/video")}>
+              Start Matching
+            </button>
+          </div>
 
           {/* Bottom Navbar */}
           <Navbar />
