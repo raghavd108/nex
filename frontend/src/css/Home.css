@@ -110,59 +110,58 @@
   color: #222;
 }
 
-/* ========= Floating Match Card ========= */
+/* ========= Floating Match Card (Simplified White Gradient) ========= */
 .match-card {
   position: fixed;
-  bottom: 40px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 260px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 28px;
-  border: 2px solid rgba(255, 65, 108, 0.5);
-  padding: 20px;
-  box-shadow: 0 12px 28px rgba(255, 65, 108, 0.3);
+  transform: translate(-50%, -50%);
+  width: 320px;
+  background: linear-gradient(145deg, #ffffff, #f7f8fa);
+  border-radius: 24px;
+  padding: 28px 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  color: #fff;
-  font-family: "Poppins", sans-serif;
-  animation: floatCard 4s ease-in-out infinite;
-  cursor: pointer;
+  color: #333;
   text-align: center;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
+  font-family: "Poppins", sans-serif;
+  z-index: 50;
 }
-.match-card:hover {
-  transform: translateX(-50%) translateY(-5px) scale(1.05);
-  box-shadow: 0 16px 36px rgba(255, 65, 108, 0.5);
-}
+
 .match-card span.card-title {
   font-size: 18px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  color: #222;
 }
+
 .match-card span.card-subtitle {
   font-size: 14px;
   font-weight: 400;
-  opacity: 0.85;
-  margin-bottom: 8px;
+  color: #666;
+  margin-bottom: 10px;
 }
+
 .match-card button.card-btn {
-  padding: 12px 22px;
-  border-radius: 28px;
+  padding: 12px 24px;
+  border-radius: 24px;
   border: none;
-  background: linear-gradient(135deg, #ff416c, #ff4b2b);
-  color: #fff;
-  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff, #e9ecef);
+  color: #222;
+  font-weight: 600;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 14px rgba(255, 65, 108, 0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
+
 .match-card button.card-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 10px 28px rgba(255, 65, 108, 0.55);
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #f0f0f0, #ffffff);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 /* Card Float Animation */
