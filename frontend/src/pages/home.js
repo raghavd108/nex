@@ -291,6 +291,41 @@ export default function Home() {
           </div>
         </div>
       )}
+      {/* 🔹 Stories Section */}
+      <div className="stories-bar">
+        {/* Your story */}
+        <div
+          className="story your-story"
+          onClick={() => alert("Add your story")}
+        >
+          <div>
+            <img
+              src={userProfile?.avatar || "/assets/users/user1.jpg"}
+              alt="Your Story"
+            />
+          </div>
+          <span>Your Story</span>
+        </div>
+
+        {/* Other users' stories */}
+        {posts
+          .filter(
+            (p, i, arr) =>
+              arr.findIndex((post) => post.userId?._id === p.userId?._id) === i
+          )
+          .map((post) => (
+            <div className="story" key={post.userId?._id}>
+              <img
+                src={
+                  post.userId?.avatar ||
+                  "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
+                }
+                alt={post.userId?.name}
+              />
+              <span>{post.userId?.name || "User"}</span>
+            </div>
+          ))}
+      </div>
 
       {/* 🔹 Feed Section */}
       <div className="feed-section">
