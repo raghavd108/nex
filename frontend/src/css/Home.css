@@ -409,6 +409,7 @@
 
 /* ========= Feed Section ========= */
 .feed-section {
+  margin-top: 15px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -473,68 +474,6 @@
 
 .feed-actions svg:hover {
   color: #ff416c;
-}
-
-/* ========= Fullscreen Story ========= */
-.story-fullscreen {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.95);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 3000;
-  padding: 20px;
-}
-
-.story-fullscreen img {
-  max-width: 95%;
-  max-height: 85%;
-  border-radius: 12px;
-  object-fit: contain;
-}
-
-.close-story {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  background: rgba(255, 255, 255, 0.8);
-  border: none;
-  border-radius: 50%;
-  padding: 6px 10px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.close-story:hover {
-  background: #ff416c;
-  color: #fff;
-}
-
-/* ========= Add Story Button in Fullscreen ========= */
-.add-story-fullscreen {
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  background: #ff416c;
-  border: none;
-  border-radius: 50%;
-  color: #fff;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 18px;
-  cursor: pointer;
-  transition: 0.3s;
-  z-index: 3100;
-}
-
-.add-story-fullscreen:hover {
-  background: #ff7a8a;
 }
 
 /* ========= Responsive ========= */
