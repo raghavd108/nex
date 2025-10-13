@@ -16,12 +16,22 @@ import MoodPopup from "../components/MoodPopup";
 export default function Home() {
   const navigate = useNavigate();
 
-  // 🔹 Mood state
+  // 🔹 States
   const [selectedMood, setSelectedMood] = useState(
     localStorage.getItem("lastMood") || "Neutral"
   );
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [newPost, setNewPost] = useState("");
+  const [photo, setPhoto] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // 🔹 Theme colors
+  const token = localStorage.getItem("token");
+  const API_URL = "https://nex-pjq3.onrender.com/api";
+
+  // 🔹 Mood colors
   const moodThemes = {
     Creative: "#FFB6C1",
     Ambitious: "#FF6347",
@@ -31,19 +41,34 @@ export default function Home() {
     Neutral: "#f5f5f5",
   };
 
+  // 🔹 Set theme on mount
+  useEffect(() => {
+    document.body.style.background = moodThemes[selectedMood];
+  }, [selectedMood]);
+
   // 🔹 Handle mood select
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood.name);
+    localStorage.setItem("lastMood", mood.name);
     document.body.style.background = moodThemes[mood.name];
+    fetchPosts(); // optionally refresh feed for that mood
   };
 
-  // 🔹 Search
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const token = localStorage.getItem("token");
-  const API_URL = "https://nex-pjq3.onrender.com";
+  // 🔹 Fetch posts
+  const fetchPosts = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/posts`);
+      setPosts(res.data);
+    } catch (err) {
+      console.error("Error loading posts:", err);
+    }
+  };
 
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  // 🔹 Handle search
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -54,7 +79,7 @@ export default function Home() {
     }
 
     try {
-      const res = await axios.get(`${API_URL}/api/profile/search`, {
+      const res = await axios.get(`${API_URL}/profile/search`, {
         params: { q: query },
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -71,60 +96,71 @@ export default function Home() {
     navigate(`/profile/${username}`);
   };
 
-  // 🔹 Dummy posts
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      user: "Ava (Designer)",
-      avatar: "/assets/users/user1.jpg",
-      mood: "Creative",
-      caption: "New ideas flowing ✨",
-      image:
-        "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=60",
-      likes: 12,
-      comments: 3,
-    },
-    {
-      id: 2,
-      user: "Arjun (Founder)",
-      avatar: "/assets/users/user2.jpg",
-      mood: "Ambitious",
-      caption: "Another step towards the dream 🚀",
-      image:
-        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=60",
-      likes: 24,
-      comments: 8,
-    },
-  ]);
-
-  // 🔹 Post Composer
-  const [newPost, setNewPost] = useState("");
-  const [photo, setPhoto] = useState(null);
-
-  const handlePost = () => {
+  // 🔹 Create new post
+  const handlePost = async () => {
     if (newPost.trim() === "" && !photo) return;
+    setLoading(true);
 
-    const newEntry = {
-      id: Date.now(),
-      user: "You",
-      avatar:
-        "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp",
-      mood: selectedMood,
-      caption: newPost,
-      image: photo ? URL.createObjectURL(photo) : null,
-      likes: 0,
-      comments: 0,
-    };
+    try {
+      const formData = new FormData();
+      formData.append("content", newPost);
+      formData.append("mood", selectedMood);
+      if (photo) formData.append("image", photo);
 
-    setPosts([newEntry, ...posts]);
-    setNewPost("");
-    setPhoto(null);
+      const res = await axios.post(`${API_URL}/posts`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setPosts([res.data, ...posts]);
+      setNewPost("");
+      setPhoto(null);
+    } catch (err) {
+      console.error("Error posting:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Set theme color on load
-  useEffect(() => {
-    document.body.style.background = moodThemes[selectedMood];
-  }, [selectedMood]);
+  // 🔹 Like a post
+  const handleLike = async (postId) => {
+    try {
+      const res = await axios.post(
+        `${API_URL}/posts/${postId}/like`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setPosts((prev) =>
+        prev.map((p) =>
+          p._id === postId
+            ? { ...p, likes: Array(res.data.likes).fill("x") }
+            : p
+        )
+      );
+    } catch (err) {
+      console.error("Error liking post:", err);
+    }
+  };
+
+  // 🔹 Comment on a post
+  const handleComment = async (postId) => {
+    const text = prompt("Write a comment:");
+    if (!text) return;
+
+    try {
+      const res = await axios.post(
+        `${API_URL}/posts/${postId}/comment`,
+        { text },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setPosts((prev) => prev.map((p) => (p._id === postId ? res.data : p)));
+    } catch (err) {
+      console.error("Error adding comment:", err);
+    }
+  };
 
   return (
     <div
@@ -134,10 +170,10 @@ export default function Home() {
         transition: "background 0.5s ease",
       }}
     >
-      {/* 🧠 Mood Greeting Popup */}
+      {/* 🧠 Mood Popup */}
       <MoodPopup onSelect={handleMoodSelect} />
 
-      {/* Top Bar */}
+      {/* 🔝 Top Bar */}
       <header className="top-bar">
         <div className="logo">Nex</div>
         <div className="top-icons">
@@ -192,10 +228,10 @@ export default function Home() {
         </div>
       )}
 
-      {/* 🔹 Social Feed */}
+      {/* 🔹 Feed Content */}
       {!isSearchOpen && (
         <>
-          {/* 🧍‍♀️ Stories */}
+          {/* 🧍 Stories */}
           <div className="stories-bar">
             <div className="story your-story">
               <FaImage />
@@ -232,28 +268,43 @@ export default function Home() {
                   onChange={(e) => setPhoto(e.target.files[0])}
                 />
               </label>
-              <button onClick={handlePost}>Post</button>
+              <button onClick={handlePost} disabled={loading}>
+                {loading ? "Posting..." : "Post"}
+              </button>
             </div>
           </div>
 
           {/* 📱 Feed Posts */}
           <div className="feed-section">
             {posts.map((post) => (
-              <div key={post.id} className="feed-card">
+              <div key={post._id} className="feed-card">
                 <div className="feed-header">
-                  <img src={post.avatar} alt={post.user} />
+                  <img
+                    src={
+                      post.userId?.avatar ||
+                      "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
+                    }
+                    alt={post.userId?.username}
+                  />
                   <div>
-                    <h4>{post.user}</h4>
-                    <span>{post.mood} mood</span>
+                    <h4>{post.userId?.name || "User"}</h4>
+                    <span>{post.mood || "Neutral"} mood</span>
                   </div>
                 </div>
-                <p className="caption">{post.caption}</p>
-                {post.image && (
-                  <img src={post.image} alt="Post" className="feed-image" />
+
+                <p className="caption">{post.content}</p>
+
+                {post.imageUrl && (
+                  <img src={post.imageUrl} alt="Post" className="feed-image" />
                 )}
+
                 <div className="feed-actions">
-                  <FaHeart /> {post.likes}
-                  <FaComment /> {post.comments}
+                  <span onClick={() => handleLike(post._id)}>
+                    <FaHeart /> {post.likes?.length || 0}
+                  </span>
+                  <span onClick={() => handleComment(post._id)}>
+                    <FaComment /> {post.comments?.length || 0}
+                  </span>
                   <FaShare />
                 </div>
               </div>
