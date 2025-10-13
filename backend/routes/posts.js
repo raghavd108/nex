@@ -1,36 +1,39 @@
+// routes/posts.js
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Post = require("../models/Post");
+const Profile = require("../models/Profile");
 const auth = require("../middleware/authMiddleware");
 const multer = require("multer");
-const cloudinary = require("../config/cloudinary"); // your Cloudinary config file
+const cloudinary = require("../config/cloudinary"); // Cloudinary config
 
-// Multer setup (memory storage)
+// ✅ Multer setup (memory storage)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Create a new post
+// ---------------------- CREATE POST ----------------------
 router.post("/", auth, upload.single("image"), async (req, res) => {
   try {
     const { content, mood } = req.body;
-    const userId = req.user.profileId; // profile _id stored in JWT middleware
+
+    // Get the user's Profile (Post references Profile)
+    const profile = await Profile.findOne({ userId: req.user.id });
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
 
     let imageUrl = null;
 
     if (req.file) {
       const b64 = Buffer.from(req.file.buffer).toString("base64");
       const dataURI = `data:${req.file.mimetype};base64,${b64}`;
-
       const uploadRes = await cloudinary.uploader.upload(dataURI, {
         folder: "posts",
       });
-
       imageUrl = uploadRes.secure_url;
     }
 
     const newPost = new Post({
-      userId,
+      userId: profile._id, // reference Profile
       content,
       imageUrl,
       mood,
@@ -38,7 +41,6 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
 
     await newPost.save();
 
-    // Return post with populated user
     const populatedPost = await Post.findById(newPost._id)
       .populate("userId", "username name avatar")
       .populate("comments.userId", "username avatar");
@@ -50,7 +52,7 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
   }
 });
 
-// GET all posts
+// ---------------------- GET ALL POSTS ----------------------
 router.get("/", async (req, res) => {
   try {
     const posts = await Post.find()
@@ -60,11 +62,12 @@ router.get("/", async (req, res) => {
 
     res.json(posts);
   } catch (err) {
+    console.error("Error fetching posts:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET a post by ID
+// ---------------------- GET POST BY ID ----------------------
 router.get("/:id", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
@@ -75,34 +78,38 @@ router.get("/:id", async (req, res) => {
 
     res.json(post);
   } catch (err) {
+    console.error("Error fetching post:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Like/unlike a post
+// ---------------------- LIKE POST ----------------------
 router.post("/:id/like", auth, async (req, res) => {
   try {
-    const userId = req.user.profileId;
+    const userId = req.user.id;
     const post = await Post.findById(req.params.id);
 
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     const liked = post.likes.includes(userId);
-
-    if (liked) post.likes.pull(userId);
-    else post.likes.push(userId);
+    if (liked) {
+      post.likes.pull(userId);
+    } else {
+      post.likes.push(userId);
+    }
 
     await post.save();
     res.json({ success: true, likes: post.likes.length });
   } catch (err) {
+    console.error("Error liking post:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Comment on a post
+// ---------------------- COMMENT ON POST ----------------------
 router.post("/:id/comment", auth, async (req, res) => {
   try {
-    const userId = req.user.profileId;
+    const userId = req.user.id;
     const { text } = req.body;
 
     const post = await Post.findById(req.params.id);
@@ -112,13 +119,15 @@ router.post("/:id/comment", auth, async (req, res) => {
     await post.save();
 
     await post.populate("comments.userId", "username avatar");
+
     res.json(post);
   } catch (err) {
+    console.error("Error commenting on post:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Get posts by mood
+// ---------------------- GET POSTS BY MOOD ----------------------
 router.get("/mood/:mood", async (req, res) => {
   try {
     const posts = await Post.find({ mood: req.params.mood })
@@ -127,19 +136,23 @@ router.get("/mood/:mood", async (req, res) => {
 
     res.json(posts);
   } catch (err) {
+    console.error("Error fetching mood posts:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Delete a post (only owner)
+// ---------------------- DELETE POST ----------------------
 router.delete("/:id", auth, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    if (post.userId.toString() !== req.user.profileId)
+    // Only owner can delete
+    const profile = await Profile.findOne({ userId: req.user.id });
+    if (!profile || post.userId.toString() !== profile._id.toString())
       return res.status(403).json({ message: "Unauthorized" });
 
+    // Delete image from Cloudinary if exists
     if (post.imageUrl) {
       const publicId = post.imageUrl.split("/").pop().split(".")[0];
       await cloudinary.uploader.destroy(`posts/${publicId}`);
