@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../css/Home.css";
-import { FaSearch, FaVideo, FaBell } from "react-icons/fa";
+import {
+  FaSearch,
+  FaBell,
+  FaHeart,
+  FaComment,
+  FaShare,
+  FaImage,
+} from "react-icons/fa";
 import axios from "axios";
 import MoodPopup from "../components/MoodPopup";
 
@@ -14,7 +21,7 @@ export default function Home() {
     localStorage.getItem("lastMood") || "Neutral"
   );
 
-  // 🔹 Dynamic theme colors per mood
+  // 🔹 Theme colors
   const moodThemes = {
     Creative: "#FFB6C1",
     Ambitious: "#FF6347",
@@ -24,27 +31,16 @@ export default function Home() {
     Neutral: "#f5f5f5",
   };
 
-  // 🔹 Suggested people per mood
-  const moodSuggestions = {
-    Creative: ["Ava (Designer)", "Leo (Musician)", "Zara (Photographer)"],
-    Ambitious: ["Arjun (Founder)", "Maya (Marketer)", "Ethan (Coder)"],
-    Chill: ["Lia (Gamer)", "Noah (Streamer)", "Tia (Traveler)"],
-    Brainstorm: ["Nina (Innovator)", "Ray (Thinker)", "Sam (Strategist)"],
-    Debate: ["Aiden (Law Student)", "Clara (Analyst)", "Dev (Political Buff)"],
-    Neutral: ["Alex (Explorer)", "Emma (Learner)", "Ryan (Creator)"],
-  };
-
-  // 🔹 Handle mood selection
+  // 🔹 Handle mood select
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood.name);
     document.body.style.background = moodThemes[mood.name];
   };
 
-  // Search state
+  // 🔹 Search
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com";
 
@@ -62,7 +58,6 @@ export default function Home() {
         params: { q: query },
         headers: { Authorization: `Bearer ${token}` },
       });
-
       setSearchResults(res.data);
     } catch (err) {
       console.error("Search failed", err);
@@ -76,7 +71,57 @@ export default function Home() {
     navigate(`/profile/${username}`);
   };
 
-  // Set theme color when page loads
+  // 🔹 Dummy posts
+  const [posts, setPosts] = useState([
+    {
+      id: 1,
+      user: "Ava (Designer)",
+      avatar: "/assets/users/user1.jpg",
+      mood: "Creative",
+      caption: "New ideas flowing ✨",
+      image:
+        "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=60",
+      likes: 12,
+      comments: 3,
+    },
+    {
+      id: 2,
+      user: "Arjun (Founder)",
+      avatar: "/assets/users/user2.jpg",
+      mood: "Ambitious",
+      caption: "Another step towards the dream 🚀",
+      image:
+        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=60",
+      likes: 24,
+      comments: 8,
+    },
+  ]);
+
+  // 🔹 Post Composer
+  const [newPost, setNewPost] = useState("");
+  const [photo, setPhoto] = useState(null);
+
+  const handlePost = () => {
+    if (newPost.trim() === "" && !photo) return;
+
+    const newEntry = {
+      id: Date.now(),
+      user: "You",
+      avatar:
+        "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp",
+      mood: selectedMood,
+      caption: newPost,
+      image: photo ? URL.createObjectURL(photo) : null,
+      likes: 0,
+      comments: 0,
+    };
+
+    setPosts([newEntry, ...posts]);
+    setNewPost("");
+    setPhoto(null);
+  };
+
+  // Set theme color on load
   useEffect(() => {
     document.body.style.background = moodThemes[selectedMood];
   }, [selectedMood]);
@@ -101,7 +146,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ✅ Full-Screen Search Overlay */}
+      {/* 🔍 Search Overlay */}
       {isSearchOpen && (
         <div className="search-overlay">
           <div className="search-header">
@@ -124,7 +169,6 @@ export default function Home() {
             {searchResults.length === 0 && searchQuery !== "" && (
               <p className="no-results">No users found</p>
             )}
-
             {searchResults.map((user) => (
               <div
                 key={user._id}
@@ -148,28 +192,75 @@ export default function Home() {
         </div>
       )}
 
-      {/* ✅ Hide rest when search is open */}
+      {/* 🔹 Social Feed */}
       {!isSearchOpen && (
         <>
-          {/* Suggested People Section */}
-          <section className="suggested-section">
-            <h3>
-              Suggested for You <span>({selectedMood} Mood)</span>
-            </h3>
-            <div className="suggested-list">
-              {moodSuggestions[selectedMood]?.map((person, index) => (
-                <div key={index} className="suggested-card">
-                  <img
-                    src={`/assets/users/user${(index % 4) + 1}.jpg`}
-                    alt={person}
-                  />
-                  <span>{person}</span>
-                </div>
-              ))}
+          {/* 🧍‍♀️ Stories */}
+          <div className="stories-bar">
+            <div className="story your-story">
+              <FaImage />
+              <span>Your Story</span>
             </div>
-          </section>
+            {["Ava", "Arjun", "Lia", "Nina", "Dev"].map((name, index) => (
+              <div key={index} className="story">
+                <img
+                  src={`/assets/users/user${(index % 4) + 1}.jpg`}
+                  alt={name}
+                />
+                <span>{name}</span>
+              </div>
+            ))}
+          </div>
 
-          {/* Floating Match Button */}
+          {/* ✏️ Create Post */}
+          <div className="post-composer">
+            <img
+              src="/assets/users/user1.jpg"
+              alt="User"
+              className="composer-avatar"
+            />
+            <textarea
+              placeholder="Share your thoughts..."
+              value={newPost}
+              onChange={(e) => setNewPost(e.target.value)}
+            ></textarea>
+            <div className="composer-actions">
+              <label className="upload-btn">
+                <FaImage />{" "}
+                <input
+                  type="file"
+                  onChange={(e) => setPhoto(e.target.files[0])}
+                />
+              </label>
+              <button onClick={handlePost}>Post</button>
+            </div>
+          </div>
+
+          {/* 📱 Feed Posts */}
+          <div className="feed-section">
+            {posts.map((post) => (
+              <div key={post.id} className="feed-card">
+                <div className="feed-header">
+                  <img src={post.avatar} alt={post.user} />
+                  <div>
+                    <h4>{post.user}</h4>
+                    <span>{post.mood} mood</span>
+                  </div>
+                </div>
+                <p className="caption">{post.caption}</p>
+                {post.image && (
+                  <img src={post.image} alt="Post" className="feed-image" />
+                )}
+                <div className="feed-actions">
+                  <FaHeart /> {post.likes}
+                  <FaComment /> {post.comments}
+                  <FaShare />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Floating Match Card */}
           <div className="match-card">
             <span className="card-title">Meet Someone Like You</span>
             <span className="card-subtitle">
@@ -180,7 +271,7 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Bottom Navbar */}
+          {/* Navbar */}
           <Navbar />
         </>
       )}

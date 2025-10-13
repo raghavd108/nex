@@ -51,7 +51,47 @@
   color: #ff416c;
 }
 
-/* ========= Suggested People Section ========= */
+/* ========= Stories Bar ========= */
+.stories-bar {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  overflow-x: auto;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  margin: 16px;
+}
+.stories-bar::-webkit-scrollbar {
+  display: none;
+}
+.story {
+  text-align: center;
+  flex-shrink: 0;
+}
+.story img,
+.story svg {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ff416c;
+  padding: 2px;
+}
+.story span {
+  font-size: 13px;
+  display: block;
+  margin-top: 6px;
+  color: #222;
+}
+.your-story {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #ff416c;
+}
+
+/* ========= Suggested Section ========= */
 .suggested-section {
   padding: 20px 16px;
   margin: 16px 0;
@@ -60,31 +100,26 @@
   backdrop-filter: blur(12px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
-
 .suggested-section h3 {
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 14px;
   color: #222;
 }
-
 .suggested-section h3 span {
   font-weight: 400;
   font-size: 14px;
   color: #555;
 }
-
 .suggested-list {
   display: flex;
   gap: 14px;
   overflow-x: auto;
   padding-bottom: 6px;
 }
-
 .suggested-list::-webkit-scrollbar {
   display: none;
 }
-
 .suggested-card {
   min-width: 100px;
   padding: 14px 10px;
@@ -97,12 +132,10 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
-
 .suggested-card:hover {
   transform: translateY(-6px) scale(1.05);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.15);
 }
-
 .suggested-card img {
   width: 64px;
   height: 64px;
@@ -112,15 +145,123 @@
   border: 2px solid #ff416c;
   transition: transform 0.3s ease;
 }
-
 .suggested-card img:hover {
   transform: scale(1.12);
 }
-
 .suggested-card span {
   font-size: 14px;
   font-weight: 600;
   color: #222;
+}
+
+/* ========= Post Composer ========= */
+.post-composer {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.composer-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+}
+.post-composer textarea {
+  width: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  padding: 8px;
+  border-radius: 10px;
+  font-family: "Poppins";
+}
+.composer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ff416c;
+  cursor: pointer;
+}
+.upload-btn input {
+  display: none;
+}
+.post-composer button {
+  background: #ff416c;
+  color: #fff;
+  border: none;
+  border-radius: 18px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.post-composer button:hover {
+  background: #ff4b2b;
+}
+
+/* ========= Feed Section ========= */
+.feed-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 16px 80px 16px;
+}
+.feed-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+}
+.feed-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.feed-header img {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid #ff416c;
+}
+.feed-header h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.feed-header span {
+  font-size: 12px;
+  color: #555;
+}
+.feed-card .caption {
+  margin: 8px 0;
+  font-size: 14px;
+}
+.feed-image {
+  width: 100%;
+  border-radius: 12px;
+  margin: 8px 0;
+}
+.feed-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #444;
+  font-size: 15px;
+}
+.feed-actions svg {
+  cursor: pointer;
+  transition: 0.3s;
+}
+.feed-actions svg:hover {
+  color: #ff416c;
 }
 
 /* ========= Match Card ========= */
@@ -136,14 +277,11 @@
   align-items: center;
   text-align: center;
   overflow: hidden;
-  font-family: "Poppins", sans-serif;
   color: #222;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(4px);
   background: transparent;
 }
-
-/* 🖼️ Background Image */
 .match-card::before {
   content: "";
   position: absolute;
@@ -155,12 +293,9 @@
   filter: brightness(0.8) saturate(1.2);
   transition: transform 0.6s ease;
 }
-
 .match-card:hover::before {
   transform: scale(1.05);
 }
-
-/* 🌫️ Soft Overlay */
 .match-card::after {
   content: "";
   position: absolute;
@@ -172,26 +307,21 @@
   );
   z-index: 1;
 }
-
-/* 🧾 Content */
 .match-card span,
 .match-card button {
   position: relative;
   z-index: 2;
 }
-
 .match-card span.card-title {
   font-size: 18px;
   font-weight: 700;
   color: #222;
 }
-
 .match-card span.card-subtitle {
   font-size: 14px;
   color: #444;
   margin-bottom: 12px;
 }
-
 .match-card button.card-btn {
   padding: 12px 24px;
   border-radius: 24px;
@@ -203,274 +333,69 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
-
 .match-card button.card-btn:hover {
   transform: scale(1.05);
 }
 
-/* ========= Search Overlay ========= */
-.search-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(8px);
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.search-header {
-  display: flex;
-  align-items: center;
-  padding: 14px 16px;
-  border-bottom: 1px solid #ddd;
-}
-
-.search-header input {
-  flex: 1;
-  padding: 10px 14px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  outline: none;
-  font-family: "Poppins", sans-serif;
-}
-
-.close-btn {
-  margin-left: 10px;
-  background: #ff4b2b;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-  cursor: pointer;
-  font-size: 18px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: background 0.3s;
-}
-
-.close-btn:hover {
-  background: #ff416c;
-}
-
-/* ========= Search Results ========= */
-.search-results-container {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-}
-
-.profile-preview {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.75);
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
-  margin-bottom: 12px;
-  cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.profile-preview:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-}
-
-.profile-preview img {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ff416c;
-}
-
-.profile-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.profile-info .name {
-  font-weight: 600;
-  font-size: 15px;
-  color: #222;
-}
-
-.profile-info .username {
-  font-size: 13px;
-  color: #555;
-}
-
-.no-results {
-  text-align: center;
-  color: #777;
-  margin-top: 40px;
-  font-size: 15px;
-}
-
 /* ========= Responsive ========= */
 
-/* === Tablets & Small Laptops (max-width: 1024px) === */
+/* === Tablets (≤1024px) === */
 @media (max-width: 1024px) {
-  .search-header {
-    padding: 12px;
+  .stories-bar {
+    gap: 10px;
   }
-
-  .search-header input {
-    font-size: 15px;
-    padding: 8px 12px;
+  .story img {
+    width: 56px;
+    height: 56px;
   }
-
-  .close-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
-
-  .search-results-container {
-    padding: 16px;
-  }
-
-  .profile-preview img {
-    width: 48px;
-    height: 48px;
-  }
-
-  .profile-info .name {
-    font-size: 14px;
-  }
-
-  .profile-info .username {
-    font-size: 12px;
-  }
-
   .match-card {
-    width: 70%;
-    padding: 24px 18px;
-  }
-
-  .match-card span.card-title {
-    font-size: 19px;
-  }
-
-  .match-card span.card-subtitle {
-    font-size: 14px;
+    width: 75%;
   }
 }
 
-/* === Mobile Devices (max-width: 768px) === */
+/* === Mobile (≤768px) === */
 @media (max-width: 768px) {
-  .search-overlay {
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(5px);
+  .logo {
+    font-size: 22px;
   }
-
-  .search-header {
-    flex-direction: row;
-    gap: 8px;
-    padding: 10px;
+  .story img {
+    width: 56px;
+    height: 56px;
   }
-
-  .search-header input {
-    font-size: 14px;
-    padding: 8px 10px;
-    border-radius: 8px;
-  }
-
-  .close-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 15px;
-  }
-
-  .profile-preview img {
-    width: 44px;
-    height: 44px;
-  }
-
-  .match-card {
-    width: 90%;
-    padding: 22px 16px;
-  }
-
-  .match-card span.card-title {
-    font-size: 17px;
-  }
-
-  .match-card span.card-subtitle {
-    font-size: 13px;
-  }
-
-  .suggested-card {
-    min-width: 90px;
-    padding: 12px 8px;
-  }
-
   .suggested-card img {
     width: 60px;
     height: 60px;
   }
+  .match-card {
+    width: 90%;
+    padding: 22px 16px;
+  }
+  .feed-card {
+    padding: 12px;
+  }
 }
 
-/* === Very Small Devices (max-width: 480px) === */
+/* === Small Phones (≤480px) === */
 @media (max-width: 480px) {
-  .search-header {
-    flex-direction: column;
-    align-items: stretch;
+  .top-bar {
+    padding: 10px 12px;
   }
-
-  .search-header input {
-    width: 100%;
-    font-size: 13px;
+  .logo {
+    font-size: 20px;
   }
-
-  .close-btn {
-    align-self: flex-end;
-    margin-top: 8px;
+  .story img {
+    width: 50px;
+    height: 50px;
   }
-
-  .profile-preview img {
+  .post-composer {
+    padding: 10px 12px;
+  }
+  .feed-header img {
     width: 40px;
     height: 40px;
   }
-
-  .profile-info .name {
-    font-size: 13px;
-  }
-
-  .profile-info .username {
-    font-size: 11.5px;
-  }
-
   .match-card {
     width: 95%;
     padding: 18px 12px;
-  }
-
-  .match-card span.card-title {
-    font-size: 16px;
-  }
-
-  .match-card span.card-subtitle {
-    font-size: 12.5px;
-  }
-
-  .no-results {
-    font-size: 13px;
-    margin-top: 24px;
   }
 }
