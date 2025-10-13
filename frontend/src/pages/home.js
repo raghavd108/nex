@@ -11,6 +11,7 @@ import {
   FaImage,
   FaPlus,
   FaTimes,
+  FaTrash,
 } from "react-icons/fa";
 import axios from "axios";
 import MoodPopup from "../components/MoodPopup";
@@ -50,6 +51,7 @@ export default function Home() {
     document.body.style.background = moodThemes[selectedMood];
   }, [selectedMood]);
 
+  // Fetch user profile
   const fetchUserProfile = async () => {
     try {
       const res = await axios.get(`${API_URL}/profile/me`, {
@@ -61,6 +63,7 @@ export default function Home() {
     }
   };
 
+  // Fetch posts
   const fetchPosts = async () => {
     try {
       const res = await axios.get(`${API_URL}/posts`);
@@ -71,6 +74,7 @@ export default function Home() {
     }
   };
 
+  // Fetch stories
   const fetchStories = async () => {
     try {
       const res = await axios.get(`${API_URL}/story`);
@@ -122,6 +126,7 @@ export default function Home() {
     navigate(`/profile/${username}`);
   };
 
+  // Create new post
   const handlePost = async () => {
     if (newPost.trim() === "" && !photo) return;
     setLoading(true);
@@ -132,6 +137,7 @@ export default function Home() {
       formData.append("mood", selectedMood);
       if (photo) formData.append("image", photo);
 
+      // POST request
       const res = await axios.post(`${API_URL}/posts`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -139,8 +145,9 @@ export default function Home() {
         },
       });
 
-      const postWithUser = { ...res.data, userId: userProfile };
-      setPosts((prev) => [postWithUser, ...prev]);
+      // Fetch populated post from backend
+      const postRes = await axios.get(`${API_URL}/posts/${res.data._id}`);
+      setPosts((prev) => [postRes.data, ...prev]);
       setNewPost("");
       setPhoto(null);
       setIsPostPopupOpen(false);
@@ -161,12 +168,7 @@ export default function Home() {
 
       setPosts((prev) =>
         prev.map((p) =>
-          p._id === postId
-            ? {
-                ...p,
-                likes: Array.isArray(res.data.likes) ? res.data.likes : [],
-              }
-            : p
+          p._id === postId ? { ...p, likes: res.data.likes } : p
         )
       );
     } catch (err) {
@@ -205,7 +207,7 @@ export default function Home() {
         },
       });
 
-      fetchStories(); // Refresh stories
+      fetchStories();
     } catch (err) {
       console.error("Error uploading story:", err);
     } finally {
@@ -222,6 +224,21 @@ export default function Home() {
       fetchStories();
     } catch (err) {
       console.error("Error deleting story:", err);
+    }
+  };
+  const handleDeletePost = async (postId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`${API_URL}/posts/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPosts((prev) => prev.filter((p) => p._id !== postId));
+    } catch (err) {
+      console.error("Error deleting post:", err);
     }
   };
 
@@ -291,7 +308,6 @@ export default function Home() {
 
       {/* Stories */}
       <div className="stories-bar">
-        {/* Your Story */}
         <div className="story your-story">
           <div
             onClick={() =>
@@ -315,7 +331,6 @@ export default function Home() {
           onChange={(e) => handleUploadStory(e.target.files[0])}
         />
 
-        {/* Other Users' Stories */}
         {Array.isArray(stories) &&
           stories
             .filter((s) => s.userId?._id !== userProfile?._id)
@@ -363,7 +378,7 @@ export default function Home() {
             </div>
           </div>
           <img
-            src={currentStory.storyUrl}
+            src={currentStory.imageUrl} // <-- use imageUrl here
             alt="Story"
             className="fullscreen-story-image"
           />
@@ -398,12 +413,22 @@ export default function Home() {
                   {Array.isArray(post.comments) ? post.comments.length : 0}
                 </span>
                 <FaShare />
+                {post.userId?._id === userProfile?._id && (
+                  <FaTrash
+                    onClick={() => handleDeletePost(post._id)}
+                    style={{
+                      marginLeft: "10px",
+                      color: "red",
+                      cursor: "pointer",
+                    }}
+                    title="Delete Post"
+                  />
+                )}
               </div>
             </div>
           ))}
       </div>
 
-      {/* Floating Post Button */}
       <button
         className="open-post-btn"
         onClick={() => setIsPostPopupOpen(true)}
@@ -411,7 +436,6 @@ export default function Home() {
         <FaPlus /> Post
       </button>
 
-      {/* Post Popup */}
       {isPostPopupOpen && (
         <div className="post-popup-overlay">
           <div className="post-popup">
