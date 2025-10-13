@@ -32,8 +32,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isPostPopupOpen, setIsPostPopupOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
-  const [isViewingStory, setIsViewingStory] = useState(false);
-  const [currentStory, setCurrentStory] = useState(null);
 
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com/api";
@@ -190,42 +188,6 @@ export default function Home() {
     }
   };
 
-  const handleUploadStory = async (file) => {
-    if (!file) return;
-    setLoading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append("story", file);
-
-      await axios.post(`${API_URL}/story/story`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      // Fetch stories immediately after upload
-      fetchStories();
-    } catch (err) {
-      console.error("Error uploading story:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteStory = async (storyId) => {
-    try {
-      await axios.delete(`${API_URL}/story/${storyId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setIsViewingStory(false);
-      fetchStories();
-    } catch (err) {
-      console.error("Error deleting story:", err);
-    }
-  };
-
   const handleDeletePost = async (postId) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this post?"
@@ -240,16 +202,6 @@ export default function Home() {
     } catch (err) {
       console.error("Error deleting post:", err);
     }
-  };
-
-  const dynamicUserStory =
-    Array.isArray(stories) && userProfile
-      ? stories.filter((s) => s.userId?._id === userProfile._id)
-      : [];
-
-  const handleViewStory = (story) => {
-    setCurrentStory(story);
-    setIsViewingStory(true);
   };
 
   return (
@@ -303,115 +255,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Stories */}
-      <div className="stories-bar">
-        {/* Current User Story */}
-        <div className="story your-story">
-          <div
-            onClick={() => {
-              if (dynamicUserStory.length > 0) {
-                // Open your story if it exists
-                handleViewStory(dynamicUserStory[0]);
-              } else {
-                // No story, open file input to upload
-                document.getElementById("storyInput")?.click();
-              }
-            }}
-            style={{
-              border:
-                dynamicUserStory.length > 0
-                  ? "3px solid #FF6347"
-                  : "2px dashed gray",
-              borderRadius: "50%",
-              padding: "2px",
-              cursor: "pointer",
-            }}
-          >
-            <img src={userProfile?.avatar} alt="Your Story" />
-            {dynamicUserStory.length === 0 && <FaPlus className="add-icon" />}
-          </div>
-          <span>
-            {dynamicUserStory.length > 0 ? "Your Story" : "Add Story"}
-          </span>
-        </div>
-
-        {/* File input for uploading story */}
-        <input
-          type="file"
-          id="storyInput"
-          style={{ display: "none" }}
-          onChange={(e) => handleUploadStory(e.target.files[0])}
-        />
-
-        {/* Other Users Stories */}
-        {Array.isArray(stories) &&
-          stories
-            .filter((s) => s.userId?._id !== userProfile?._id)
-            .map((s) => (
-              <div
-                className="story"
-                key={s._id}
-                onClick={() => handleViewStory(s)}
-                style={{
-                  border: s.imageUrl ? "3px solid #FF6347" : "2px dashed gray",
-                  borderRadius: "50%",
-                  padding: "2px",
-                  cursor: "pointer",
-                }}
-              >
-                <img src={s.userId?.avatar} alt={s.userId?.name} />
-                <span>{s.userId?.name}</span>
-              </div>
-            ))}
-      </div>
-
-      {/* Fullscreen Story Viewer */}
-      {isViewingStory && currentStory && (
-        <div className="story-fullscreen">
-          <div className="story-fullscreen-header">
-            <div className="story-buttons-top">
-              {currentStory.userId?._id === userProfile?._id && (
-                <>
-                  <button
-                    className="add-story-fullscreen"
-                    onClick={() =>
-                      document.getElementById("storyInput")?.click()
-                    }
-                  >
-                    <FaPlus /> Add Story
-                  </button>
-                  <button
-                    className="delete-story"
-                    onClick={() => handleDeleteStory(currentStory._id)}
-                  >
-                    Delete
-                  </button>
-                </>
-              )}
-              <button
-                className="close-story"
-                onClick={() => setIsViewingStory(false)}
-              >
-                <FaTimes />
-              </button>
-            </div>
-          </div>
-
-          {/* Ensure imageUrl exists; fallback if needed */}
-          {currentStory.imageUrl ? (
-            <img
-              src={currentStory.imageUrl}
-              alt="Story"
-              className="fullscreen-story-image"
-            />
-          ) : (
-            <p style={{ textAlign: "center", marginTop: "50px" }}>
-              Story image not available
-            </p>
-          )}
         </div>
       )}
 

@@ -165,5 +165,23 @@ router.delete("/:id", auth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// ---------------------- GET POSTS BY USERNAME ----------------------
+router.get("/user/:username", async (req, res) => {
+  try {
+    // Find profile by username
+    const profile = await Profile.findOne({ username: req.params.username });
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
+
+    const posts = await Post.find({ userId: profile._id })
+      .populate("userId", "username name avatar")
+      .populate("comments.userId", "username avatar")
+      .sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (err) {
+    console.error("Error fetching user posts:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;

@@ -13,7 +13,6 @@ const themedRoom = require("./routes/themedRoom");
 const messageRoutes = require("./routes/messages");
 const chatSocket = require("./routes/messageSocket.js");
 const postsRoute = require("./routes/posts.js");
-const storyRoutes = require("./routes/stories");
 
 require("dotenv").config(); // Load .env variables
 
@@ -56,7 +55,6 @@ app.use(express.json());
 // ✅ Example API Route
 app.use("/api/profile", profileRoutes);
 app.use("/api/posts", postsRoute);
-app.use("/api/story", storyRoutes);
 app.use("/api/likes", likeRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/rooms", roomRoutes);
