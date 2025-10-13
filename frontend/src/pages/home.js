@@ -27,6 +27,8 @@ export default function Home() {
   const [newPost, setNewPost] = useState("");
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isPostPopupOpen, setIsPostPopupOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
 
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com/api";
@@ -46,6 +48,23 @@ export default function Home() {
     document.body.style.background = moodThemes[selectedMood];
   }, [selectedMood]);
 
+  // 🔹 Fetch logged-in user profile
+  const fetchUserProfile = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/profile/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUserProfile(res.data);
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserProfile();
+    fetchPosts();
+  }, []);
+
   // 🔹 Handle mood select
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood.name);
@@ -63,10 +82,6 @@ export default function Home() {
       console.error("Error loading posts:", err);
     }
   };
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
 
   // 🔹 Handle search
   const handleSearch = async (e) => {
@@ -117,6 +132,7 @@ export default function Home() {
       setPosts([res.data, ...posts]);
       setNewPost("");
       setPhoto(null);
+      setIsPostPopupOpen(false);
     } catch (err) {
       console.error("Error posting:", err);
     } finally {
@@ -228,104 +244,102 @@ export default function Home() {
         </div>
       )}
 
-      {/* 🔹 Feed Content */}
-      {!isSearchOpen && (
-        <>
-          {/* 🧍 Stories */}
-          <div className="stories-bar">
-            <div className="story your-story">
-              <FaImage />
-              <span>Your Story</span>
+      {/* 🔹 Floating Create Post Button */}
+      <button
+        className="open-post-btn"
+        onClick={() => setIsPostPopupOpen(true)}
+      >
+        + Post
+      </button>
+
+      {/* 🔹 Post Popup */}
+      {isPostPopupOpen && (
+        <div
+          className="post-popup-overlay"
+          onClick={() => setIsPostPopupOpen(false)}
+        >
+          <div className="post-popup" onClick={(e) => e.stopPropagation()}>
+            <div className="popup-header">
+              <h3>Create Post</h3>
+              <button onClick={() => setIsPostPopupOpen(false)}>✕</button>
             </div>
-            {["Ava", "Arjun", "Lia", "Nina", "Dev"].map((name, index) => (
-              <div key={index} className="story">
+            <div className="popup-body">
+              <div className="composer-avatar">
                 <img
-                  src={`/assets/users/user${(index % 4) + 1}.jpg`}
-                  alt={name}
+                  src={userProfile?.avatar || "/assets/users/user1.jpg"}
+                  alt={userProfile?.name || "User"}
                 />
-                <span>{name}</span>
               </div>
-            ))}
-          </div>
-
-          {/* ✏️ Create Post */}
-          <div className="post-composer">
-            <img
-              src="/assets/users/user1.jpg"
-              alt="User"
-              className="composer-avatar"
-            />
-            <textarea
-              placeholder="Share your thoughts..."
-              value={newPost}
-              onChange={(e) => setNewPost(e.target.value)}
-            ></textarea>
-            <div className="composer-actions">
-              <label className="upload-btn">
-                <FaImage />{" "}
-                <input
-                  type="file"
-                  onChange={(e) => setPhoto(e.target.files[0])}
-                />
-              </label>
-              <button onClick={handlePost} disabled={loading}>
-                {loading ? "Posting..." : "Post"}
-              </button>
+              <textarea
+                placeholder="What's on your mind?"
+                value={newPost}
+                onChange={(e) => setNewPost(e.target.value)}
+              />
+              <div className="composer-actions">
+                <label className="upload-btn">
+                  <FaImage />
+                  <input
+                    type="file"
+                    onChange={(e) => setPhoto(e.target.files[0])}
+                  />
+                </label>
+                <button onClick={handlePost} disabled={loading}>
+                  {loading ? "Posting..." : "Post"}
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* 📱 Feed Posts */}
-          <div className="feed-section">
-            {posts.map((post) => (
-              <div key={post._id} className="feed-card">
-                <div className="feed-header">
-                  <img
-                    src={
-                      post.userId?.avatar ||
-                      "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
-                    }
-                    alt={post.userId?.username}
-                  />
-                  <div>
-                    <h4>{post.userId?.name || "User"}</h4>
-                    <span>{post.mood || "Neutral"} mood</span>
-                  </div>
-                </div>
-
-                <p className="caption">{post.content}</p>
-
-                {post.imageUrl && (
-                  <img src={post.imageUrl} alt="Post" className="feed-image" />
-                )}
-
-                <div className="feed-actions">
-                  <span onClick={() => handleLike(post._id)}>
-                    <FaHeart /> {post.likes?.length || 0}
-                  </span>
-                  <span onClick={() => handleComment(post._id)}>
-                    <FaComment /> {post.comments?.length || 0}
-                  </span>
-                  <FaShare />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Floating Match Card */}
-          <div className="match-card">
-            <span className="card-title">Meet Someone Like You</span>
-            <span className="card-subtitle">
-              Your next connection is waiting!
-            </span>
-            <button className="card-btn" onClick={() => navigate("/video")}>
-              Start Matching
-            </button>
-          </div>
-
-          {/* Navbar */}
-          <Navbar />
-        </>
+        </div>
       )}
+
+      {/* 🔹 Feed Section */}
+      <div className="feed-section">
+        {posts.map((post) => (
+          <div key={post._id} className="feed-card">
+            <div className="feed-header">
+              <img
+                src={
+                  post.userId?.avatar ||
+                  "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
+                }
+                alt={post.userId?.username}
+              />
+              <div>
+                <h4>{post.userId?.name || "User"}</h4>
+                <span>{post.mood || "Neutral"} mood</span>
+              </div>
+            </div>
+
+            <p className="caption">{post.content}</p>
+
+            {post.imageUrl && (
+              <img src={post.imageUrl} alt="Post" className="feed-image" />
+            )}
+
+            <div className="feed-actions">
+              <span onClick={() => handleLike(post._id)}>
+                <FaHeart /> {post.likes?.length || 0}
+              </span>
+              <span onClick={() => handleComment(post._id)}>
+                <FaComment /> {post.comments?.length || 0}
+              </span>
+              <FaShare />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Floating Match Card */}
+      <div className="match-card">
+        <span className="card-title">Meet Someone Like You</span>
+        <span className="card-subtitle">Your next connection is waiting!</span>
+        <button className="card-btn" onClick={() => navigate("/video")}>
+          Start Matching
+        </button>
+      </div>
+
+      {/* Navbar */}
+      <Navbar />
     </div>
   );
 }
