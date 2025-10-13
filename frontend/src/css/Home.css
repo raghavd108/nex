@@ -53,6 +53,88 @@
   color: #ff416c;
 }
 
+/* ========= Search Overlay ========= */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  z-index: 2000;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.search-header input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.search-header .close-btn {
+  background: #ff416c;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.search-results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.profile-preview:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.profile-preview img {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-info .name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.profile-info .username {
+  font-size: 12px;
+  color: #555;
+}
+
+.no-results {
+  color: #fff;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
 /* ========= Stories Bar ========= */
 .stories-bar {
   display: flex;
@@ -68,7 +150,6 @@
   box-sizing: border-box;
 }
 
-/* Make "Your Story" always the first */
 .stories-bar::before {
   content: "";
   flex-shrink: 0;
@@ -86,6 +167,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  cursor: pointer;
 }
 
 .story img,
@@ -114,7 +196,7 @@
   cursor: pointer;
   position: relative;
   flex-shrink: 0;
-  order: -1; /* Always put it at the start */
+  order: -1;
 }
 
 .your-story .add-icon {
@@ -391,6 +473,42 @@
 
 .feed-actions svg:hover {
   color: #ff416c;
+}
+
+/* ========= Fullscreen Story ========= */
+.story-fullscreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+.story-fullscreen img {
+  max-width: 95%;
+  max-height: 95%;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.close-story {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  padding: 6px 10px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.close-story:hover {
+  background: #ff416c;
+  color: #fff;
 }
 
 /* ========= Responsive ========= */

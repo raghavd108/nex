@@ -53,7 +53,7 @@ export default function Navbar() {
           </li>
           <li>
             <Link
-              to="/match"
+              to="/VideoCall"
               className={isActive("/VideoCall") ? "active" : ""}
             >
               <i className="fas fa-heartbeat"></i>

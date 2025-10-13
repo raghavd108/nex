@@ -10,6 +10,7 @@ import {
   FaShare,
   FaImage,
   FaPlus,
+  FaTimes,
 } from "react-icons/fa";
 import axios from "axios";
 import MoodPopup from "../components/MoodPopup";
@@ -27,10 +28,11 @@ export default function Home() {
   const [stories, setStories] = useState([]);
   const [newPost, setNewPost] = useState("");
   const [photo, setPhoto] = useState(null);
-  const [storyFile, setStoryFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isPostPopupOpen, setIsPostPopupOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+  const [isViewingStory, setIsViewingStory] = useState(false);
+  const [currentStory, setCurrentStory] = useState(null);
 
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com/api";
@@ -48,7 +50,6 @@ export default function Home() {
     document.body.style.background = moodThemes[selectedMood];
   }, [selectedMood]);
 
-  // Fetch user profile
   const fetchUserProfile = async () => {
     try {
       const res = await axios.get(`${API_URL}/profile/me`, {
@@ -60,7 +61,6 @@ export default function Home() {
     }
   };
 
-  // Fetch posts
   const fetchPosts = async () => {
     try {
       const res = await axios.get(`${API_URL}/posts`);
@@ -71,7 +71,6 @@ export default function Home() {
     }
   };
 
-  // Fetch stories
   const fetchStories = async () => {
     try {
       const res = await axios.get(`${API_URL}/story`);
@@ -123,7 +122,6 @@ export default function Home() {
     navigate(`/profile/${username}`);
   };
 
-  // Create new post
   const handlePost = async () => {
     if (newPost.trim() === "" && !photo) return;
     setLoading(true);
@@ -192,7 +190,6 @@ export default function Home() {
     }
   };
 
-  // Upload story
   const handleUploadStory = async (file) => {
     if (!file) return;
     setLoading(true);
@@ -216,11 +213,15 @@ export default function Home() {
     }
   };
 
-  // Check if user already has a story
   const userStory =
     Array.isArray(stories) && stories.length > 0 && userProfile
       ? stories.find((s) => s.userId?._id === userProfile._id)
       : null;
+
+  const handleViewStory = (story) => {
+    setCurrentStory(story);
+    setIsViewingStory(true);
+  };
 
   return (
     <div
@@ -276,52 +277,18 @@ export default function Home() {
         </div>
       )}
 
-      {/* Post Popup */}
-      {isPostPopupOpen && (
-        <div
-          className="post-popup-overlay"
-          onClick={() => setIsPostPopupOpen(false)}
-        >
-          <div className="post-popup" onClick={(e) => e.stopPropagation()}>
-            <div className="popup-header">
-              <h3>Create Post</h3>
-              <button onClick={() => setIsPostPopupOpen(false)}>✕</button>
-            </div>
-            <div className="popup-body">
-              <div className="composer-avatar">
-                <img src={userProfile?.avatar} alt="User" />
-              </div>
-              <textarea
-                placeholder="What's on your mind?"
-                value={newPost}
-                onChange={(e) => setNewPost(e.target.value)}
-              />
-              <div className="composer-actions">
-                <label className="upload-btn">
-                  <FaImage />
-                  <input
-                    type="file"
-                    onChange={(e) => setPhoto(e.target.files[0])}
-                  />
-                </label>
-                <button onClick={handlePost} disabled={loading}>
-                  {loading ? "Posting..." : "Post"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Stories */}
       <div className="stories-bar">
-        <div
-          className="story your-story"
-          onClick={() => document.getElementById("storyInput")?.click()}
-        >
-          <div>
+        <div className="story your-story">
+          <div
+            onClick={() =>
+              userStory
+                ? handleViewStory(userStory)
+                : document.getElementById("storyInput")?.click()
+            }
+          >
             <img src={userProfile?.avatar} alt="Your Story" />
-            <FaPlus className="add-icon" />
+            {!userStory && <FaPlus className="add-icon" />}
           </div>
           <span>{userStory ? "Your Story" : "Add Story"}</span>
         </div>
@@ -336,12 +303,33 @@ export default function Home() {
           stories
             .filter((s) => s.userId?._id !== userProfile?._id)
             .map((s) => (
-              <div className="story" key={s._id}>
+              <div
+                className="story"
+                key={s._id}
+                onClick={() => handleViewStory(s)}
+              >
                 <img src={s.userId?.avatar} alt={s.userId?.name} />
                 <span>{s.userId?.name}</span>
               </div>
             ))}
       </div>
+
+      {/* Fullscreen Story Viewer */}
+      {isViewingStory && currentStory && (
+        <div className="story-fullscreen">
+          <button
+            className="close-story"
+            onClick={() => setIsViewingStory(false)}
+          >
+            <FaTimes />
+          </button>
+          <img
+            src={currentStory.storyUrl}
+            alt="Story"
+            className="fullscreen-story-image"
+          />
+        </div>
+      )}
 
       {/* Feed */}
       <div className="feed-section">
@@ -375,6 +363,57 @@ export default function Home() {
             </div>
           ))}
       </div>
+      {/* Floating Post Button */}
+      <button
+        className="open-post-btn"
+        onClick={() => setIsPostPopupOpen(true)}
+      >
+        <FaPlus /> Post
+      </button>
+
+      {/* Post Popup */}
+      {isPostPopupOpen && (
+        <div className="post-popup-overlay">
+          <div className="post-popup">
+            <div className="popup-header">
+              <h3>Create Post</h3>
+              <button onClick={() => setIsPostPopupOpen(false)}>
+                <FaTimes />
+              </button>
+            </div>
+            <div className="popup-body">
+              <div className="composer-avatar">
+                <img src={userProfile?.avatar} alt="Avatar" />
+              </div>
+              <textarea
+                placeholder="What's on your mind?"
+                value={newPost}
+                onChange={(e) => setNewPost(e.target.value)}
+              />
+              {photo && (
+                <img
+                  src={URL.createObjectURL(photo)}
+                  alt="Preview"
+                  style={{ borderRadius: "12px", maxHeight: "150px" }}
+                />
+              )}
+              <div className="composer-actions">
+                <label className="upload-btn">
+                  <FaImage /> Upload Image
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setPhoto(e.target.files[0])}
+                  />
+                </label>
+                <button onClick={handlePost} disabled={loading}>
+                  {loading ? "Posting..." : "Post"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Navbar />
     </div>
