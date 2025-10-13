@@ -67,14 +67,27 @@
   max-width: 100%;
   box-sizing: border-box;
 }
+
+/* Make "Your Story" always the first */
+.stories-bar::before {
+  content: "";
+  flex-shrink: 0;
+  width: 0;
+}
+
 .stories-bar::-webkit-scrollbar {
   display: none;
 }
+
 .story {
   text-align: center;
   flex-shrink: 0;
   width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
 .story img,
 .story svg {
   width: 64px;
@@ -84,6 +97,7 @@
   border: 3px solid #ff416c;
   padding: 2px;
 }
+
 .story span {
   font-size: 13px;
   display: block;
@@ -91,6 +105,7 @@
   color: #222;
   word-wrap: break-word;
 }
+
 .your-story {
   display: flex;
   flex-direction: column;
@@ -98,7 +113,10 @@
   color: #ff416c;
   cursor: pointer;
   position: relative;
+  flex-shrink: 0;
+  order: -1; /* Always put it at the start */
 }
+
 .your-story .add-icon {
   position: absolute;
   bottom: 0;
@@ -126,17 +144,20 @@
   max-width: 100%;
   overflow-x: hidden;
 }
+
 .suggested-section h3 {
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 14px;
   color: #222;
 }
+
 .suggested-section h3 span {
   font-weight: 400;
   font-size: 14px;
   color: #555;
 }
+
 .suggested-list {
   display: flex;
   gap: 14px;
@@ -144,9 +165,11 @@
   padding-bottom: 6px;
   scroll-behavior: smooth;
 }
+
 .suggested-list::-webkit-scrollbar {
   display: none;
 }
+
 .suggested-card {
   min-width: 100px;
   padding: 14px 10px;
@@ -159,10 +182,12 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
+
 .suggested-card:hover {
   transform: translateY(-6px) scale(1.05);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.15);
 }
+
 .suggested-card img {
   width: 64px;
   height: 64px;
@@ -172,9 +197,11 @@
   border: 2px solid #ff416c;
   transition: transform 0.3s ease;
 }
+
 .suggested-card img:hover {
   transform: scale(1.12);
 }
+
 .suggested-card span {
   font-size: 14px;
   font-weight: 600;
@@ -197,6 +224,7 @@
   z-index: 1000;
   transition: transform 0.3s ease;
 }
+
 .open-post-btn:hover {
   transform: scale(1.1);
 }
@@ -211,6 +239,7 @@
   align-items: center;
   z-index: 2000;
 }
+
 .post-popup {
   background: #fff;
   padding: 20px;
@@ -223,30 +252,36 @@
   box-sizing: border-box;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
+
 .popup-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .popup-header h3 {
   margin: 0;
 }
+
 .popup-header button {
   background: none;
   border: none;
   font-size: 20px;
   cursor: pointer;
 }
+
 .popup-body {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+
 .popup-body .composer-avatar img {
   width: 46px;
   height: 46px;
   border-radius: 50%;
 }
+
 .popup-body textarea {
   width: 100%;
   min-height: 80px;
@@ -256,11 +291,13 @@
   resize: none;
   font-family: "Poppins", sans-serif;
 }
+
 .popup-body .composer-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .popup-body .upload-btn {
   display: flex;
   align-items: center;
@@ -268,9 +305,11 @@
   color: #ff416c;
   cursor: pointer;
 }
+
 .popup-body .upload-btn input {
   display: none;
 }
+
 .popup-body button {
   background: #ff416c;
   color: #fff;
@@ -281,6 +320,7 @@
   font-weight: 600;
   transition: 0.3s;
 }
+
 .popup-body button:hover {
   background: #ff4b2b;
 }
@@ -292,6 +332,7 @@
   gap: 16px;
   margin: 0 16px 80px 16px;
 }
+
 .feed-card {
   background: rgba(255, 255, 255, 0.8);
   border-radius: 16px;
@@ -299,35 +340,42 @@
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
   word-break: break-word;
 }
+
 .feed-header {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .feed-header img {
   width: 46px;
   height: 46px;
   border-radius: 50%;
   border: 2px solid #ff416c;
 }
+
 .feed-header h4 {
   margin: 0;
   font-size: 15px;
   font-weight: 600;
 }
+
 .feed-header span {
   font-size: 12px;
   color: #555;
 }
+
 .feed-card .caption {
   margin: 8px 0;
   font-size: 14px;
 }
+
 .feed-image {
   width: 100%;
   border-radius: 12px;
   margin: 8px 0;
 }
+
 .feed-actions {
   display: flex;
   align-items: center;
@@ -335,10 +383,12 @@
   color: #444;
   font-size: 15px;
 }
+
 .feed-actions svg {
   cursor: pointer;
   transition: 0.3s;
 }
+
 .feed-actions svg:hover {
   color: #ff416c;
 }
