@@ -64,9 +64,10 @@ export default function Home() {
   const fetchPosts = async () => {
     try {
       const res = await axios.get(`${API_URL}/posts`);
-      setPosts(res.data);
+      setPosts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error loading posts:", err);
+      setPosts([]);
     }
   };
 
@@ -74,9 +75,10 @@ export default function Home() {
   const fetchStories = async () => {
     try {
       const res = await axios.get(`${API_URL}/story`);
-      setStories(res.data);
+      setStories(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error loading stories:", err);
+      setStories([]);
     }
   };
 
@@ -107,9 +109,10 @@ export default function Home() {
         params: { q: query },
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSearchResults(res.data);
+      setSearchResults(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Search failed", err);
+      setSearchResults([]);
     }
   };
 
@@ -138,9 +141,8 @@ export default function Home() {
         },
       });
 
-      // Fix: populate post with user info
       const postWithUser = { ...res.data, userId: userProfile };
-      setPosts([postWithUser, ...posts]);
+      setPosts((prev) => [postWithUser, ...prev]);
       setNewPost("");
       setPhoto(null);
       setIsPostPopupOpen(false);
@@ -162,7 +164,10 @@ export default function Home() {
       setPosts((prev) =>
         prev.map((p) =>
           p._id === postId
-            ? { ...p, likes: Array(res.data.likes).fill("x") }
+            ? {
+                ...p,
+                likes: Array.isArray(res.data.likes) ? res.data.likes : [],
+              }
             : p
         )
       );
@@ -188,13 +193,13 @@ export default function Home() {
   };
 
   // Upload story
-  const handleUploadStory = async () => {
-    if (!storyFile) return;
+  const handleUploadStory = async (file) => {
+    if (!file) return;
     setLoading(true);
 
     try {
       const formData = new FormData();
-      formData.append("story", storyFile);
+      formData.append("story", file);
 
       await axios.post(`${API_URL}/story/story`, formData, {
         headers: {
@@ -203,7 +208,6 @@ export default function Home() {
         },
       });
 
-      setStoryFile(null);
       fetchStories(); // Refresh stories
     } catch (err) {
       console.error("Error uploading story:", err);
@@ -213,7 +217,10 @@ export default function Home() {
   };
 
   // Check if user already has a story
-  const userStory = stories.find((s) => s.userId?._id === userProfile?._id);
+  const userStory =
+    Array.isArray(stories) && stories.length > 0 && userProfile
+      ? stories.find((s) => s.userId?._id === userProfile._id)
+      : null;
 
   return (
     <div
@@ -227,11 +234,7 @@ export default function Home() {
         <div className="top-icons">
           <FaSearch className="icon" onClick={() => setIsSearchOpen(true)} />
           <FaBell className="icon" />
-
-          <FaComment
-            className="icon"
-            onClick={() => navigate("/match")} // Navigate to match page
-          />
+          <FaComment className="icon" onClick={() => navigate("/match")} />
         </div>
       </header>
 
@@ -314,61 +317,63 @@ export default function Home() {
       <div className="stories-bar">
         <div
           className="story your-story"
-          onClick={() => document.getElementById("storyInput").click()}
+          onClick={() => document.getElementById("storyInput")?.click()}
         >
           <div>
             <img src={userProfile?.avatar} alt="Your Story" />
             <FaPlus className="add-icon" />
           </div>
-          <span>{userStory ? "Add Story" : "Your Story"}</span>
+          <span>{userStory ? "Your Story" : "Add Story"}</span>
         </div>
         <input
           type="file"
           id="storyInput"
           style={{ display: "none" }}
-          onChange={(e) =>
-            setStoryFile(e.target.files[0]) || handleUploadStory()
-          }
+          onChange={(e) => handleUploadStory(e.target.files[0])}
         />
 
-        {stories
-          .filter((s) => s.userId?._id !== userProfile?._id) // exclude current user
-          .map((s) => (
-            <div className="story" key={s._id}>
-              <img src={s.userId?.avatar} alt={s.userId?.name} />
-              <span>{s.userId?.name}</span>
-            </div>
-          ))}
+        {Array.isArray(stories) &&
+          stories
+            .filter((s) => s.userId?._id !== userProfile?._id)
+            .map((s) => (
+              <div className="story" key={s._id}>
+                <img src={s.userId?.avatar} alt={s.userId?.name} />
+                <span>{s.userId?.name}</span>
+              </div>
+            ))}
       </div>
 
       {/* Feed */}
       <div className="feed-section">
-        {posts.map((post) => (
-          <div key={post._id} className="feed-card">
-            <div className="feed-header">
-              <img src={post.userId?.avatar} alt={post.userId?.username} />
-              <div>
-                <h4>{post.userId?.name || "User"}</h4>
-                <span>{post.mood || "Neutral"} mood</span>
+        {Array.isArray(posts) &&
+          posts.map((post) => (
+            <div key={post._id} className="feed-card">
+              <div className="feed-header">
+                <img src={post.userId?.avatar} alt={post.userId?.username} />
+                <div>
+                  <h4>{post.userId?.name || "User"}</h4>
+                  <span>{post.mood || "Neutral"} mood</span>
+                </div>
+              </div>
+
+              <p className="caption">{post.content}</p>
+              {post.imageUrl && (
+                <img src={post.imageUrl} alt="Post" className="feed-image" />
+              )}
+
+              <div className="feed-actions">
+                <span onClick={() => handleLike(post._id)}>
+                  <FaHeart />{" "}
+                  {Array.isArray(post.likes) ? post.likes.length : 0}
+                </span>
+                <span onClick={() => handleComment(post._id)}>
+                  <FaComment />{" "}
+                  {Array.isArray(post.comments) ? post.comments.length : 0}
+                </span>
+                <FaShare />
               </div>
             </div>
-
-            <p className="caption">{post.content}</p>
-            {post.imageUrl && (
-              <img src={post.imageUrl} alt="Post" className="feed-image" />
-            )}
-
-            <div className="feed-actions">
-              <span onClick={() => handleLike(post._id)}>
-                <FaHeart /> {post.likes?.length || 0}
-              </span>
-              <span onClick={() => handleComment(post._id)}>
-                <FaComment /> {post.comments?.length || 0}
-              </span>
-              <FaShare />
-            </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       <Navbar />
