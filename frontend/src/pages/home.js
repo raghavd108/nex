@@ -15,8 +15,6 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import MoodPopup from "../components/MoodPopup";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -62,7 +60,6 @@ export default function Home() {
       setUserProfile(res.data);
     } catch (err) {
       console.error("Error fetching profile:", err);
-      toast.error("Failed to fetch user profile.");
     }
   };
 
@@ -74,7 +71,6 @@ export default function Home() {
     } catch (err) {
       console.error("Error loading posts:", err);
       setPosts([]);
-      toast.error("Failed to load posts.");
     }
   };
 
@@ -86,7 +82,6 @@ export default function Home() {
     } catch (err) {
       console.error("Error loading stories:", err);
       setStories([]);
-      toast.error("Failed to load stories.");
     }
   };
 
@@ -121,7 +116,6 @@ export default function Home() {
     } catch (err) {
       console.error("Search failed", err);
       setSearchResults([]);
-      toast.error("Search failed. Try again.");
     }
   };
 
@@ -134,10 +128,7 @@ export default function Home() {
 
   // Create new post
   const handlePost = async () => {
-    if (newPost.trim() === "" && !photo) {
-      toast.info("Please add text or image to post.");
-      return;
-    }
+    if (newPost.trim() === "" && !photo) return;
     setLoading(true);
 
     try {
@@ -146,6 +137,7 @@ export default function Home() {
       formData.append("mood", selectedMood);
       if (photo) formData.append("image", photo);
 
+      // POST request
       const res = await axios.post(`${API_URL}/posts`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -153,16 +145,14 @@ export default function Home() {
         },
       });
 
-      // Fetch populated post
+      // Fetch populated post from backend
       const postRes = await axios.get(`${API_URL}/posts/${res.data._id}`);
       setPosts((prev) => [postRes.data, ...prev]);
       setNewPost("");
       setPhoto(null);
       setIsPostPopupOpen(false);
-      toast.success("Post created successfully!");
     } catch (err) {
       console.error("Error posting:", err);
-      toast.error("Failed to create post.");
     } finally {
       setLoading(false);
     }
@@ -183,7 +173,6 @@ export default function Home() {
       );
     } catch (err) {
       console.error("Error liking post:", err);
-      toast.error("Failed to like post.");
     }
   };
 
@@ -198,10 +187,8 @@ export default function Home() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setPosts((prev) => prev.map((p) => (p._id === postId ? res.data : p)));
-      toast.success("Comment added!");
     } catch (err) {
       console.error("Error adding comment:", err);
-      toast.error("Failed to add comment.");
     }
   };
 
@@ -221,10 +208,8 @@ export default function Home() {
       });
 
       fetchStories();
-      toast.success("Story uploaded!");
     } catch (err) {
       console.error("Error uploading story:", err);
-      toast.error("Failed to upload story.");
     } finally {
       setLoading(false);
     }
@@ -237,13 +222,10 @@ export default function Home() {
       });
       setIsViewingStory(false);
       fetchStories();
-      toast.success("Story deleted!");
     } catch (err) {
       console.error("Error deleting story:", err);
-      toast.error("Failed to delete story.");
     }
   };
-
   const handleDeletePost = async (postId) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this post?"
@@ -255,10 +237,8 @@ export default function Home() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPosts((prev) => prev.filter((p) => p._id !== postId));
-      toast.success("Post deleted!");
     } catch (err) {
       console.error("Error deleting post:", err);
-      toast.error("Failed to delete post.");
     }
   };
 
@@ -288,10 +268,6 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Toast container */}
-      <ToastContainer position="top-right" autoClose={3000} />
-
-      {/* Search overlay */}
       {isSearchOpen && (
         <div className="search-overlay">
           <div className="search-header">
