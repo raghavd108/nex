@@ -213,10 +213,22 @@ export default function Home() {
     }
   };
 
-  const userStory =
-    Array.isArray(stories) && stories.length > 0 && userProfile
-      ? stories.find((s) => s.userId?._id === userProfile._id)
-      : null;
+  const handleDeleteStory = async (storyId) => {
+    try {
+      await axios.delete(`${API_URL}/story/${storyId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setIsViewingStory(false);
+      fetchStories();
+    } catch (err) {
+      console.error("Error deleting story:", err);
+    }
+  };
+
+  const dynamicUserStory =
+    Array.isArray(stories) && userProfile
+      ? stories.filter((s) => s.userId?._id === userProfile._id)
+      : [];
 
   const handleViewStory = (story) => {
     setCurrentStory(story);
@@ -279,19 +291,23 @@ export default function Home() {
 
       {/* Stories */}
       <div className="stories-bar">
+        {/* Your Story */}
         <div className="story your-story">
           <div
             onClick={() =>
-              userStory
-                ? handleViewStory(userStory)
+              dynamicUserStory.length > 0
+                ? handleViewStory(dynamicUserStory[0])
                 : document.getElementById("storyInput")?.click()
             }
           >
             <img src={userProfile?.avatar} alt="Your Story" />
-            {!userStory && <FaPlus className="add-icon" />}
+            {dynamicUserStory.length === 0 && <FaPlus className="add-icon" />}
           </div>
-          <span>{userStory ? "Your Story" : "Add Story"}</span>
+          <span>
+            {dynamicUserStory.length > 0 ? "Your Story" : "Add Story"}
+          </span>
         </div>
+
         <input
           type="file"
           id="storyInput"
@@ -299,6 +315,7 @@ export default function Home() {
           onChange={(e) => handleUploadStory(e.target.files[0])}
         />
 
+        {/* Other Users' Stories */}
         {Array.isArray(stories) &&
           stories
             .filter((s) => s.userId?._id !== userProfile?._id)
@@ -317,12 +334,34 @@ export default function Home() {
       {/* Fullscreen Story Viewer */}
       {isViewingStory && currentStory && (
         <div className="story-fullscreen">
-          <button
-            className="close-story"
-            onClick={() => setIsViewingStory(false)}
-          >
-            <FaTimes />
-          </button>
+          <div className="story-fullscreen-header">
+            <div className="story-buttons-top">
+              {currentStory.userId?._id === userProfile?._id && (
+                <>
+                  <button
+                    className="add-story-fullscreen"
+                    onClick={() =>
+                      document.getElementById("storyInput")?.click()
+                    }
+                  >
+                    <FaPlus /> Add Story
+                  </button>
+                  <button
+                    className="delete-story"
+                    onClick={() => handleDeleteStory(currentStory._id)}
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
+              <button
+                className="close-story"
+                onClick={() => setIsViewingStory(false)}
+              >
+                <FaTimes />
+              </button>
+            </div>
+          </div>
           <img
             src={currentStory.storyUrl}
             alt="Story"
@@ -363,6 +402,7 @@ export default function Home() {
             </div>
           ))}
       </div>
+
       {/* Floating Post Button */}
       <button
         className="open-post-btn"

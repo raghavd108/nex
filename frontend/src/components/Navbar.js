@@ -52,10 +52,7 @@ export default function Navbar() {
             </Link>
           </li>
           <li>
-            <Link
-              to="/VideoCall"
-              className={isActive("/VideoCall") ? "active" : ""}
-            >
+            <Link to="/video" className={isActive("/video") ? "active" : ""}>
               <i className="fas fa-heartbeat"></i>
               <span>Match</span>
             </Link>
