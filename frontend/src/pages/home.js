@@ -308,13 +308,18 @@ export default function Home() {
 
       {/* Stories */}
       <div className="stories-bar">
+        {/* Current User Story */}
         <div className="story your-story">
           <div
-            onClick={() =>
-              dynamicUserStory.length > 0
-                ? handleViewStory(dynamicUserStory[0])
-                : document.getElementById("storyInput")?.click()
-            }
+            onClick={() => {
+              if (dynamicUserStory.length > 0) {
+                // Open your story if it exists
+                handleViewStory(dynamicUserStory[0]);
+              } else {
+                // No story, open file input to upload
+                document.getElementById("storyInput")?.click();
+              }
+            }}
             style={{
               border:
                 dynamicUserStory.length > 0
@@ -333,6 +338,7 @@ export default function Home() {
           </span>
         </div>
 
+        {/* File input for uploading story */}
         <input
           type="file"
           id="storyInput"
@@ -340,6 +346,7 @@ export default function Home() {
           onChange={(e) => handleUploadStory(e.target.files[0])}
         />
 
+        {/* Other Users Stories */}
         {Array.isArray(stories) &&
           stories
             .filter((s) => s.userId?._id !== userProfile?._id)
@@ -392,11 +399,19 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <img
-            src={currentStory.imageUrl}
-            alt="Story"
-            className="fullscreen-story-image"
-          />
+
+          {/* Ensure imageUrl exists; fallback if needed */}
+          {currentStory.imageUrl ? (
+            <img
+              src={currentStory.imageUrl}
+              alt="Story"
+              className="fullscreen-story-image"
+            />
+          ) : (
+            <p style={{ textAlign: "center", marginTop: "50px" }}>
+              Story image not available
+            </p>
+          )}
         </div>
       )}
 
