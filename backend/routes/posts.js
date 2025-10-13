@@ -113,5 +113,28 @@ router.get("/mood/:mood", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// 🔹 Delete a post (only owner)
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    // Only the owner can delete
+    if (post.userId.toString() !== req.user.id)
+      return res.status(403).json({ message: "Unauthorized" });
+
+    // Optionally delete image from Cloudinary
+    if (post.imageUrl) {
+      const publicId = post.imageUrl.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(`posts/${publicId}`);
+    }
+
+    await post.deleteOne();
+    res.json({ message: "Post deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting post:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;

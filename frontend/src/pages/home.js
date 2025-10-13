@@ -9,6 +9,7 @@ import {
   FaComment,
   FaShare,
   FaImage,
+  FaPlus,
 } from "react-icons/fa";
 import axios from "axios";
 import MoodPopup from "../components/MoodPopup";
@@ -16,7 +17,6 @@ import MoodPopup from "../components/MoodPopup";
 export default function Home() {
   const navigate = useNavigate();
 
-  // 🔹 States
   const [selectedMood, setSelectedMood] = useState(
     localStorage.getItem("lastMood") || "Neutral"
   );
@@ -24,8 +24,10 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [stories, setStories] = useState([]);
   const [newPost, setNewPost] = useState("");
   const [photo, setPhoto] = useState(null);
+  const [storyFile, setStoryFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isPostPopupOpen, setIsPostPopupOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
@@ -33,7 +35,6 @@ export default function Home() {
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com/api";
 
-  // 🔹 Mood colors
   const moodThemes = {
     Creative: "#FFB6C1",
     Ambitious: "#FF6347",
@@ -43,12 +44,11 @@ export default function Home() {
     Neutral: "#f5f5f5",
   };
 
-  // 🔹 Set theme on mount
   useEffect(() => {
     document.body.style.background = moodThemes[selectedMood];
   }, [selectedMood]);
 
-  // 🔹 Fetch logged-in user profile
+  // Fetch user profile
   const fetchUserProfile = async () => {
     try {
       const res = await axios.get(`${API_URL}/profile/me`, {
@@ -60,20 +60,7 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    fetchUserProfile();
-    fetchPosts();
-  }, []);
-
-  // 🔹 Handle mood select
-  const handleMoodSelect = (mood) => {
-    setSelectedMood(mood.name);
-    localStorage.setItem("lastMood", mood.name);
-    document.body.style.background = moodThemes[mood.name];
-    fetchPosts(); // optionally refresh feed for that mood
-  };
-
-  // 🔹 Fetch posts
+  // Fetch posts
   const fetchPosts = async () => {
     try {
       const res = await axios.get(`${API_URL}/posts`);
@@ -83,7 +70,29 @@ export default function Home() {
     }
   };
 
-  // 🔹 Handle search
+  // Fetch stories
+  const fetchStories = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/story`);
+      setStories(res.data);
+    } catch (err) {
+      console.error("Error loading stories:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserProfile();
+    fetchPosts();
+    fetchStories();
+  }, []);
+
+  const handleMoodSelect = (mood) => {
+    setSelectedMood(mood.name);
+    localStorage.setItem("lastMood", mood.name);
+    document.body.style.background = moodThemes[mood.name];
+    fetchPosts();
+  };
+
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -111,7 +120,7 @@ export default function Home() {
     navigate(`/profile/${username}`);
   };
 
-  // 🔹 Create new post
+  // Create new post
   const handlePost = async () => {
     if (newPost.trim() === "" && !photo) return;
     setLoading(true);
@@ -129,7 +138,9 @@ export default function Home() {
         },
       });
 
-      setPosts([res.data, ...posts]);
+      // Fix: populate post with user info
+      const postWithUser = { ...res.data, userId: userProfile };
+      setPosts([postWithUser, ...posts]);
       setNewPost("");
       setPhoto(null);
       setIsPostPopupOpen(false);
@@ -140,7 +151,6 @@ export default function Home() {
     }
   };
 
-  // 🔹 Like a post
   const handleLike = async (postId) => {
     try {
       const res = await axios.post(
@@ -161,7 +171,6 @@ export default function Home() {
     }
   };
 
-  // 🔹 Comment on a post
   const handleComment = async (postId) => {
     const text = prompt("Write a comment:");
     if (!text) return;
@@ -178,27 +187,54 @@ export default function Home() {
     }
   };
 
+  // Upload story
+  const handleUploadStory = async () => {
+    if (!storyFile) return;
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("story", storyFile);
+
+      await axios.post(`${API_URL}/story/story`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setStoryFile(null);
+      fetchStories(); // Refresh stories
+    } catch (err) {
+      console.error("Error uploading story:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Check if user already has a story
+  const userStory = stories.find((s) => s.userId?._id === userProfile?._id);
+
   return (
     <div
       className="home-page"
-      style={{
-        background: moodThemes[selectedMood],
-        transition: "background 0.5s ease",
-      }}
+      style={{ background: moodThemes[selectedMood], transition: "0.5s" }}
     >
-      {/* 🧠 Mood Popup */}
       <MoodPopup onSelect={handleMoodSelect} />
 
-      {/* 🔝 Top Bar */}
       <header className="top-bar">
         <div className="logo">Nex</div>
         <div className="top-icons">
           <FaSearch className="icon" onClick={() => setIsSearchOpen(true)} />
           <FaBell className="icon" />
+
+          <FaComment
+            className="icon"
+            onClick={() => navigate("/match")} // Navigate to match page
+          />
         </div>
       </header>
 
-      {/* 🔍 Search Overlay */}
       {isSearchOpen && (
         <div className="search-overlay">
           <div className="search-header">
@@ -216,7 +252,6 @@ export default function Home() {
               ✕
             </button>
           </div>
-
           <div className="search-results-container">
             {searchResults.length === 0 && searchQuery !== "" && (
               <p className="no-results">No users found</p>
@@ -227,13 +262,7 @@ export default function Home() {
                 className="profile-preview"
                 onClick={() => handleSelectUser(user.username)}
               >
-                <img
-                  src={
-                    user.avatar ||
-                    "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
-                  }
-                  alt={user.username}
-                />
+                <img src={user.avatar} alt={user.username} />
                 <div className="profile-info">
                   <span className="name">{user.name || "Unnamed"}</span>
                   <span className="username">@{user.username}</span>
@@ -244,15 +273,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 🔹 Floating Create Post Button */}
-      <button
-        className="open-post-btn"
-        onClick={() => setIsPostPopupOpen(true)}
-      >
-        + Post
-      </button>
-
-      {/* 🔹 Post Popup */}
+      {/* Post Popup */}
       {isPostPopupOpen && (
         <div
           className="post-popup-overlay"
@@ -265,10 +286,7 @@ export default function Home() {
             </div>
             <div className="popup-body">
               <div className="composer-avatar">
-                <img
-                  src={userProfile?.avatar || "/assets/users/user1.jpg"}
-                  alt={userProfile?.name || "User"}
-                />
+                <img src={userProfile?.avatar} alt="User" />
               </div>
               <textarea
                 placeholder="What's on your mind?"
@@ -291,54 +309,44 @@ export default function Home() {
           </div>
         </div>
       )}
-      {/* 🔹 Stories Section */}
+
+      {/* Stories */}
       <div className="stories-bar">
-        {/* Your story */}
         <div
           className="story your-story"
-          onClick={() => alert("Add your story")}
+          onClick={() => document.getElementById("storyInput").click()}
         >
           <div>
-            <img
-              src={userProfile?.avatar || "/assets/users/user1.jpg"}
-              alt="Your Story"
-            />
+            <img src={userProfile?.avatar} alt="Your Story" />
+            <FaPlus className="add-icon" />
           </div>
-          <span>Your Story</span>
+          <span>{userStory ? "Add Story" : "Your Story"}</span>
         </div>
+        <input
+          type="file"
+          id="storyInput"
+          style={{ display: "none" }}
+          onChange={(e) =>
+            setStoryFile(e.target.files[0]) || handleUploadStory()
+          }
+        />
 
-        {/* Other users' stories */}
-        {posts
-          .filter(
-            (p, i, arr) =>
-              arr.findIndex((post) => post.userId?._id === p.userId?._id) === i
-          )
-          .map((post) => (
-            <div className="story" key={post.userId?._id}>
-              <img
-                src={
-                  post.userId?.avatar ||
-                  "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
-                }
-                alt={post.userId?.name}
-              />
-              <span>{post.userId?.name || "User"}</span>
+        {stories
+          .filter((s) => s.userId?._id !== userProfile?._id) // exclude current user
+          .map((s) => (
+            <div className="story" key={s._id}>
+              <img src={s.userId?.avatar} alt={s.userId?.name} />
+              <span>{s.userId?.name}</span>
             </div>
           ))}
       </div>
 
-      {/* 🔹 Feed Section */}
+      {/* Feed */}
       <div className="feed-section">
         {posts.map((post) => (
           <div key={post._id} className="feed-card">
             <div className="feed-header">
-              <img
-                src={
-                  post.userId?.avatar ||
-                  "https://res.cloudinary.com/dwn4lzyyf/image/upload/v1757474358/nex-backgrounds/microphone-stool-on-stand-comedy-600nw-1031487514.jpg_mcmw3u.webp"
-                }
-                alt={post.userId?.username}
-              />
+              <img src={post.userId?.avatar} alt={post.userId?.username} />
               <div>
                 <h4>{post.userId?.name || "User"}</h4>
                 <span>{post.mood || "Neutral"} mood</span>
@@ -346,7 +354,6 @@ export default function Home() {
             </div>
 
             <p className="caption">{post.content}</p>
-
             {post.imageUrl && (
               <img src={post.imageUrl} alt="Post" className="feed-image" />
             )}
@@ -364,16 +371,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Floating Match Card */}
-      <div className="match-card">
-        <span className="card-title">Meet Someone Like You</span>
-        <span className="card-subtitle">Your next connection is waiting!</span>
-        <button className="card-btn" onClick={() => navigate("/video")}>
-          Start Matching
-        </button>
-      </div>
-
-      {/* Navbar */}
       <Navbar />
     </div>
   );
