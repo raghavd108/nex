@@ -13,7 +13,7 @@ const themedRoom = require("./routes/themedRoom");
 const messageRoutes = require("./routes/messages");
 const chatSocket = require("./routes/messageSocket.js");
 const postsRoute = require("./routes/posts.js");
-const storyRoutes = require("./routes/storyRoutes");
+const storyRoutes = require("./routes/stories");
 
 require("dotenv").config(); // Load .env variables
 
