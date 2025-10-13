@@ -137,7 +137,6 @@ export default function Home() {
       formData.append("mood", selectedMood);
       if (photo) formData.append("image", photo);
 
-      // POST request
       const res = await axios.post(`${API_URL}/posts`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -145,7 +144,6 @@ export default function Home() {
         },
       });
 
-      // Fetch populated post from backend
       const postRes = await axios.get(`${API_URL}/posts/${res.data._id}`);
       setPosts((prev) => [postRes.data, ...prev]);
       setNewPost("");
@@ -207,6 +205,7 @@ export default function Home() {
         },
       });
 
+      // Fetch stories immediately after upload
       fetchStories();
     } catch (err) {
       console.error("Error uploading story:", err);
@@ -226,6 +225,7 @@ export default function Home() {
       console.error("Error deleting story:", err);
     }
   };
+
   const handleDeletePost = async (postId) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this post?"
@@ -315,6 +315,15 @@ export default function Home() {
                 ? handleViewStory(dynamicUserStory[0])
                 : document.getElementById("storyInput")?.click()
             }
+            style={{
+              border:
+                dynamicUserStory.length > 0
+                  ? "3px solid #FF6347"
+                  : "2px dashed gray",
+              borderRadius: "50%",
+              padding: "2px",
+              cursor: "pointer",
+            }}
           >
             <img src={userProfile?.avatar} alt="Your Story" />
             {dynamicUserStory.length === 0 && <FaPlus className="add-icon" />}
@@ -339,6 +348,12 @@ export default function Home() {
                 className="story"
                 key={s._id}
                 onClick={() => handleViewStory(s)}
+                style={{
+                  border: s.imageUrl ? "3px solid #FF6347" : "2px dashed gray",
+                  borderRadius: "50%",
+                  padding: "2px",
+                  cursor: "pointer",
+                }}
               >
                 <img src={s.userId?.avatar} alt={s.userId?.name} />
                 <span>{s.userId?.name}</span>
@@ -378,7 +393,7 @@ export default function Home() {
             </div>
           </div>
           <img
-            src={currentStory.imageUrl} // <-- use imageUrl here
+            src={currentStory.imageUrl}
             alt="Story"
             className="fullscreen-story-image"
           />

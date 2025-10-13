@@ -9,29 +9,34 @@ const Story = require("../models/Story");
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// 🔹 Create story
+// Get user's profile first
+const Profile = require("../models/Profile");
+
 router.post("/story", auth, upload.single("story"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
+    const profile = await Profile.findOne({ userId: req.user.id });
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
+
     // Upload to Cloudinary
     const b64 = Buffer.from(req.file.buffer).toString("base64");
     const dataURI = `data:${req.file.mimetype};base64,${b64}`;
-
     const uploadRes = await cloudinary.uploader.upload(dataURI, {
       folder: "stories",
     });
 
-    // Set expiration: 24 hours from now
+    // Set expiration: 24 hours
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     const newStory = new Story({
-      userId: req.user.id,
+      userId: profile._id, // ✅ reference Profile
       imageUrl: uploadRes.secure_url,
       expiresAt,
     });
 
     await newStory.save();
+
     res.status(201).json(newStory);
   } catch (err) {
     console.error("Error creating story:", err);
