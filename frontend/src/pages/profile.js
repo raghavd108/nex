@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import {
   FaCamera,
   FaUserEdit,
@@ -59,7 +59,7 @@ export default function ProfilePage() {
         });
         setIsOwnProfile(!username || meRes.data.username === username);
 
-        // ✅ Fetch this user's posts
+        // Fetch posts
         const postRes = await axios.get(`${API_URL}/api/posts`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -79,6 +79,15 @@ export default function ProfilePage() {
 
   const handleInputChange = (field, value) =>
     setEditData({ ...editData, [field]: value });
+
+  const handleMultiSelect = (field, value) => {
+    setEditData((prev) => {
+      const current = prev[field] || [];
+      if (current.includes(value))
+        return { ...prev, [field]: current.filter((v) => v !== value) };
+      else return { ...prev, [field]: [...current, value] };
+    });
+  };
 
   const handleSave = async () => {
     try {
@@ -133,11 +142,24 @@ export default function ProfilePage() {
 
   if (!user) return <div>Loading...</div>;
 
+  const roleOptions = [
+    "Founder",
+    "Co-founder",
+    "Investor",
+    "Mentor",
+    "Developer",
+    "Designer",
+    "Marketer",
+    "Advisor",
+    "Student",
+    "Other",
+  ];
+  const lookingForOptions = ["Co-founder", "Investor", "Mentor"];
+
   return (
     <>
       <Navbar />
       <div className={styles.profileContainer}>
-        {/* ---------- Profile Card ---------- */}
         <div className={styles.profileCard}>
           {!isEditing ? (
             <>
@@ -193,6 +215,39 @@ export default function ProfilePage() {
                   <strong>Interests:</strong>{" "}
                   {user.interests?.join(", ") || "None"}
                 </p>
+                <p>
+                  <strong>Roles:</strong> {user.roles?.join(", ") || "None"}
+                </p>
+                <p>
+                  <strong>Skills:</strong> {user.skills?.join(", ") || "None"}
+                </p>
+                <p>
+                  <strong>Industries:</strong>{" "}
+                  {user.industries?.join(", ") || "None"}
+                </p>
+                <p>
+                  <strong>Looking For:</strong>{" "}
+                  {user.lookingFor?.join(", ") || "None"}
+                </p>
+                <p>
+                  <strong>Open to Collaborate:</strong>{" "}
+                  {user.isOpenToCollaborate ? "Yes" : "No"}
+                </p>
+
+                {user.startupAffiliations?.length > 0 && (
+                  <div>
+                    <strong>Startups:</strong>
+                    <ul>
+                      {user.startupAffiliations.map((s) => (
+                        <li key={s.startupId._id}>
+                          <Link to={`/startup/${s.startupId._id}`}>
+                            {s.startupId.name} ({s.role}) {s.isFounder && "⭐"}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </>
           ) : (
@@ -244,18 +299,86 @@ export default function ProfilePage() {
               </div>
 
               <div className={styles.editInput}>
-                <label>Interests:</label>
+                <label>Interests (comma separated):</label>
                 <input
                   type="text"
-                  value={
-                    typeof editData.interests === "string"
-                      ? editData.interests
-                      : editData.interests.join(", ")
-                  }
+                  value={editData.interests?.join(", ")}
                   onChange={(e) =>
-                    handleInputChange("interests", e.target.value)
+                    handleInputChange(
+                      "interests",
+                      e.target.value.split(",").map((s) => s.trim())
+                    )
                   }
                 />
+              </div>
+
+              <div className={styles.editInput}>
+                <label>Roles:</label>
+                {roleOptions.map((r) => (
+                  <label key={r}>
+                    <input
+                      type="checkbox"
+                      checked={editData.roles?.includes(r)}
+                      onChange={() => handleMultiSelect("roles", r)}
+                    />
+                    {r}
+                  </label>
+                ))}
+              </div>
+
+              <div className={styles.editInput}>
+                <label>Skills (comma separated):</label>
+                <input
+                  type="text"
+                  value={editData.skills?.join(", ")}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "skills",
+                      e.target.value.split(",").map((s) => s.trim())
+                    )
+                  }
+                />
+              </div>
+
+              <div className={styles.editInput}>
+                <label>Industries:</label>
+                <input
+                  type="text"
+                  value={editData.industries?.join(", ")}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "industries",
+                      e.target.value.split(",").map((s) => s.trim())
+                    )
+                  }
+                />
+              </div>
+
+              <div className={styles.editInput}>
+                <label>Looking For:</label>
+                {lookingForOptions.map((opt) => (
+                  <label key={opt}>
+                    <input
+                      type="checkbox"
+                      checked={editData.lookingFor?.includes(opt)}
+                      onChange={() => handleMultiSelect("lookingFor", opt)}
+                    />
+                    {opt}
+                  </label>
+                ))}
+              </div>
+
+              <div className={styles.editInput}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={editData.isOpenToCollaborate}
+                    onChange={(e) =>
+                      handleInputChange("isOpenToCollaborate", e.target.checked)
+                    }
+                  />
+                  Open to Collaborate
+                </label>
               </div>
 
               <button type="submit" className={styles.saveBtn}>
@@ -265,7 +388,6 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* ---------- User Posts Section ---------- */}
         <div className={styles.postsSection}>
           <h3>{isOwnProfile ? "Your Posts" : `${user.name}'s Posts`}</h3>
           {posts.length > 0 ? (

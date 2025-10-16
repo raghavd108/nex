@@ -14,6 +14,8 @@ const messageRoutes = require("./routes/messages");
 const chatSocket = require("./routes/messageSocket.js");
 const postsRoute = require("./routes/posts.js");
 
+const startupRoutes = require("./routes/startupRoutes");
+
 require("dotenv").config(); // Load .env variables
 
 const app = express();
@@ -54,6 +56,9 @@ app.use(express.json());
 // });
 // ✅ Example API Route
 app.use("/api/profile", profileRoutes);
+
+app.use("/api/startups", startupRoutes);
+
 app.use("/api/posts", postsRoute);
 app.use("/api/likes", likeRoutes);
 app.use("/api/settings", settingsRoutes);

@@ -1,28 +1,35 @@
 const Profile = require("../models/Profile");
-const cloudinary = require("../config/cloudinary"); // ✅ import cloudinary config
+const cloudinary = require("../config/cloudinary"); // ✅ Cloudinary config import
 
+// ✅ Get or create a user's profile
 exports.getProfile = async (req, res) => {
   try {
-    const profile = await Profile.findOne({ userId: req.userId });
+    let profile = await Profile.findOne({ userId: req.userId }).populate(
+      "startupAffiliations.startupId",
+      "name logo stage"
+    );
+
     if (!profile) {
-      const newProfile = new Profile({ userId: req.userId });
-      await newProfile.save();
-      return res.json(newProfile);
+      profile = new Profile({ userId: req.userId });
+      await profile.save();
     }
+
     res.json(profile);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error fetching profile:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
+// ✅ Update user profile
 exports.updateProfile = async (req, res) => {
   try {
     const profile = await Profile.findOne({ userId: req.userId });
-
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
     }
 
+    // 🚫 Prevent username change once set
     if (
       profile.username &&
       req.body.username &&
@@ -33,6 +40,7 @@ exports.updateProfile = async (req, res) => {
         .json({ message: "Username cannot be changed once set" });
     }
 
+    // ✅ Validate username if setting for the first time
     if (!profile.username && req.body.username) {
       const existing = await Profile.findOne({ username: req.body.username });
       if (existing) {
@@ -40,40 +48,67 @@ exports.updateProfile = async (req, res) => {
       }
     }
 
-    const updateData = { ...req.body };
-    if (profile.username) {
-      delete updateData.username; // prevent overwrite
+    // ✅ Allowed fields for update (prevents overwriting system fields)
+    const allowedFields = [
+      "name",
+      "bio",
+      "age",
+      "location",
+      "interests",
+      "roles",
+      "skills",
+      "industries",
+      "startupAffiliations",
+      "isOpenToCollaborate",
+      "lookingFor",
+      "visibility",
+    ];
+
+    const updateData = {};
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
+
+    // Handle username only if not already set
+    if (!profile.username && req.body.username) {
+      updateData.username = req.body.username;
     }
 
-    const updated = await Profile.findOneAndUpdate(
+    // Update `updatedAt`
+    updateData.updatedAt = Date.now();
+
+    const updatedProfile = await Profile.findOneAndUpdate(
       { userId: req.userId },
       updateData,
       { new: true }
-    );
+    ).populate("startupAffiliations.startupId", "name logo stage");
 
-    res.json(updated);
+    res.json(updatedProfile);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Profile update error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
+// ✅ Upload or update profile photo
 exports.uploadPhoto = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // Convert buffer to a data URI
+    // Convert buffer to a data URI for Cloudinary
     const dataUri = `data:${
       req.file.mimetype
     };base64,${req.file.buffer.toString("base64")}`;
 
-    // Upload to Cloudinary
     const result = await cloudinary.uploader.upload(dataUri, {
       folder: "nex_avatars",
     });
 
-    // Save URL to DB
+    // Save Cloudinary URL
     const updated = await Profile.findOneAndUpdate(
       { userId: req.userId },
       { avatar: result.secure_url },
@@ -86,7 +121,8 @@ exports.uploadPhoto = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-// Search profiles by username (case-insensitive, partial match)
+
+// ✅ Search profiles by username or name (case-insensitive)
 exports.searchProfiles = async (req, res) => {
   try {
     const query = req.query.q;
@@ -95,22 +131,39 @@ exports.searchProfiles = async (req, res) => {
     }
 
     const results = await Profile.find({
-      username: { $regex: query, $options: "i" }, // case-insensitive match
-    }).select("username name avatar _id"); // return only useful fields
+      $or: [
+        { username: { $regex: query, $options: "i" } },
+        { name: { $regex: query, $options: "i" } },
+      ],
+      visibility: "public",
+    }).select("username name avatar roles industries skills");
 
     res.json(results);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Search error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
-// ✅ Get profile by username
+
+// ✅ Get profile by username (public view)
 exports.getProfileByUsername = async (req, res) => {
   try {
     const { username } = req.params;
-    const profile = await Profile.findOne({ username });
+    const profile = await Profile.findOne({ username }).populate(
+      "startupAffiliations.startupId",
+      "name logo stage"
+    );
 
     if (!profile) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // Respect visibility settings
+    if (
+      profile.visibility === "private" &&
+      profile.userId.toString() !== req.userId
+    ) {
+      return res.status(403).json({ message: "This profile is private." });
     }
 
     res.json(profile);

@@ -409,7 +409,6 @@
 
 /* ========= Feed Section ========= */
 .feed-section {
-  margin-top: 15px;
   display: flex;
   flex-direction: column;
   gap: 16px;
