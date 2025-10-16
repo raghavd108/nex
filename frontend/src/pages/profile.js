@@ -3,7 +3,6 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import {
   FaCamera,
   FaUserEdit,
-  FaUsers,
   FaCog,
   FaSave,
   FaHeart,
@@ -38,7 +37,6 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         let res;
-
         if (username) {
           res = await axios.get(`${API_URL}/api/profile/${username}`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -63,7 +61,6 @@ export default function ProfilePage() {
         const postRes = await axios.get(`${API_URL}/api/posts`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         const filteredPosts = postRes.data.filter(
           (p) => p.userId.username === (username || meRes.data.username)
         );
@@ -160,51 +157,60 @@ export default function ProfilePage() {
     <>
       <Navbar />
       <div className={styles.profileContainer}>
+        {/* PROFILE HEADER */}
         <div className={styles.profileCard}>
           {!isEditing ? (
             <>
-              <img
-                src={previewAvatar}
-                alt="avatar"
-                className={styles.profileAvatar}
-              />
-              <h2>{user.name}</h2>
-              <p className={styles.username}>@{user.username}</p>
-              <p className={styles.profileBio}>{user.bio}</p>
+              <div className={styles.profileHeader}>
+                <img
+                  src={previewAvatar}
+                  alt="avatar"
+                  className={styles.profileAvatar}
+                />
+                <div className={styles.profileInfo}>
+                  <h2>{user.name}</h2>
+                  <p className={styles.username}>@{user.username}</p>
+                  <p className={styles.profileBio}>{user.bio}</p>
 
-              {isOwnProfile && (
-                <div className={styles.profileOptions}>
-                  <label htmlFor="photo-upload" className={styles.optionBox}>
-                    <FaCamera className={styles.optionIcon} />
-                    <input
-                      id="photo-upload"
-                      type="file"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handlePhotoUpload}
-                    />
-                    <span>Photo</span>
-                  </label>
+                  {isOwnProfile && (
+                    <div className={styles.profileOptions}>
+                      <label
+                        htmlFor="photo-upload"
+                        className={styles.optionBox}
+                      >
+                        <FaCamera className={styles.optionIcon} />
+                        <input
+                          id="photo-upload"
+                          type="file"
+                          accept="image/*"
+                          style={{ display: "none" }}
+                          onChange={handlePhotoUpload}
+                        />
+                        <span>Photo</span>
+                      </label>
 
-                  <div
-                    className={styles.optionBox}
-                    onClick={() => setIsEditing(true)}
-                  >
-                    <FaUserEdit className={styles.optionIcon} />
-                    <span>Edit</span>
-                  </div>
+                      <div
+                        className={styles.optionBox}
+                        onClick={() => setIsEditing(true)}
+                      >
+                        <FaUserEdit className={styles.optionIcon} />
+                        <span>Edit</span>
+                      </div>
 
-                  <div
-                    className={styles.optionBox}
-                    onClick={() => navigate("/settings")}
-                  >
-                    <FaCog className={styles.optionIcon} />
-                    <span>Settings</span>
-                  </div>
+                      <div
+                        className={styles.optionBox}
+                        onClick={() => navigate("/settings")}
+                      >
+                        <FaCog className={styles.optionIcon} />
+                        <span>Settings</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
 
-              <div className={styles.profileInfo}>
+              {/* PROFILE DETAILS */}
+              <div className={styles.profileDetails}>
                 <p>
                   <strong>Age:</strong> {user.age || "N/A"}
                 </p>
@@ -234,8 +240,9 @@ export default function ProfilePage() {
                   {user.isOpenToCollaborate ? "Yes" : "No"}
                 </p>
 
-                {user.startupAffiliations?.length > 0 && (
-                  <div>
+                {/* STARTUP AFFILIATIONS */}
+                {user.startupAffiliations?.length > 0 ? (
+                  <div className={styles.startupAffiliations}>
                     <strong>Startups:</strong>
                     <ul>
                       {user.startupAffiliations.map((s) => (
@@ -247,6 +254,18 @@ export default function ProfilePage() {
                       ))}
                     </ul>
                   </div>
+                ) : (
+                  isOwnProfile && (
+                    <div className={styles.createStartupPrompt}>
+                      <p>You haven’t created a startup yet!</p>
+                      <button
+                        onClick={() => navigate("/create-startup")}
+                        className={styles.createStartupBtn}
+                      >
+                        Create Your Startup
+                      </button>
+                    </div>
+                  )
                 )}
               </div>
             </>
@@ -260,6 +279,7 @@ export default function ProfilePage() {
             >
               {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
 
+              {/* EDIT FORM FIELDS */}
               <div className={styles.editInput}>
                 <label>Name:</label>
                 <input
@@ -388,6 +408,7 @@ export default function ProfilePage() {
           )}
         </div>
 
+        {/* POSTS SECTION */}
         <div className={styles.postsSection}>
           <h3>{isOwnProfile ? "Your Posts" : `${user.name}'s Posts`}</h3>
           {posts.length > 0 ? (

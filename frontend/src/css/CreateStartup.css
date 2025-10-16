@@ -1,0 +1,137 @@
+/* ===========================
+   CreateStartup.module.css
+   Modern & Professional Form
+=========================== */
+
+/* ---------- Container ---------- */
+.create-startup-container {
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 30px 25px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  font-family: "Poppins", sans-serif;
+  color: #1f2937;
+}
+
+.create-startup-container h2 {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #111827;
+}
+
+/* ---------- Form ---------- */
+.create-startup-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ---------- Input Fields ---------- */
+.create-startup-container input[type="text"],
+.create-startup-container input[type="file"],
+.create-startup-container select,
+.create-startup-container textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #111827;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.create-startup-container input[type="text"]:focus,
+.create-startup-container input[type="file"]:focus,
+.create-startup-container select:focus,
+.create-startup-container textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  outline: none;
+}
+
+/* ---------- Textarea ---------- */
+.create-startup-container textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ---------- Labels ---------- */
+.create-startup-container label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* ---------- Checkbox Groups ---------- */
+.create-startup-container div > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 12px;
+  margin-top: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.create-startup-container input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #6366f1;
+}
+
+/* ---------- Button ---------- */
+.create-startup-container button {
+  margin-top: 10px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: #6366f1;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.create-startup-container button:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
+}
+
+.create-startup-container button:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .create-startup-container {
+    padding: 25px 20px;
+  }
+
+  .create-startup-container h2 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-startup-container {
+    margin: 30px 15px;
+    padding: 20px 15px;
+  }
+
+  .create-startup-container h2 {
+    font-size: 22px;
+  }
+
+  .create-startup-container button {
+    font-size: 15px;
+    padding: 10px 16px;
+  }
+}

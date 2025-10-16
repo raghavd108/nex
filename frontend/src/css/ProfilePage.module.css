@@ -1,6 +1,6 @@
 /* ===========================
    ProfilePage.module.css
-   Professional & Responsive
+   Modern, Clean & Responsive
 =========================== */
 
 /* ---------- Container ---------- */
@@ -8,138 +8,185 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px;
-  background: #f9fafe;
+  padding: 50px 20px;
+  background: linear-gradient(to bottom, #f0f4ff, #ffffff);
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
-  color: #333;
+  color: #1f2937;
 }
 
 /* ---------- Profile Card ---------- */
 .profileCard {
   width: 100%;
-  max-width: 900px;
+  max-width: 950px;
   background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  padding: 35px;
   margin-bottom: 40px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 25px;
+  transition: all 0.3s ease;
 }
 
 .profileCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------- Profile Header ---------- */
+.profileHeader {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 /* ---------- Avatar ---------- */
 .profileAvatar {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #4f46e5; /* brand color */
-  margin-bottom: 15px;
+  border: 4px solid #6366f1;
+  transition: transform 0.3s ease;
+}
+
+.profileAvatar:hover {
+  transform: scale(1.05);
 }
 
 /* ---------- Name & Username ---------- */
 h2 {
-  font-size: 28px;
+  font-size: 30px;
+  font-weight: 700;
   margin: 0;
-  font-weight: 600;
   color: #111827;
 }
 
 .username {
-  color: #6b7280;
   font-size: 16px;
-  margin-bottom: 10px;
+  color: #6b7280;
+  margin: 6px 0;
 }
 
 /* ---------- Bio ---------- */
 .profileBio {
   font-size: 16px;
   color: #4b5563;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 /* ---------- Profile Options ---------- */
 .profileOptions {
   display: flex;
-  gap: 15px;
-  margin-top: 10px;
+  gap: 18px;
+  margin-top: 15px;
   flex-wrap: wrap;
 }
 
 .optionBox {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: #eef2ff;
-  padding: 8px 14px;
-  border-radius: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  font-weight: 500;
+  font-size: 14px;
+  color: #4f46e5;
+  transition: all 0.2s ease;
 }
 
 .optionBox:hover {
   background: #dbeafe;
+  transform: translateY(-2px);
 }
 
 .optionIcon {
-  color: #4f46e5;
+  font-size: 18px;
 }
 
-/* ---------- Profile Info ---------- */
-.profileInfo {
+/* ---------- Profile Details ---------- */
+.profileDetails {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   font-size: 15px;
   color: #374151;
 }
 
-.profileInfo strong {
+.profileDetails strong {
   color: #111827;
 }
 
-/* Startup affiliations */
-.profileInfo ul {
+/* ---------- Startup Affiliations ---------- */
+.startupAffiliations {
+  margin-top: 10px;
+}
+
+.startupAffiliations ul {
   list-style: none;
   padding-left: 0;
-  margin-top: 6px;
+  margin-top: 5px;
 }
 
-.profileInfo li {
-  margin-bottom: 4px;
+.startupAffiliations li {
+  margin-bottom: 6px;
 }
 
-.profileInfo li a {
-  color: #4f46e5;
+.startupAffiliations a {
+  color: #6366f1;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
-.profileInfo li a:hover {
-  color: #6366f1;
+.startupAffiliations a:hover {
+  color: #4f46e5;
   text-decoration: underline;
+}
+
+/* ---------- Create Startup Prompt ---------- */
+.createStartupPrompt {
+  margin-top: 15px;
+  padding: 12px 16px;
+  background: #eef2ff;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.createStartupBtn {
+  margin-top: 8px;
+  padding: 10px 18px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.createStartupBtn:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
 }
 
 /* ---------- Edit Form ---------- */
 .editForm {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 18px;
 }
 
 .editInput {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .editInput label {
@@ -150,45 +197,46 @@ h2 {
 
 .editInput input,
 .editInput textarea {
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 12px;
   font-size: 14px;
   color: #111827;
-  transition: border 0.2s ease, box-shadow 0.2s ease;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
 }
 
 .editInput input:focus,
 .editInput textarea:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
   outline: none;
 }
 
 .editInput input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #4f46e5;
+  width: 18px;
+  height: 18px;
+  accent-color: #6366f1;
 }
 
 /* Save button */
 .saveBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 18px;
+  gap: 8px;
+  padding: 12px 20px;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   color: #fff;
-  background: #4f46e5;
+  background: #6366f1;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .saveBtn:hover {
-  background: #6366f1;
+  background: #4f46e5;
+  transform: translateY(-2px);
 }
 
 /* ---------- Error Message ---------- */
@@ -200,123 +248,113 @@ h2 {
 /* ---------- Posts Section ---------- */
 .postsSection {
   width: 100%;
-  max-width: 900px;
+  max-width: 950px;
 }
 
 .postsSection h3 {
-  margin-bottom: 15px;
-  font-size: 22px;
-  font-weight: 600;
+  margin-bottom: 18px;
+  font-size: 24px;
+  font-weight: 700;
   color: #111827;
 }
 
 .postGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
 }
 
 .postCard {
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.07);
+  transition: all 0.3s ease;
 }
 
 .postCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
 }
 
 .postImage {
   width: 100%;
-  height: 180px;
+  height: 190px;
   object-fit: cover;
 }
 
 .postContent {
-  padding: 12px 14px;
+  padding: 14px 16px;
 }
 
 .postActions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   font-size: 14px;
   color: #6b7280;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .noPosts {
   color: #6b7280;
   font-style: italic;
   text-align: center;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 /* ===========================
    Responsive Styles
 =========================== */
 @media (max-width: 768px) {
-  .profileContainer {
-    padding: 20px 15px;
+  .profileHeader {
+    flex-direction: column;
+    align-items: center;
   }
 
   .profileCard {
-    padding: 20px;
+    padding: 25px;
   }
 
   h2 {
-    font-size: 24px;
-  }
-
-  .username {
-    font-size: 14px;
+    font-size: 26px;
   }
 
   .profileBio {
-    font-size: 14px;
-  }
-
-  .profileInfo {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .postImage {
-    height: 140px;
+    height: 160px;
   }
 
   .postGrid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
-
-  .profileOptions {
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
 }
 
 @media (max-width: 480px) {
   .profileCard {
-    padding: 15px;
+    padding: 18px;
   }
 
   .profileAvatar {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
   }
 
   h2 {
-    font-size: 20px;
+    font-size: 22px;
   }
 
-  .saveBtn {
-    padding: 8px 14px;
+  .saveBtn,
+  .createStartupBtn {
+    padding: 10px 16px;
     font-size: 14px;
   }
 
   .postGrid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 14px;
   }
 }
