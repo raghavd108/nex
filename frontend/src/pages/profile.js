@@ -259,7 +259,7 @@ export default function ProfilePage() {
                     <div className={styles.createStartupPrompt}>
                       <p>You haven’t created a startup yet!</p>
                       <button
-                        onClick={() => navigate("/create-startup")}
+                        onClick={() => navigate("/CreateStartup")}
                         className={styles.createStartupBtn}
                       >
                         Create Your Startup
