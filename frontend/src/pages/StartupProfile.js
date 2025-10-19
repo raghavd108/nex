@@ -1,101 +1,84 @@
+// src/pages/StartupProfile.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import "../css/StartupProfile.css";
 
 export default function StartupProfile() {
   const { id } = useParams();
   const [startup, setStartup] = useState(null);
-  const [following, setFollowing] = useState(false);
 
   useEffect(() => {
     const fetchStartup = async () => {
-      try {
-        const res = await axios.get(`/api/startups/${id}`);
-        setStartup(res.data);
-
-        // check if user is following
-        const profileRes = await axios.get("/api/profile/me");
-        const myProfileId = profileRes.data._id;
-        setFollowing(res.data.followers.some((f) => f._id === myProfileId));
-      } catch (err) {
-        console.error(err);
-      }
+      const res = await axios.get(
+        `https://nex-pjq3.onrender.com/api/startups/${id}`
+      );
+      setStartup(res.data);
     };
     fetchStartup();
   }, [id]);
 
-  const toggleFollow = async () => {
-    try {
-      await axios.post(`/api/startups/${id}/follow`);
-      setFollowing(!following);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   if (!startup) return <p>Loading...</p>;
 
   return (
-    <div className="startup-profile">
-      <img src={startup.logo || "/default-logo.png"} alt="Logo" width="150" />
-      <h2>{startup.name}</h2>
-      <p>
-        <strong>Mission:</strong> {startup.mission}
-      </p>
-      {startup.description && (
-        <p>
-          <strong>Description:</strong> {startup.description}
-        </p>
-      )}
-      <p>
-        <strong>Stage:</strong> {startup.stage}
-      </p>
-      {startup.fundingInfo && (
-        <p>
-          <strong>Funding:</strong> {startup.fundingInfo}
-        </p>
-      )}
-      <p>
-        <strong>Roles:</strong> {startup.roles.join(", ")}
-      </p>
-      <p>
-        <strong>Industries:</strong> {startup.industries.join(", ")}
-      </p>
-      <p>
-        <strong>Skills:</strong> {startup.skills.join(", ")}
-      </p>
+    <div className="startup-profile-page">
+      <div className="banner"></div>
+      <div className="profile-header">
+        <img
+          src={startup.logo || "/default-logo.png"}
+          alt="Logo"
+          className="startup-logo"
+        />
+        <div>
+          <h1>{startup.name}</h1>
+          <p>{startup.mission}</p>
+        </div>
+        <button className="follow-btn">Follow</button>
+      </div>
 
-      {startup.pitchDeckUrl && (
+      <div className="info-section">
         <p>
-          <a
-            href={startup.pitchDeckUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View Pitch Deck
-          </a>
+          <strong>Stage:</strong> {startup.stage}
         </p>
-      )}
-
-      <h3>Founder</h3>
-      {startup.founderProfileId && (
         <p>
-          {startup.founderProfileId.name} (@{startup.founderProfileId.username})
+          <strong>Industries:</strong> {startup.industries.join(", ")}
         </p>
-      )}
+        <p>
+          <strong>Funding:</strong> {startup.fundingInfo || "N/A"}
+        </p>
+        <p>
+          <strong>Skills:</strong> {startup.skills.join(", ")}
+        </p>
+      </div>
 
-      <h3>Team Members</h3>
-      <ul>
-        {startup.team.map((m) => (
-          <li key={m.profileId._id}>
-            {m.profileId.name} - {m.role}
-          </li>
-        ))}
-      </ul>
+      <div className="team-section">
+        <h3>Team Members 👥</h3>
+        {startup.team?.length ? (
+          <ul>
+            {startup.team.map((m) => (
+              <li key={m._id}>
+                {m.profileId.name} - {m.role}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No team members yet.</p>
+        )}
+      </div>
 
-      <button onClick={toggleFollow}>
-        {following ? "Unfollow" : "Follow"}
-      </button>
+      <div className="posts-section">
+        <h3>Startup Updates 📢</h3>
+        {startup.posts?.length ? (
+          startup.posts.map((p) => (
+            <div key={p._id} className="post-card">
+              <p>{p.content}</p>
+              {p.imageUrl && <img src={p.imageUrl} alt="post" />}
+            </div>
+          ))
+        ) : (
+          <p>No updates yet. Start sharing progress!</p>
+        )}
+      </div>
     </div>
   );
 }

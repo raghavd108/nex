@@ -17,6 +17,7 @@ import { AuthProvider } from "./components/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import ThemedRoom from "./pages/ThemedRoom";
 import CreateStartup from "./pages/CreateStartup";
+import StartupProfile from "./pages/StartupProfile";
 
 function App() {
   return (
@@ -99,6 +100,15 @@ function App() {
             element={
               <PrivateRoute>
                 <CreateStartup />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/startup/:id"
+            element={
+              <PrivateRoute>
+                <StartupProfile />
               </PrivateRoute>
             }
           />

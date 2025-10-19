@@ -1,6 +1,7 @@
+// src/pages/CreateStartup.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 import "../css/CreateStartup.css";
 
 const stages = ["idea", "MVP", "seed", "growth", "scaling"];
@@ -16,6 +17,8 @@ const rolesList = [
 const industriesList = ["AI", "Fintech", "Health", "Edtech", "E-commerce"];
 
 export default function CreateStartup() {
+  const navigate = useNavigate();
+  const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: "",
     mission: "",
@@ -34,7 +37,6 @@ export default function CreateStartup() {
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com";
 
-  // ✅ Fetch logged-in user's profile ID
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -43,11 +45,14 @@ export default function CreateStartup() {
         });
         setProfileId(res.data._id);
       } catch (err) {
-        console.error("Failed to fetch profile", err);
+        console.error("Profile fetch failed", err);
       }
     };
     if (token) fetchProfile();
   }, [token]);
+
+  const handleNext = () => setStep((s) => s + 1);
+  const handlePrev = () => setStep((s) => s - 1);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,34 +61,23 @@ export default function CreateStartup() {
 
   const handleMultiSelect = (name, value) => {
     setForm((prev) => {
-      const current = prev[name];
-      if (current.includes(value)) {
-        return { ...prev, [name]: current.filter((v) => v !== value) };
-      } else {
-        return { ...prev, [name]: [...current, value] };
-      }
+      const arr = prev[name];
+      return arr.includes(value)
+        ? { ...prev, [name]: arr.filter((v) => v !== value) }
+        : { ...prev, [name]: [...arr, value] };
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!profileId) {
-      alert("Profile not loaded yet!");
-      return;
-    }
-
     setLoading(true);
     try {
-      // ✅ Add founderProfileId automatically
       const payload = { ...form, founderProfileId: profileId };
-
       const res = await axios.post(`${API_URL}/api/startups`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       const startupId = res.data._id;
 
-      // Upload logo if exists
       if (logo) {
         const logoData = new FormData();
         logoData.append("logo", logo);
@@ -96,7 +90,6 @@ export default function CreateStartup() {
         );
       }
 
-      // Upload pitch deck if exists
       if (pitchDeck) {
         const deckData = new FormData();
         deckData.append("pitchDeck", pitchDeck);
@@ -109,19 +102,7 @@ export default function CreateStartup() {
         );
       }
 
-      alert("Startup created successfully!");
-      setForm({
-        name: "",
-        mission: "",
-        description: "",
-        stage: "idea",
-        fundingInfo: "",
-        roles: [],
-        industries: [],
-        skills: [],
-      });
-      setLogo(null);
-      setPitchDeck(null);
+      navigate(`/startup/${startupId}`);
     } catch (err) {
       console.error(err);
       alert("Error creating startup");
@@ -129,49 +110,65 @@ export default function CreateStartup() {
     setLoading(false);
   };
 
-  return (
-    <div className="create-startup-container">
-      <h2>Create a Startup</h2>
-      <form onSubmit={handleSubmit}>
+  const steps = [
+    {
+      label: "Startup Name",
+      field: (
         <input
           name="name"
-          placeholder="Startup Name"
           value={form.name}
           onChange={handleChange}
-          required
+          placeholder="What's your startup called?"
         />
+      ),
+    },
+    {
+      label: "Mission",
+      field: (
         <textarea
           name="mission"
-          placeholder="Mission"
           value={form.mission}
           onChange={handleChange}
-          required
+          placeholder="What's your mission?"
         />
+      ),
+    },
+    {
+      label: "Description",
+      field: (
         <textarea
           name="description"
-          placeholder="Description"
           value={form.description}
           onChange={handleChange}
+          placeholder="Describe your idea..."
         />
-
-        <label>Stage:</label>
+      ),
+    },
+    {
+      label: "Stage",
+      field: (
         <select name="stage" value={form.stage} onChange={handleChange}>
           {stages.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
+            <option key={s}>{s}</option>
           ))}
         </select>
-
+      ),
+    },
+    {
+      label: "Funding Info",
+      field: (
         <input
           name="fundingInfo"
-          placeholder="Funding Info"
           value={form.fundingInfo}
           onChange={handleChange}
+          placeholder="Funding details (optional)"
         />
-
-        <div>
-          <label>Roles:</label>
+      ),
+    },
+    {
+      label: "Roles",
+      field: (
+        <div className="checkbox-group">
           {rolesList.map((r) => (
             <label key={r}>
               <input
@@ -183,9 +180,12 @@ export default function CreateStartup() {
             </label>
           ))}
         </div>
-
-        <div>
-          <label>Industries:</label>
+      ),
+    },
+    {
+      label: "Industries",
+      field: (
+        <div className="checkbox-group">
           {industriesList.map((i) => (
             <label key={i}>
               <input
@@ -197,42 +197,67 @@ export default function CreateStartup() {
             </label>
           ))}
         </div>
+      ),
+    },
+    {
+      label: "Skills",
+      field: (
+        <input
+          placeholder="Comma separated skills"
+          value={form.skills.join(", ")}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              skills: e.target.value.split(",").map((s) => s.trim()),
+            })
+          }
+        />
+      ),
+    },
+    {
+      label: "Upload Logo",
+      field: (
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setLogo(e.target.files[0])}
+        />
+      ),
+    },
+    {
+      label: "Upload Pitch Deck",
+      field: (
+        <input
+          type="file"
+          accept=".pdf,.ppt,.pptx"
+          onChange={(e) => setPitchDeck(e.target.files[0])}
+        />
+      ),
+    },
+  ];
 
-        <div>
-          <label>Skills (comma separated):</label>
-          <input
-            placeholder="e.g. Marketing, AI"
-            value={form.skills.join(", ")}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                skills: e.target.value.split(",").map((s) => s.trim()),
-              })
-            }
-          />
+  return (
+    <div className="create-startup-container fade-in">
+      <h2>{steps[step].label}</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="step-content">{steps[step].field}</div>
+        <div className="step-nav">
+          {step > 0 && (
+            <button type="button" onClick={handlePrev}>
+              ⬅ Back
+            </button>
+          )}
+          {step < steps.length - 1 && (
+            <button type="button" onClick={handleNext}>
+              Next ➡
+            </button>
+          )}
+          {step === steps.length - 1 && (
+            <button type="submit" disabled={loading}>
+              {loading ? "Creating..." : "Create Startup 🚀"}
+            </button>
+          )}
         </div>
-
-        <div>
-          <label>Logo:</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setLogo(e.target.files[0])}
-          />
-        </div>
-
-        <div>
-          <label>Pitch Deck:</label>
-          <input
-            type="file"
-            accept=".pdf,.ppt,.pptx"
-            onChange={(e) => setPitchDeck(e.target.files[0])}
-          />
-        </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Startup"}
-        </button>
       </form>
     </div>
   );
