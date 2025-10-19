@@ -237,7 +237,10 @@ export default function CreateStartup() {
   ];
 
   return (
-    <div className="create-startup-container fade-in">
+    <div
+      className="create-startup-container fade-in"
+      style={{ "--step": step }}
+    >
       <h2>{steps[step].label}</h2>
       <form onSubmit={handleSubmit}>
         <div className="step-content">{steps[step].field}</div>
