@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../components/Navbar"; // Make sure you have a Navbar component
+import Navbar from "../components/Navbar";
 import "../css/StartupProfile.css";
 
 export default function StartupProfile() {
@@ -12,6 +12,8 @@ export default function StartupProfile() {
   const [following, setFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isFounder, setIsFounder] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [formData, setFormData] = useState({});
 
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com/api";
@@ -23,13 +25,12 @@ export default function StartupProfile() {
         return;
       }
       try {
-        // Fetch startup data
         const res = await axios.get(`${API_URL}/startups/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStartup(res.data);
+        setFormData(res.data);
 
-        // Check if current user is following
         const profileRes = await axios.get(`${API_URL}/profile/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -60,8 +61,43 @@ export default function StartupProfile() {
     }
   };
 
-  const handleEdit = () => {
-    navigate(`/CreateStartup?editId=${id}`);
+  const handleEditClick = () => setEditing(true);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    setFormData((prev) => ({ ...prev, logo: e.target.files[0] }));
+  };
+
+  const handleUpdate = async () => {
+    if (!token) return alert("Login required");
+    try {
+      const updatedData = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (Array.isArray(formData[key])) {
+          updatedData.append(key, JSON.stringify(formData[key]));
+        } else {
+          updatedData.append(key, formData[key]);
+        }
+      });
+
+      await axios.put(`${API_URL}/startups/${id}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      alert("Startup profile updated successfully!");
+      setStartup(formData);
+      setEditing(false);
+    } catch (err) {
+      console.error("Error updating startup:", err);
+      alert("Failed to update startup profile");
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -69,13 +105,17 @@ export default function StartupProfile() {
 
   return (
     <div>
-      <Navbar /> {/* Navbar at the top */}
+      <Navbar />
       <div className="startup-profile-page">
         <div className="banner"></div>
 
         <div className="profile-header">
           <img
-            src={startup.logo || "/default-logo.png"}
+            src={
+              startup.logo && typeof startup.logo === "string"
+                ? startup.logo
+                : "/default-logo.png"
+            }
             alt="Logo"
             className="startup-logo"
           />
@@ -83,19 +123,89 @@ export default function StartupProfile() {
             <h1>{startup.name}</h1>
             <p>{startup.mission}</p>
           </div>
+
           <div className="profile-actions">
             <button className="follow-btn" onClick={toggleFollow}>
               {following ? "Following ✅" : "Follow +"}
             </button>
             {isFounder && (
-              <button className="edit-btn" onClick={handleEdit}>
+              <button className="edit-btn" onClick={handleEditClick}>
                 ✏️ Edit Profile
               </button>
             )}
           </div>
         </div>
 
-        <div className="info-section">
+        {/* ========= Edit Modal ========= */}
+        {editing && (
+          <div className="edit-modal-overlay">
+            <div className="edit-modal">
+              <h2>Edit Startup Profile</h2>
+              <label>Logo:</label>
+              <input type="file" onChange={handleFileChange} />
+
+              <label>Mission:</label>
+              <textarea
+                name="mission"
+                value={formData.mission || ""}
+                onChange={handleInputChange}
+              />
+
+              <label>Stage:</label>
+              <input
+                name="stage"
+                value={formData.stage || ""}
+                onChange={handleInputChange}
+              />
+
+              <label>Industries (comma separated):</label>
+              <input
+                name="industries"
+                value={formData.industries?.join(", ") || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    industries: e.target.value.split(",").map((i) => i.trim()),
+                  })
+                }
+              />
+
+              <label>Funding Info:</label>
+              <input
+                name="fundingInfo"
+                value={formData.fundingInfo || ""}
+                onChange={handleInputChange}
+              />
+
+              <label>Skills (comma separated):</label>
+              <input
+                name="skills"
+                value={formData.skills?.join(", ") || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    skills: e.target.value.split(",").map((s) => s.trim()),
+                  })
+                }
+              />
+
+              <div className="edit-btns">
+                <button className="save-btn" onClick={handleUpdate}>
+                  💾 Save Changes
+                </button>
+                <button
+                  className="cancel-btn"
+                  onClick={() => setEditing(false)}
+                >
+                  ❌ Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="info-section card">
+          <h3>About Startup</h3>
           <p>
             <strong>Stage:</strong> {startup.stage}
           </p>
@@ -113,7 +223,7 @@ export default function StartupProfile() {
           </p>
         </div>
 
-        <div className="team-section">
+        <div className="team-section card">
           <h3>Team Members 👥</h3>
           {startup.team?.length ? (
             <ul>
@@ -128,7 +238,7 @@ export default function StartupProfile() {
           )}
         </div>
 
-        <div className="posts-section">
+        <div className="posts-section card">
           <h3>Startup Updates 📢</h3>
           {startup.posts?.length ? (
             startup.posts.map((p) => (
