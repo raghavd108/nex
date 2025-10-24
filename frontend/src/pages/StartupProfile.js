@@ -36,7 +36,10 @@ export default function StartupProfile() {
         });
         const myProfileId = profileRes.data._id;
         setFollowing(res.data.followers?.some((f) => f._id === myProfileId));
-        setIsFounder(res.data.founderProfileId === myProfileId);
+        setIsFounder(
+          res.data.founderProfileId === myProfileId ||
+            res.data.founderProfileId?._id === myProfileId
+        );
       } catch (err) {
         console.error("Failed to fetch startup", err);
         alert("Error fetching startup data");
