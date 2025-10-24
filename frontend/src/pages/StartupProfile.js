@@ -14,6 +14,9 @@ export default function StartupProfile() {
   const [isFounder, setIsFounder] = useState(false);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedMembers, setSelectedMembers] = useState([]);
 
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com/api";
@@ -100,6 +103,79 @@ export default function StartupProfile() {
     } catch (err) {
       console.error("Error updating startup:", err);
       alert("Failed to update startup profile");
+    }
+  };
+
+  // ================= Team Member Search & Add =================
+
+  const handleSearch = async (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const res = await axios.get(`${API_URL}/profile/search`, {
+        params: { q: query },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSearchResults(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Search failed", err);
+      setSearchResults([]);
+    }
+  };
+
+  const handleSelectMember = (user) => {
+    if (selectedMembers.some((m) => m._id === user._id)) return;
+    setSelectedMembers((prev) => [...prev, { ...user, role: "" }]);
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
+  const handleRoleChange = (id, value) => {
+    setSelectedMembers((prev) =>
+      prev.map((m) => (m._id === id ? { ...m, role: value } : m))
+    );
+  };
+
+  const handleRemoveMember = (id) => {
+    setSelectedMembers((prev) => prev.filter((m) => m._id !== id));
+  };
+
+  const handleSaveTeam = async () => {
+    if (selectedMembers.length === 0) return alert("Add at least one teammate");
+
+    try {
+      await Promise.all(
+        selectedMembers.map((m) =>
+          axios.post(
+            `${API_URL}/startups/${id}/addTeamMember`,
+            { profileId: m._id, role: m.role || "Member" },
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+        )
+      );
+
+      alert("Team members added successfully!");
+      setStartup((prev) => ({
+        ...prev,
+        team: [
+          ...prev.team,
+          ...selectedMembers.map((m) => ({
+            profileId: m,
+            role: m.role || "Member",
+          })),
+        ],
+      }));
+
+      setSelectedMembers([]);
+    } catch (err) {
+      console.error("Add members failed:", err);
+      alert("Failed to add team members");
     }
   };
 
@@ -226,6 +302,7 @@ export default function StartupProfile() {
           </p>
         </div>
 
+        {/* ========= Team Section ========= */}
         <div className="team-section card">
           <h3>Team Members 👥</h3>
           {startup.team?.length ? (
@@ -238,6 +315,79 @@ export default function StartupProfile() {
             </ul>
           ) : (
             <p>No team members yet.</p>
+          )}
+
+          {/* ========= Add Team Members (Founder Only) ========= */}
+          {isFounder && (
+            <div className="add-member-box">
+              <h4>Add Team Members</h4>
+              <input
+                type="text"
+                placeholder="Search users by name..."
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+
+              {/* Search results dropdown */}
+              {searchResults.length > 0 && (
+                <div className="search-results-container">
+                  {searchResults.map((user) => (
+                    <div
+                      key={user._id}
+                      className="profile-preview"
+                      onClick={() => handleSelectMember(user)}
+                    >
+                      <img
+                        src={user.avatar || "/default-avatar.png"}
+                        alt={user.username}
+                      />
+                      <div className="profile-info">
+                        <span className="name">{user.name || "Unnamed"}</span>
+                        <span className="username">@{user.username}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Selected Members */}
+              {selectedMembers.length > 0 && (
+                <div className="selected-members">
+                  <h5>Selected Members</h5>
+                  {selectedMembers.map((m) => (
+                    <div key={m._id} className="selected-member">
+                      <img
+                        src={m.avatar || "/default-avatar.png"}
+                        alt={m.name}
+                        className="avatar"
+                      />
+                      <span>{m.name}</span>
+                      <input
+                        type="text"
+                        placeholder="Role (e.g., Designer)"
+                        value={m.role}
+                        onChange={(e) =>
+                          handleRoleChange(m._id, e.target.value)
+                        }
+                      />
+                      <button
+                        onClick={() => handleRemoveMember(m._id)}
+                        style={{
+                          marginLeft: "8px",
+                          color: "red",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ❌
+                      </button>
+                    </div>
+                  ))}
+                  <button className="save-btn" onClick={handleSaveTeam}>
+                    💾 Save Team
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 

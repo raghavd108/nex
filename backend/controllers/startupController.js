@@ -60,16 +60,34 @@ exports.updateStartup = async (req, res) => {
       !founderProfile ||
       startup.founderProfileId.toString() !== founderProfile._id.toString()
     ) {
-      return res.status(403).json({
-        message: "Unauthorized: Only founder can update this startup",
-      });
+      return res.status(403).json({ message: "Unauthorized" });
     }
 
-    const updated = await Startup.findByIdAndUpdate(req.params.id, req.body, {
+    const updateData = { ...req.body };
+
+    // ✅ If a new logo is uploaded, handle it
+    if (req.file) {
+      const dataUri = `data:${
+        req.file.mimetype
+      };base64,${req.file.buffer.toString("base64")}`;
+      const result = await cloudinary.uploader.upload(dataUri, {
+        folder: "nex_startup_logos",
+      });
+      updateData.logo = result.secure_url;
+    }
+
+    // ✅ Parse arrays (since you stringify them in frontend)
+    if (updateData.industries)
+      updateData.industries = JSON.parse(updateData.industries);
+    if (updateData.skills) updateData.skills = JSON.parse(updateData.skills);
+
+    const updated = await Startup.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
     });
+
     res.json(updated);
   } catch (err) {
+    console.error("Update Startup Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
