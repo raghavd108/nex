@@ -240,33 +240,52 @@ export default function ProfilePage() {
                   {user.isOpenToCollaborate ? "Yes" : "No"}
                 </p>
 
-                {/* STARTUP AFFILIATIONS */}
-                {user.startupAffiliations?.length > 0 ? (
-                  <div className={styles.startupAffiliations}>
-                    <strong>Startups:</strong>
-                    <ul>
-                      {user.startupAffiliations.map((s) => (
-                        <li key={s.startupId._id}>
-                          <Link to={`/startup/${s.startupId._id}`}>
-                            {s.startupId.name} ({s.role}) {s.isFounder && "⭐"}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  isOwnProfile && (
-                    <div className={styles.createStartupPrompt}>
-                      <p>You haven’t created a startup yet!</p>
-                      <button
-                        onClick={() => navigate("/CreateStartup")}
-                        className={styles.createStartupBtn}
-                      >
-                        Create Your Startup
-                      </button>
-                    </div>
-                  )
-                )}
+                {/* ✅ STARTUP AFFILIATIONS (Fixed for null startupId) */}
+                {user.startupAffiliations && user.startupAffiliations.length > 0
+                  ? (() => {
+                      const validStartups = user.startupAffiliations.filter(
+                        (s) => s.startupId && s.startupId._id
+                      );
+
+                      return validStartups.length > 0 ? (
+                        <div className={styles.startupAffiliations}>
+                          <strong>Startups:</strong>
+                          <ul>
+                            {validStartups.map((s) => (
+                              <li key={s.startupId._id}>
+                                <Link to={`/startup/${s.startupId._id}`}>
+                                  {s.startupId.name} ({s.role}){" "}
+                                  {s.isFounder && "⭐"}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : (
+                        isOwnProfile && (
+                          <div className={styles.createStartupPrompt}>
+                            <p>You haven’t created a startup yet!</p>
+                            <button
+                              onClick={() => navigate("/CreateStartup")}
+                              className={styles.createStartupBtn}
+                            >
+                              Create Your Startup
+                            </button>
+                          </div>
+                        )
+                      );
+                    })()
+                  : isOwnProfile && (
+                      <div className={styles.createStartupPrompt}>
+                        <p>You haven’t created a startup yet!</p>
+                        <button
+                          onClick={() => navigate("/CreateStartup")}
+                          className={styles.createStartupBtn}
+                        >
+                          Create Your Startup
+                        </button>
+                      </div>
+                    )}
               </div>
             </>
           ) : (
@@ -279,7 +298,7 @@ export default function ProfilePage() {
             >
               {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
 
-              {/* EDIT FORM FIELDS */}
+              {/* EDIT FORM */}
               <div className={styles.editInput}>
                 <label>Name:</label>
                 <input
