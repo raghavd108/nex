@@ -19,8 +19,7 @@ export default function StartupProfile() {
   const [selectedMembers, setSelectedMembers] = useState([]);
 
   const token = localStorage.getItem("token");
-  const API_URL =
-    import.meta.env.VITE_API_URL || "https://nex-pjq3.onrender.com/api";
+  const API_URL = "https://nex-pjq3.onrender.com/api";
 
   // =================== Fetch Startup Data ===================
   useEffect(() => {
