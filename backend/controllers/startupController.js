@@ -30,9 +30,9 @@ exports.createStartup = async (req, res) => {
       description,
       stage,
       fundingInfo,
-      roles,
-      industries,
-      skills,
+      roles: roles || [],
+      industries: industries || [],
+      skills: skills || [],
     });
 
     await newStartup.save();
@@ -69,18 +69,25 @@ exports.updateStartup = async (req, res) => {
 
     let updateData = { ...req.body };
 
-    // ✅ Parse JSON fields (for industries, roles, etc.)
+    // Convert comma-separated strings to arrays
     ["industries", "roles", "skills"].forEach((key) => {
-      if (updateData[key] && typeof updateData[key] === "string") {
-        try {
-          updateData[key] = JSON.parse(updateData[key]);
-        } catch {
-          // ignore parse errors
+      if (updateData[key]) {
+        if (typeof updateData[key] === "string") {
+          try {
+            // Try parsing JSON first
+            updateData[key] = JSON.parse(updateData[key]);
+          } catch {
+            // Fallback to comma-separated split
+            updateData[key] = updateData[key]
+              .split(",")
+              .map((i) => i.trim())
+              .filter(Boolean);
+          }
         }
       }
     });
 
-    // ✅ If new logo uploaded — replace old one
+    // Handle logo upload
     if (req.file) {
       const dataUri = `data:${
         req.file.mimetype
@@ -89,7 +96,7 @@ exports.updateStartup = async (req, res) => {
         folder: "nex_startup_logos",
       });
 
-      // If previous logo exists, delete from Cloudinary (optional)
+      // Delete old logo if exists
       if (startup.logo && startup.logo.includes("res.cloudinary.com")) {
         try {
           const publicId = startup.logo.split("/").pop().split(".")[0];
@@ -133,7 +140,6 @@ exports.uploadLogo = async (req, res) => {
     if (startup.founderProfileId.toString() !== founderProfile._id.toString())
       return res.status(403).json({ message: "Unauthorized" });
 
-    // Replace existing logo (only one allowed)
     const dataUri = `data:${
       req.file.mimetype
     };base64,${req.file.buffer.toString("base64")}`;
@@ -141,7 +147,6 @@ exports.uploadLogo = async (req, res) => {
       folder: "nex_startup_logos",
     });
 
-    // Delete previous logo if exists
     if (startup.logo && startup.logo.includes("res.cloudinary.com")) {
       try {
         const publicId = startup.logo.split("/").pop().split(".")[0];
@@ -185,7 +190,6 @@ exports.uploadPitchDeck = async (req, res) => {
       resource_type: "raw",
     });
 
-    // Replace existing pitch deck if exists
     if (
       startup.pitchDeckUrl &&
       startup.pitchDeckUrl.includes("res.cloudinary.com")
@@ -259,6 +263,7 @@ exports.removeTeamMember = async (req, res) => {
   try {
     const founderProfile = await Profile.findOne({ userId: req.userId });
     const startup = await Startup.findById(req.params.id);
+
     if (!startup) return res.status(404).json({ message: "Startup not found" });
     if (startup.founderProfileId.toString() !== founderProfile._id.toString())
       return res.status(403).json({ message: "Unauthorized" });
@@ -291,7 +296,6 @@ exports.toggleFollow = async (req, res) => {
     const index = startup.followers.findIndex(
       (id) => id.toString() === profile._id.toString()
     );
-
     if (index > -1) {
       startup.followers.splice(index, 1);
       await startup.save();
