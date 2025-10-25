@@ -24,10 +24,7 @@ export default function StartupProfile() {
   // =================== Fetch Startup Data ===================
   useEffect(() => {
     const fetchStartup = async () => {
-      if (!token) {
-        alert("You must be logged in to view this startup.");
-        return;
-      }
+      if (!token) return alert("Login required");
       try {
         const [startupRes, profileRes] = await Promise.all([
           axios.get(`${API_URL}/startups/${id}`, {
@@ -43,11 +40,11 @@ export default function StartupProfile() {
 
         setStartup(startupData);
         setFormData({
-          name: startupData.name,
-          mission: startupData.mission,
-          description: startupData.description,
-          stage: startupData.stage,
-          fundingInfo: startupData.fundingInfo,
+          name: startupData.name || "",
+          mission: startupData.mission || "",
+          description: startupData.description || "",
+          stage: startupData.stage || "idea",
+          fundingInfo: startupData.fundingInfo || "",
           industries: startupData.industries || [],
           skills: startupData.skills || [],
           logo: startupData.logo || "",
@@ -123,16 +120,17 @@ export default function StartupProfile() {
         },
       });
 
-      setStartup(res.data.startup);
+      const updatedStartup = res.data.startup || res.data;
+      setStartup(updatedStartup);
       setFormData({
-        name: res.data.startup.name,
-        mission: res.data.startup.mission,
-        description: res.data.startup.description,
-        stage: res.data.startup.stage,
-        fundingInfo: res.data.startup.fundingInfo,
-        industries: res.data.startup.industries || [],
-        skills: res.data.startup.skills || [],
-        logo: res.data.startup.logo || "",
+        name: updatedStartup.name || "",
+        mission: updatedStartup.mission || "",
+        description: updatedStartup.description || "",
+        stage: updatedStartup.stage || "idea",
+        fundingInfo: updatedStartup.fundingInfo || "",
+        industries: updatedStartup.industries || [],
+        skills: updatedStartup.skills || [],
+        logo: updatedStartup.logo || "",
       });
 
       setEditing(false);
@@ -157,7 +155,7 @@ export default function StartupProfile() {
       });
       const results = Array.isArray(res.data)
         ? res.data.filter(
-            (u) => !startup.team.some((m) => m.profileId?._id === u._id)
+            (u) => !startup.team?.some((m) => m.profileId?._id === u._id)
           )
         : [];
       setSearchResults(results);
@@ -202,7 +200,7 @@ export default function StartupProfile() {
       setStartup((prev) => ({
         ...prev,
         team: [
-          ...prev.team,
+          ...(prev.team || []),
           ...selectedMembers.map((m) => ({
             profileId: m,
             role: m.role || "Member",
@@ -284,7 +282,10 @@ export default function StartupProfile() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    industries: e.target.value.split(",").map((i) => i.trim()),
+                    industries: e.target.value
+                      .split(",")
+                      .map((i) => i.trim())
+                      .filter(Boolean),
                   })
                 }
               />
@@ -303,7 +304,10 @@ export default function StartupProfile() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    skills: e.target.value.split(",").map((s) => s.trim()),
+                    skills: e.target.value
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean),
                   })
                 }
               />
@@ -330,13 +334,14 @@ export default function StartupProfile() {
             <strong>Stage:</strong> {startup.stage}
           </p>
           <p>
-            <strong>Industries:</strong> {startup.industries?.join(", ")}
+            <strong>Industries:</strong>{" "}
+            {startup.industries?.join(", ") || "N/A"}
           </p>
           <p>
             <strong>Funding:</strong> {startup.fundingInfo || "N/A"}
           </p>
           <p>
-            <strong>Skills:</strong> {startup.skills?.join(", ")}
+            <strong>Skills:</strong> {startup.skills?.join(", ") || "N/A"}
           </p>
           <p>
             <strong>Followers:</strong> {startup.followers?.length || 0}
@@ -348,9 +353,9 @@ export default function StartupProfile() {
           <h3>Team Members 👥</h3>
           {startup.team?.length ? (
             <ul>
-              {startup.team.map((m) => (
-                <li key={m._id}>
-                  {m.profileId?.name || "Unknown"} - {m.role}
+              {startup.team.map((m, idx) => (
+                <li key={m._id || idx}>
+                  {m.profileId?.name || "Unknown"} - {m.role || "Member"}
                 </li>
               ))}
             </ul>

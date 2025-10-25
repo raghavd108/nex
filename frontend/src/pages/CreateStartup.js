@@ -1,3 +1,4 @@
+// src/pages/CreateStartup.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -28,23 +29,22 @@ export default function CreateStartup() {
     industries: [],
     skills: [],
   });
-  const [logos, setLogos] = useState([]); // Multiple logos
-  const [pitchDecks, setPitchDecks] = useState([]); // Multiple pitch decks
+  const [logos, setLogos] = useState([]); // multiple logos
+  const [pitchDecks, setPitchDecks] = useState([]); // multiple pitch decks
   const [loading, setLoading] = useState(false);
   const [profileId, setProfileId] = useState(null);
 
   const token = localStorage.getItem("token");
-
-  // ✅ Use env for flexibility
   const API_URL = "https://nex-pjq3.onrender.com";
 
-  // Wake up server on mount (Render cold start fix)
+  // Wake up server (Render cold start)
   useEffect(() => {
     axios.get(`${API_URL}/api/health`).catch(() => {});
   }, [API_URL]);
 
-  // Fetch profile of logged-in user
+  // Fetch logged-in user profile
   useEffect(() => {
+    if (!token) return;
     const fetchProfile = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/profile/me`, {
@@ -55,7 +55,7 @@ export default function CreateStartup() {
         console.error("Profile fetch failed:", err);
       }
     };
-    if (token) fetchProfile();
+    fetchProfile();
   }, [token, API_URL]);
 
   const handleNext = () => setStep((s) => s + 1);
@@ -84,18 +84,27 @@ export default function CreateStartup() {
     e.preventDefault();
     setLoading(true);
     try {
-      // ✅ Step 1: Create startup
-      const payload = { ...form, founderProfileId: profileId };
+      // Step 1: Create startup with arrays normalized
+      const payload = {
+        ...form,
+        founderProfileId: profileId,
+        industries: form.industries || [],
+        skills: form.skills || [],
+        roles: form.roles || [],
+      };
+
       const res = await axios.post(`${API_URL}/api/startups`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const startupId = res.data._id;
 
-      // ✅ Step 2: Upload multiple logos
+      let mainLogoUrl = "";
+
+      // Step 2: Upload multiple logos
       if (logos.length > 0) {
         const logoFormData = new FormData();
         logos.forEach((file) => logoFormData.append("logos", file));
-        await axios.post(
+        const logoRes = await axios.post(
           `${API_URL}/api/startups/${startupId}/logos`,
           logoFormData,
           {
@@ -105,9 +114,11 @@ export default function CreateStartup() {
             },
           }
         );
+        // Take first logo as main
+        mainLogoUrl = logoRes.data[0]?.url || "";
       }
 
-      // ✅ Step 3: Upload multiple pitch decks
+      // Step 3: Upload multiple pitch decks
       if (pitchDecks.length > 0) {
         const deckFormData = new FormData();
         pitchDecks.forEach((file) => deckFormData.append("pitchDecks", file));
@@ -123,11 +134,20 @@ export default function CreateStartup() {
         );
       }
 
-      // ✅ Step 4: Navigate to the created startup profile
+      // Step 4: Update startup with main logo
+      if (mainLogoUrl) {
+        await axios.put(
+          `${API_URL}/api/startups/${startupId}`,
+          { logo: mainLogoUrl },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+
+      // Step 5: Navigate to startup profile
       navigate(`/startup/${startupId}`);
     } catch (err) {
       console.error("Error creating startup:", err);
-      alert("There was a problem creating your startup. Please try again.");
+      alert("Failed to create startup. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -141,7 +161,7 @@ export default function CreateStartup() {
           name="name"
           value={form.name}
           onChange={handleChange}
-          placeholder="What's your startup called?"
+          placeholder="Startup name"
           required
         />
       ),
@@ -153,7 +173,7 @@ export default function CreateStartup() {
           name="mission"
           value={form.mission}
           onChange={handleChange}
-          placeholder="What's your mission?"
+          placeholder="Mission"
           required
         />
       ),
@@ -165,7 +185,7 @@ export default function CreateStartup() {
           name="description"
           value={form.description}
           onChange={handleChange}
-          placeholder="Describe your idea..."
+          placeholder="Describe your idea"
           required
         />
       ),
@@ -187,7 +207,7 @@ export default function CreateStartup() {
           name="fundingInfo"
           value={form.fundingInfo}
           onChange={handleChange}
-          placeholder="Funding details (optional)"
+          placeholder="Funding info (optional)"
         />
       ),
     },
@@ -201,7 +221,7 @@ export default function CreateStartup() {
                 type="checkbox"
                 checked={form.roles.includes(r)}
                 onChange={() => handleMultiSelect("roles", r)}
-              />
+              />{" "}
               {r}
             </label>
           ))}
@@ -218,7 +238,7 @@ export default function CreateStartup() {
                 type="checkbox"
                 checked={form.industries.includes(i)}
                 onChange={() => handleMultiSelect("industries", i)}
-              />
+              />{" "}
               {i}
             </label>
           ))}
