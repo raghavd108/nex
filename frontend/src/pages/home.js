@@ -32,6 +32,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isPostPopupOpen, setIsPostPopupOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+  const [userStartups, setUserStartups] = useState([]);
+  const [selectedProfileType, setSelectedProfileType] = useState("personal");
+  const [selectedStartupId, setSelectedStartupId] = useState("");
 
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com/api";
@@ -61,6 +64,19 @@ export default function Home() {
     }
   };
 
+  // Fetch user startups
+  const fetchUserStartups = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/startups/my`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUserStartups(res.data || []);
+    } catch (err) {
+      console.error("Error fetching startups:", err);
+      setUserStartups([]);
+    }
+  };
+
   // Fetch posts
   const fetchPosts = async () => {
     try {
@@ -85,6 +101,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchUserProfile();
+    fetchUserStartups();
     fetchPosts();
     fetchStories();
   }, []);
@@ -134,6 +151,12 @@ export default function Home() {
       formData.append("content", newPost);
       formData.append("mood", selectedMood);
       if (photo) formData.append("image", photo);
+
+      // Add post type info
+      formData.append("postType", selectedProfileType);
+      if (selectedProfileType === "startup" && selectedStartupId) {
+        formData.append("startupId", selectedStartupId);
+      }
 
       const res = await axios.post(`${API_URL}/posts`, formData, {
         headers: {
@@ -264,9 +287,24 @@ export default function Home() {
           posts.map((post) => (
             <div key={post._id} className="feed-card">
               <div className="feed-header">
-                <img src={post.userId?.avatar} alt={post.userId?.username} />
+                <img
+                  src={
+                    post.postType === "startup"
+                      ? post.startupId?.logo
+                      : post.userId?.avatar
+                  }
+                  alt={
+                    post.postType === "startup"
+                      ? post.startupId?.name
+                      : post.userId?.username
+                  }
+                />
                 <div>
-                  <h4>{post.userId?.name || "User"}</h4>
+                  <h4>
+                    {post.postType === "startup"
+                      ? post.startupId?.name
+                      : post.userId?.name || "User"}
+                  </h4>
                   <span>{post.mood || "Neutral"} mood</span>
                 </div>
               </div>
@@ -286,7 +324,8 @@ export default function Home() {
                   {Array.isArray(post.comments) ? post.comments.length : 0}
                 </span>
                 <FaShare />
-                {post.userId?._id === userProfile?._id && (
+                {(post.userId?._id === userProfile?._id ||
+                  post.startupId?.ownerId === userProfile?._id) && (
                   <FaTrash
                     onClick={() => handleDeletePost(post._id)}
                     style={{
@@ -334,6 +373,50 @@ export default function Home() {
                   style={{ borderRadius: "12px", maxHeight: "150px" }}
                 />
               )}
+
+              {/* 🔄 Select Post Type */}
+              <div className="post-type-selector">
+                <label>
+                  <input
+                    type="radio"
+                    name="postType"
+                    value="personal"
+                    checked={selectedProfileType === "personal"}
+                    onChange={() => setSelectedProfileType("personal")}
+                  />
+                  Post as Personal Profile
+                </label>
+
+                {userStartups.length > 0 && (
+                  <>
+                    <label>
+                      <input
+                        type="radio"
+                        name="postType"
+                        value="startup"
+                        checked={selectedProfileType === "startup"}
+                        onChange={() => setSelectedProfileType("startup")}
+                      />
+                      Post as Startup
+                    </label>
+
+                    {selectedProfileType === "startup" && (
+                      <select
+                        value={selectedStartupId}
+                        onChange={(e) => setSelectedStartupId(e.target.value)}
+                      >
+                        <option value="">Select Startup</option>
+                        {userStartups.map((startup) => (
+                          <option key={startup._id} value={startup._id}>
+                            {startup.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </>
+                )}
+              </div>
+
               <div className="composer-actions">
                 <label className="upload-btn">
                   <FaImage /> Upload Image

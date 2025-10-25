@@ -14,6 +14,7 @@ export default function StartupProfile() {
   const [isFounder, setIsFounder] = useState(false);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({});
+  const [previewLogo, setPreviewLogo] = useState(null); // For live preview
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
@@ -33,6 +34,7 @@ export default function StartupProfile() {
         });
         setStartup(res.data);
         setFormData(res.data);
+        setPreviewLogo(res.data.logo); // show logo preview
 
         const profileRes = await axios.get(`${API_URL}/profile/me`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -52,6 +54,7 @@ export default function StartupProfile() {
     fetchStartup();
   }, [id, token]);
 
+  // ---------------- Follow ----------------
   const toggleFollow = async () => {
     if (!token) return alert("Login required");
     try {
@@ -67,6 +70,7 @@ export default function StartupProfile() {
     }
   };
 
+  // ---------------- Editing ----------------
   const handleEditClick = () => setEditing(true);
 
   const handleInputChange = (e) => {
@@ -75,7 +79,11 @@ export default function StartupProfile() {
   };
 
   const handleFileChange = (e) => {
-    setFormData((prev) => ({ ...prev, logo: e.target.files[0] }));
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, logo: file }));
+      setPreviewLogo(URL.createObjectURL(file)); // live preview
+    }
   };
 
   const handleUpdate = async () => {
@@ -90,7 +98,7 @@ export default function StartupProfile() {
         }
       });
 
-      await axios.put(`${API_URL}/startups/${id}`, updatedData, {
+      const res = await axios.put(`${API_URL}/startups/${id}`, updatedData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -98,16 +106,16 @@ export default function StartupProfile() {
       });
 
       alert("Startup profile updated successfully!");
-      setStartup(formData);
+      setStartup(res.data);
       setEditing(false);
+      setPreviewLogo(res.data.logo);
     } catch (err) {
       console.error("Error updating startup:", err);
       alert("Failed to update startup profile");
     }
   };
 
-  // ================= Team Member Search & Add =================
-
+  // ---------------- Team Member Search ----------------
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -130,7 +138,11 @@ export default function StartupProfile() {
   };
 
   const handleSelectMember = (user) => {
-    if (selectedMembers.some((m) => m._id === user._id)) return;
+    if (
+      selectedMembers.some((m) => m._id === user._id) ||
+      startup.team?.some((m) => m.profileId?._id === user._id)
+    )
+      return; // avoid duplicates
     setSelectedMembers((prev) => [...prev, { ...user, role: "" }]);
     setSearchQuery("");
     setSearchResults([]);
@@ -150,7 +162,7 @@ export default function StartupProfile() {
     if (selectedMembers.length === 0) return alert("Add at least one teammate");
 
     try {
-      await Promise.all(
+      const res = await Promise.all(
         selectedMembers.map((m) =>
           axios.post(
             `${API_URL}/startups/${id}/addTeamMember`,
@@ -160,11 +172,11 @@ export default function StartupProfile() {
         )
       );
 
-      alert("Team members added successfully!");
+      // Add newly added team members to frontend state
       setStartup((prev) => ({
         ...prev,
         team: [
-          ...prev.team,
+          ...(prev.team || []),
           ...selectedMembers.map((m) => ({
             profileId: m,
             role: m.role || "Member",
@@ -172,6 +184,7 @@ export default function StartupProfile() {
         ],
       }));
 
+      alert("Team members added successfully!");
       setSelectedMembers([]);
     } catch (err) {
       console.error("Add members failed:", err);
@@ -190,11 +203,7 @@ export default function StartupProfile() {
 
         <div className="profile-header">
           <img
-            src={
-              startup.logo && typeof startup.logo === "string"
-                ? startup.logo
-                : "/default-logo.png"
-            }
+            src={previewLogo || "/default-logo.png"}
             alt="Logo"
             className="startup-logo"
           />
@@ -222,6 +231,15 @@ export default function StartupProfile() {
               <h2>Edit Startup Profile</h2>
               <label>Logo:</label>
               <input type="file" onChange={handleFileChange} />
+
+              {previewLogo && (
+                <img
+                  src={previewLogo}
+                  alt="Preview"
+                  className="logo-preview"
+                  style={{ margin: "10px 0", maxHeight: "100px" }}
+                />
+              )}
 
               <label>Mission:</label>
               <textarea
@@ -283,6 +301,7 @@ export default function StartupProfile() {
           </div>
         )}
 
+        {/* ========= About Startup ========= */}
         <div className="info-section card">
           <h3>About Startup</h3>
           <p>
@@ -307,8 +326,8 @@ export default function StartupProfile() {
           <h3>Team Members 👥</h3>
           {startup.team?.length ? (
             <ul>
-              {startup.team.map((m) => (
-                <li key={m._id}>
+              {startup.team.map((m, index) => (
+                <li key={index}>
                   {m.profileId?.name || "Unknown"} - {m.role}
                 </li>
               ))}
@@ -317,7 +336,6 @@ export default function StartupProfile() {
             <p>No team members yet.</p>
           )}
 
-          {/* ========= Add Team Members (Founder Only) ========= */}
           {isFounder && (
             <div className="add-member-box">
               <h4>Add Team Members</h4>
@@ -328,7 +346,6 @@ export default function StartupProfile() {
                 onChange={handleSearch}
               />
 
-              {/* Search results dropdown */}
               {searchResults.length > 0 && (
                 <div className="search-results-container">
                   {searchResults.map((user) => (
@@ -350,7 +367,6 @@ export default function StartupProfile() {
                 </div>
               )}
 
-              {/* Selected Members */}
               {selectedMembers.length > 0 && (
                 <div className="selected-members">
                   <h5>Selected Members</h5>
@@ -391,6 +407,7 @@ export default function StartupProfile() {
           )}
         </div>
 
+        {/* ========= Startup Posts ========= */}
         <div className="posts-section card">
           <h3>Startup Updates 📢</h3>
           {startup.posts?.length ? (
