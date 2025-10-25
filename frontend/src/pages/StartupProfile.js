@@ -53,7 +53,12 @@ export default function StartupProfile() {
           logo: startupData.logo || "",
         });
 
-        setFollowing(startupData.followers?.some((f) => f._id === myProfileId));
+        setFollowing(
+          startupData.followers?.some((f) =>
+            typeof f === "string" ? f === myProfileId : f._id === myProfileId
+          )
+        );
+
         setIsFounder(
           startupData.founderProfileId === myProfileId ||
             startupData.founderProfileId?._id === myProfileId
@@ -104,6 +109,8 @@ export default function StartupProfile() {
       Object.keys(formData).forEach((key) => {
         if (Array.isArray(formData[key])) {
           updatedData.append(key, JSON.stringify(formData[key]));
+        } else if (key === "logo" && formData.logo instanceof File) {
+          updatedData.append("logo", formData.logo);
         } else {
           updatedData.append(key, formData[key]);
         }
@@ -116,7 +123,18 @@ export default function StartupProfile() {
         },
       });
 
-      setStartup(res.data);
+      setStartup(res.data.startup);
+      setFormData({
+        name: res.data.startup.name,
+        mission: res.data.startup.mission,
+        description: res.data.startup.description,
+        stage: res.data.startup.stage,
+        fundingInfo: res.data.startup.fundingInfo,
+        industries: res.data.startup.industries || [],
+        skills: res.data.startup.skills || [],
+        logo: res.data.startup.logo || "",
+      });
+
       setEditing(false);
       alert("✅ Startup updated successfully!");
     } catch (err) {
@@ -137,7 +155,6 @@ export default function StartupProfile() {
         params: { q: query },
         headers: { Authorization: `Bearer ${token}` },
       });
-      // ✅ Filter out duplicates (avoid adding same user twice)
       const results = Array.isArray(res.data)
         ? res.data.filter(
             (u) => !startup.team.some((m) => m.profileId?._id === u._id)
