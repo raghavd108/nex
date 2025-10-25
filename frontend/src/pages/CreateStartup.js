@@ -1,4 +1,3 @@
-// src/pages/CreateStartup.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -29,14 +28,23 @@ export default function CreateStartup() {
     industries: [],
     skills: [],
   });
-  const [logo, setLogo] = useState(null);
-  const [pitchDeck, setPitchDeck] = useState(null);
+  const [logos, setLogos] = useState([]); // Multiple logos
+  const [pitchDecks, setPitchDecks] = useState([]); // Multiple pitch decks
   const [loading, setLoading] = useState(false);
   const [profileId, setProfileId] = useState(null);
 
   const token = localStorage.getItem("token");
-  const API_URL = "https://nex-pjq3.onrender.com";
 
+  // ✅ Use env for flexibility
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://nex-pjq3.onrender.com";
+
+  // Wake up server on mount (Render cold start fix)
+  useEffect(() => {
+    axios.get(`${API_URL}/api/health`).catch(() => {});
+  }, [API_URL]);
+
+  // Fetch profile of logged-in user
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -45,18 +53,18 @@ export default function CreateStartup() {
         });
         setProfileId(res.data._id);
       } catch (err) {
-        console.error("Profile fetch failed", err);
+        console.error("Profile fetch failed:", err);
       }
     };
     if (token) fetchProfile();
-  }, [token]);
+  }, [token, API_URL]);
 
   const handleNext = () => setStep((s) => s + 1);
   const handlePrev = () => setStep((s) => s - 1);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleMultiSelect = (name, value) => {
@@ -68,46 +76,62 @@ export default function CreateStartup() {
     });
   };
 
+  const handleFileChange = (setter) => (e) => {
+    const files = Array.from(e.target.files);
+    setter(files);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // ✅ Step 1: Create startup
       const payload = { ...form, founderProfileId: profileId };
       const res = await axios.post(`${API_URL}/api/startups`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const startupId = res.data._id;
 
-      if (logo) {
-        const logoData = new FormData();
-        logoData.append("logo", logo);
+      // ✅ Step 2: Upload multiple logos
+      if (logos.length > 0) {
+        const logoFormData = new FormData();
+        logos.forEach((file) => logoFormData.append("logos", file));
         await axios.post(
-          `${API_URL}/api/startups/${startupId}/logo`,
-          logoData,
+          `${API_URL}/api/startups/${startupId}/logos`,
+          logoFormData,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
           }
         );
       }
 
-      if (pitchDeck) {
-        const deckData = new FormData();
-        deckData.append("pitchDeck", pitchDeck);
+      // ✅ Step 3: Upload multiple pitch decks
+      if (pitchDecks.length > 0) {
+        const deckFormData = new FormData();
+        pitchDecks.forEach((file) => deckFormData.append("pitchDecks", file));
         await axios.post(
-          `${API_URL}/api/startups/${startupId}/pitchdeck`,
-          deckData,
+          `${API_URL}/api/startups/${startupId}/pitchdecks`,
+          deckFormData,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
           }
         );
       }
 
+      // ✅ Step 4: Navigate to the created startup profile
       navigate(`/startup/${startupId}`);
     } catch (err) {
-      console.error(err);
-      alert("Error creating startup");
+      console.error("Error creating startup:", err);
+      alert("There was a problem creating your startup. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const steps = [
@@ -119,6 +143,7 @@ export default function CreateStartup() {
           value={form.name}
           onChange={handleChange}
           placeholder="What's your startup called?"
+          required
         />
       ),
     },
@@ -130,6 +155,7 @@ export default function CreateStartup() {
           value={form.mission}
           onChange={handleChange}
           placeholder="What's your mission?"
+          required
         />
       ),
     },
@@ -141,6 +167,7 @@ export default function CreateStartup() {
           value={form.description}
           onChange={handleChange}
           placeholder="Describe your idea..."
+          required
         />
       ),
     },
@@ -208,29 +235,34 @@ export default function CreateStartup() {
           onChange={(e) =>
             setForm({
               ...form,
-              skills: e.target.value.split(",").map((s) => s.trim()),
+              skills: e.target.value
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean),
             })
           }
         />
       ),
     },
     {
-      label: "Upload Logo",
+      label: "Upload Logos (Multiple)",
       field: (
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => setLogo(e.target.files[0])}
+          multiple
+          onChange={handleFileChange(setLogos)}
         />
       ),
     },
     {
-      label: "Upload Pitch Deck",
+      label: "Upload Pitch Decks (Multiple)",
       field: (
         <input
           type="file"
           accept=".pdf,.ppt,.pptx"
-          onChange={(e) => setPitchDeck(e.target.files[0])}
+          multiple
+          onChange={handleFileChange(setPitchDecks)}
         />
       ),
     },

@@ -1,8 +1,11 @@
+// controllers/startupController.js
 const Startup = require("../models/Startup");
 const Profile = require("../models/Profile");
 const cloudinary = require("../config/cloudinary");
 
-/*  Create a new Startup*/
+/* ================================
+   CREATE NEW STARTUP
+================================ */
 exports.createStartup = async (req, res) => {
   try {
     const founderProfile = await Profile.findOne({ userId: req.userId });
@@ -34,7 +37,6 @@ exports.createStartup = async (req, res) => {
 
     await newStartup.save();
 
-    // 🔗 Automatically link startup to founder’s profile
     founderProfile.startupAffiliations.push({
       startupId: newStartup._id,
       role: "Founder",
@@ -49,7 +51,9 @@ exports.createStartup = async (req, res) => {
   }
 };
 
-/*  Update Startup (Only Founder Can Edit)*/
+/* ================================
+   UPDATE STARTUP (FOUNDERS ONLY)
+================================ */
 exports.updateStartup = async (req, res) => {
   try {
     const founderProfile = await Profile.findOne({ userId: req.userId });
@@ -63,9 +67,20 @@ exports.updateStartup = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-    const updateData = { ...req.body };
+    let updateData = { ...req.body };
 
-    // ✅ If a new logo is uploaded, handle it
+    // ✅ Parse JSON fields (for industries, roles, etc.)
+    ["industries", "roles", "skills"].forEach((key) => {
+      if (updateData[key] && typeof updateData[key] === "string") {
+        try {
+          updateData[key] = JSON.parse(updateData[key]);
+        } catch {
+          // ignore parse errors
+        }
+      }
+    });
+
+    // ✅ If new logo uploaded — replace old one
     if (req.file) {
       const dataUri = `data:${
         req.file.mimetype
@@ -73,26 +88,41 @@ exports.updateStartup = async (req, res) => {
       const result = await cloudinary.uploader.upload(dataUri, {
         folder: "nex_startup_logos",
       });
+
+      // If previous logo exists, delete from Cloudinary (optional)
+      if (startup.logo && startup.logo.includes("res.cloudinary.com")) {
+        try {
+          const publicId = startup.logo.split("/").pop().split(".")[0];
+          await cloudinary.uploader.destroy(`nex_startup_logos/${publicId}`);
+        } catch (e) {
+          console.warn("Old logo deletion failed:", e.message);
+        }
+      }
+
       updateData.logo = result.secure_url;
     }
 
-    // ✅ Parse arrays (since you stringify them in frontend)
-    if (updateData.industries)
-      updateData.industries = JSON.parse(updateData.industries);
-    if (updateData.skills) updateData.skills = JSON.parse(updateData.skills);
+    const updatedStartup = await Startup.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    )
+      .populate("founderProfileId", "name avatar username")
+      .populate("team.profileId", "name avatar username");
 
-    const updated = await Startup.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
+    res.json({
+      message: "Startup updated successfully",
+      startup: updatedStartup,
     });
-
-    res.json(updated);
   } catch (err) {
     console.error("Update Startup Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-/* Upload Logo*/
+/* ================================
+   UPLOAD LOGO (SINGLE)
+================================ */
 exports.uploadLogo = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
@@ -100,16 +130,26 @@ exports.uploadLogo = async (req, res) => {
     const founderProfile = await Profile.findOne({ userId: req.userId });
     const startup = await Startup.findById(req.params.id);
     if (!startup) return res.status(404).json({ message: "Startup not found" });
-    if (startup.founderProfileId.toString() !== founderProfile._id.toString()) {
+    if (startup.founderProfileId.toString() !== founderProfile._id.toString())
       return res.status(403).json({ message: "Unauthorized" });
-    }
 
+    // Replace existing logo (only one allowed)
     const dataUri = `data:${
       req.file.mimetype
     };base64,${req.file.buffer.toString("base64")}`;
     const result = await cloudinary.uploader.upload(dataUri, {
       folder: "nex_startup_logos",
     });
+
+    // Delete previous logo if exists
+    if (startup.logo && startup.logo.includes("res.cloudinary.com")) {
+      try {
+        const publicId = startup.logo.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(`nex_startup_logos/${publicId}`);
+      } catch (e) {
+        console.warn("Old logo deletion failed:", e.message);
+      }
+    }
 
     startup.logo = result.secure_url;
     await startup.save();
@@ -124,7 +164,9 @@ exports.uploadLogo = async (req, res) => {
   }
 };
 
-/* Upload Pitch Deck (PDF / Slides)*/
+/* ================================
+   UPLOAD PITCH DECK (PDF/PPT)
+================================ */
 exports.uploadPitchDeck = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
@@ -132,17 +174,31 @@ exports.uploadPitchDeck = async (req, res) => {
     const founderProfile = await Profile.findOne({ userId: req.userId });
     const startup = await Startup.findById(req.params.id);
     if (!startup) return res.status(404).json({ message: "Startup not found" });
-    if (startup.founderProfileId.toString() !== founderProfile._id.toString()) {
+    if (startup.founderProfileId.toString() !== founderProfile._id.toString())
       return res.status(403).json({ message: "Unauthorized" });
-    }
 
     const dataUri = `data:${
       req.file.mimetype
     };base64,${req.file.buffer.toString("base64")}`;
     const result = await cloudinary.uploader.upload(dataUri, {
       folder: "nex_pitch_decks",
-      resource_type: "raw", // PDF or PPT files
+      resource_type: "raw",
     });
+
+    // Replace existing pitch deck if exists
+    if (
+      startup.pitchDeckUrl &&
+      startup.pitchDeckUrl.includes("res.cloudinary.com")
+    ) {
+      try {
+        const publicId = startup.pitchDeckUrl.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(`nex_pitch_decks/${publicId}`, {
+          resource_type: "raw",
+        });
+      } catch (e) {
+        console.warn("Old pitch deck deletion failed:", e.message);
+      }
+    }
 
     startup.pitchDeckUrl = result.secure_url;
     await startup.save();
@@ -157,17 +213,18 @@ exports.uploadPitchDeck = async (req, res) => {
   }
 };
 
-/*  Add Team Member */
+/* ================================
+   ADD TEAM MEMBER
+================================ */
 exports.addTeamMember = async (req, res) => {
   try {
     const { profileId, role } = req.body;
-
     const founderProfile = await Profile.findOne({ userId: req.userId });
     const startup = await Startup.findById(req.params.id);
+
     if (!startup) return res.status(404).json({ message: "Startup not found" });
-    if (startup.founderProfileId.toString() !== founderProfile._id.toString()) {
+    if (startup.founderProfileId.toString() !== founderProfile._id.toString())
       return res.status(403).json({ message: "Unauthorized" });
-    }
 
     const alreadyMember = startup.team.some(
       (m) => m.profileId.toString() === profileId
@@ -178,7 +235,6 @@ exports.addTeamMember = async (req, res) => {
     startup.team.push({ profileId, role });
     await startup.save();
 
-    // also update that profile’s affiliation
     const memberProfile = await Profile.findById(profileId);
     if (memberProfile) {
       memberProfile.startupAffiliations.push({
@@ -191,37 +247,41 @@ exports.addTeamMember = async (req, res) => {
 
     res.json({ message: "Team member added", startup });
   } catch (err) {
+    console.error("Add Team Member Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-/* Remove Team Member*/
+/* ================================
+   REMOVE TEAM MEMBER
+================================ */
 exports.removeTeamMember = async (req, res) => {
   try {
     const founderProfile = await Profile.findOne({ userId: req.userId });
     const startup = await Startup.findById(req.params.id);
     if (!startup) return res.status(404).json({ message: "Startup not found" });
-    if (startup.founderProfileId.toString() !== founderProfile._id.toString()) {
+    if (startup.founderProfileId.toString() !== founderProfile._id.toString())
       return res.status(403).json({ message: "Unauthorized" });
-    }
 
     startup.team = startup.team.filter(
       (m) => m.profileId.toString() !== req.params.memberId
     );
     await startup.save();
 
-    // remove from member’s profile affiliations
     await Profile.findByIdAndUpdate(req.params.memberId, {
       $pull: { startupAffiliations: { startupId: startup._id } },
     });
 
     res.json({ message: "Team member removed", startup });
   } catch (err) {
+    console.error("Remove Team Member Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-/* Follow / Unfollow Startup */
+/* ================================
+   FOLLOW / UNFOLLOW STARTUP
+================================ */
 exports.toggleFollow = async (req, res) => {
   try {
     const profile = await Profile.findOne({ userId: req.userId });
@@ -242,11 +302,14 @@ exports.toggleFollow = async (req, res) => {
       return res.json({ message: "Followed startup" });
     }
   } catch (err) {
+    console.error("Follow Toggle Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-/* Get All Public Startups (with Filters)*/
+/* ================================
+   GET ALL STARTUPS (FILTERED)
+================================ */
 exports.getAllStartups = async (req, res) => {
   try {
     const { industry, stage, role } = req.query;
@@ -261,25 +324,32 @@ exports.getAllStartups = async (req, res) => {
 
     res.json(startups);
   } catch (err) {
+    console.error("Get All Startups Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-/*  Get Startups by Founder */
+/* ================================
+   GET STARTUPS BY FOUNDER
+================================ */
 exports.getStartupsByFounder = async (req, res) => {
   try {
     const startups = await Startup.find({
       founderProfileId: req.params.profileId,
-    }).populate("founderProfileId", "name username avatar");
+    })
+      .populate("founderProfileId", "name username avatar")
+      .populate("team.profileId", "name avatar username");
 
     res.json(startups);
   } catch (err) {
+    console.error("Get Founder Startups Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-/*
-    Get Startup by ID*/
+/* ================================
+   GET STARTUP BY ID
+================================ */
 exports.getStartupById = async (req, res) => {
   try {
     const startup = await Startup.findById(req.params.id)
@@ -290,6 +360,7 @@ exports.getStartupById = async (req, res) => {
 
     res.json(startup);
   } catch (err) {
+    console.error("Get Startup By ID Error:", err);
     res.status(500).json({ message: err.message });
   }
 };

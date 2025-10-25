@@ -19,8 +19,10 @@ export default function StartupProfile() {
   const [selectedMembers, setSelectedMembers] = useState([]);
 
   const token = localStorage.getItem("token");
-  const API_URL = "https://nex-pjq3.onrender.com/api";
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://nex-pjq3.onrender.com/api";
 
+  // =================== Fetch Startup Data ===================
   useEffect(() => {
     const fetchStartup = async () => {
       if (!token) {
@@ -28,32 +30,48 @@ export default function StartupProfile() {
         return;
       }
       try {
-        const res = await axios.get(`${API_URL}/startups/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setStartup(res.data);
-        setFormData(res.data);
+        const [startupRes, profileRes] = await Promise.all([
+          axios.get(`${API_URL}/startups/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_URL}/profile/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
 
-        const profileRes = await axios.get(`${API_URL}/profile/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const startupData = startupRes.data;
         const myProfileId = profileRes.data._id;
-        setFollowing(res.data.followers?.some((f) => f._id === myProfileId));
+
+        setStartup(startupData);
+        setFormData({
+          name: startupData.name,
+          mission: startupData.mission,
+          description: startupData.description,
+          stage: startupData.stage,
+          fundingInfo: startupData.fundingInfo,
+          industries: startupData.industries || [],
+          skills: startupData.skills || [],
+          logo: startupData.logo || "",
+        });
+
+        setFollowing(startupData.followers?.some((f) => f._id === myProfileId));
         setIsFounder(
-          res.data.founderProfileId === myProfileId ||
-            res.data.founderProfileId?._id === myProfileId
+          startupData.founderProfileId === myProfileId ||
+            startupData.founderProfileId?._id === myProfileId
         );
       } catch (err) {
-        console.error("Failed to fetch startup", err);
-        alert("Error fetching startup data");
+        console.error("Failed to fetch startup:", err);
+        alert("Error fetching startup data.");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
+
     fetchStartup();
   }, [id, token]);
 
+  // =================== Follow / Unfollow ===================
   const toggleFollow = async () => {
-    if (!token) return alert("Login required");
     try {
       await axios.post(
         `${API_URL}/startups/${id}/follow`,
@@ -62,11 +80,12 @@ export default function StartupProfile() {
       );
       setFollowing((prev) => !prev);
     } catch (err) {
-      console.error("Follow/unfollow failed", err);
+      console.error("Follow/unfollow failed:", err);
       alert("Error updating follow status");
     }
   };
 
+  // =================== Edit & Update ===================
   const handleEditClick = () => setEditing(true);
 
   const handleInputChange = (e) => {
@@ -80,6 +99,7 @@ export default function StartupProfile() {
 
   const handleUpdate = async () => {
     if (!token) return alert("Login required");
+
     try {
       const updatedData = new FormData();
       Object.keys(formData).forEach((key) => {
@@ -90,41 +110,43 @@ export default function StartupProfile() {
         }
       });
 
-      await axios.put(`${API_URL}/startups/${id}`, updatedData, {
+      const res = await axios.put(`${API_URL}/startups/${id}`, updatedData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
 
-      alert("Startup profile updated successfully!");
-      setStartup(formData);
+      setStartup(res.data);
       setEditing(false);
+      alert("✅ Startup updated successfully!");
     } catch (err) {
       console.error("Error updating startup:", err);
-      alert("Failed to update startup profile");
+      alert("Failed to update startup.");
     }
   };
 
-  // ================= Team Member Search & Add =================
-
+  // =================== Search Team Members ===================
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
 
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
+    if (!query.trim()) return setSearchResults([]);
 
     try {
       const res = await axios.get(`${API_URL}/profile/search`, {
         params: { q: query },
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSearchResults(Array.isArray(res.data) ? res.data : []);
+      // ✅ Filter out duplicates (avoid adding same user twice)
+      const results = Array.isArray(res.data)
+        ? res.data.filter(
+            (u) => !startup.team.some((m) => m.profileId?._id === u._id)
+          )
+        : [];
+      setSearchResults(results);
     } catch (err) {
-      console.error("Search failed", err);
+      console.error("Search failed:", err);
       setSearchResults([]);
     }
   };
@@ -160,7 +182,7 @@ export default function StartupProfile() {
         )
       );
 
-      alert("Team members added successfully!");
+      alert("🎉 Team members added successfully!");
       setStartup((prev) => ({
         ...prev,
         team: [
@@ -191,13 +213,14 @@ export default function StartupProfile() {
         <div className="profile-header">
           <img
             src={
-              startup.logo && typeof startup.logo === "string"
+              typeof startup.logo === "string" && startup.logo
                 ? startup.logo
                 : "/default-logo.png"
             }
             alt="Logo"
             className="startup-logo"
           />
+
           <div className="profile-info">
             <h1>{startup.name}</h1>
             <p>{startup.mission}</p>
@@ -209,7 +232,7 @@ export default function StartupProfile() {
             </button>
             {isFounder && (
               <button className="edit-btn" onClick={handleEditClick}>
-                ✏️ Edit Profile
+                ✏️ Edit
               </button>
             )}
           </div>
@@ -220,6 +243,7 @@ export default function StartupProfile() {
           <div className="edit-modal-overlay">
             <div className="edit-modal">
               <h2>Edit Startup Profile</h2>
+
               <label>Logo:</label>
               <input type="file" onChange={handleFileChange} />
 
@@ -283,19 +307,20 @@ export default function StartupProfile() {
           </div>
         )}
 
+        {/* ========= Info Section ========= */}
         <div className="info-section card">
           <h3>About Startup</h3>
           <p>
             <strong>Stage:</strong> {startup.stage}
           </p>
           <p>
-            <strong>Industries:</strong> {startup.industries.join(", ")}
+            <strong>Industries:</strong> {startup.industries?.join(", ")}
           </p>
           <p>
             <strong>Funding:</strong> {startup.fundingInfo || "N/A"}
           </p>
           <p>
-            <strong>Skills:</strong> {startup.skills.join(", ")}
+            <strong>Skills:</strong> {startup.skills?.join(", ")}
           </p>
           <p>
             <strong>Followers:</strong> {startup.followers?.length || 0}
@@ -317,7 +342,7 @@ export default function StartupProfile() {
             <p>No team members yet.</p>
           )}
 
-          {/* ========= Add Team Members (Founder Only) ========= */}
+          {/* ========= Add Team Members ========= */}
           {isFounder && (
             <div className="add-member-box">
               <h4>Add Team Members</h4>
@@ -328,7 +353,6 @@ export default function StartupProfile() {
                 onChange={handleSearch}
               />
 
-              {/* Search results dropdown */}
               {searchResults.length > 0 && (
                 <div className="search-results-container">
                   {searchResults.map((user) => (
@@ -350,7 +374,6 @@ export default function StartupProfile() {
                 </div>
               )}
 
-              {/* Selected Members */}
               {selectedMembers.length > 0 && (
                 <div className="selected-members">
                   <h5>Selected Members</h5>
@@ -388,20 +411,6 @@ export default function StartupProfile() {
                 </div>
               )}
             </div>
-          )}
-        </div>
-
-        <div className="posts-section card">
-          <h3>Startup Updates 📢</h3>
-          {startup.posts?.length ? (
-            startup.posts.map((p) => (
-              <div key={p._id} className="post-card">
-                <p>{p.content}</p>
-                {p.imageUrl && <img src={p.imageUrl} alt="post" />}
-              </div>
-            ))
-          ) : (
-            <p>No updates yet. Start sharing progress!</p>
           )}
         </div>
       </div>

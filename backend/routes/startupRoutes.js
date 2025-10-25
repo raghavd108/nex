@@ -14,7 +14,7 @@ router.post("/", auth, startupController.createStartup);
 // ✅ Update existing startup (only founder)
 router.put("/:id", auth, startupController.updateStartup);
 
-// ✅ Upload or update startup logo
+// ✅ Upload or update SINGLE startup logo
 router.post(
   "/:id/logo",
   auth,
@@ -22,12 +22,12 @@ router.post(
   startupController.uploadLogo
 );
 
-// ✅ Upload pitch deck (PDF/slides)
+// ✅ Upload MULTIPLE pitch decks
 router.post(
   "/:id/pitchdeck",
   auth,
-  upload.single("pitchDeck"),
-  startupController.uploadPitchDeck
+  upload.array("pitchDecks", 10), // up to 10 pitch decks
+  startupController.uploadPitchDecks
 );
 
 // ✅ Add or remove team member
@@ -37,10 +37,10 @@ router.delete("/:id/team/:memberId", auth, startupController.removeTeamMember);
 // ✅ Follow or unfollow a startup
 router.post("/:id/follow", auth, startupController.toggleFollow);
 
-// 🔍 Get all public startups (filtered by industry, stage, or role)
+// 🔍 Get all public startups (filtered)
 router.get("/", auth, startupController.getAllStartups);
 
-// 👤 Get startups by founder (using founder profileId)
+// 👤 Get startups by founder
 router.get("/founder/:profileId", auth, startupController.getStartupsByFounder);
 
 // 🔎 Get single startup by ID
