@@ -4,17 +4,17 @@ const auth = require("../middleware/authMiddleware");
 const multer = require("multer");
 const startupController = require("../controllers/startupController");
 
-// ✅ Use memory storage (no local file writes)
+// Memory storage for multer
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// ✅ Create new startup profile
+// Create new startup
 router.post("/", auth, startupController.createStartup);
 
-// ✅ Update existing startup (only founder)
+// Update existing startup
 router.put("/:id", auth, startupController.updateStartup);
 
-// ✅ Upload or update SINGLE startup logo
+// Upload / update logo
 router.post(
   "/:id/logo",
   auth,
@@ -22,28 +22,24 @@ router.post(
   startupController.uploadLogo
 );
 
-// ✅ Upload MULTIPLE pitch decks
+// Upload pitch deck (single file)
 router.post(
   "/:id/pitchdeck",
   auth,
-  upload.array("pitchDecks", 10), // up to 10 pitch decks
-  startupController.uploadPitchDecks
+  upload.single("pitchDeck"),
+  startupController.uploadPitchDeck
 );
 
-// ✅ Add or remove team member
+// Add / remove team members
 router.post("/:id/team", auth, startupController.addTeamMember);
 router.delete("/:id/team/:memberId", auth, startupController.removeTeamMember);
 
-// ✅ Follow or unfollow a startup
+// Follow / unfollow
 router.post("/:id/follow", auth, startupController.toggleFollow);
 
-// 🔍 Get all public startups (filtered)
+// Get startups
 router.get("/", auth, startupController.getAllStartups);
-
-// 👤 Get startups by founder
 router.get("/founder/:profileId", auth, startupController.getStartupsByFounder);
-
-// 🔎 Get single startup by ID
 router.get("/:id", auth, startupController.getStartupById);
 
 module.exports = router;
