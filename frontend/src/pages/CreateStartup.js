@@ -36,8 +36,7 @@ export default function CreateStartup() {
   const token = localStorage.getItem("token");
 
   // ✅ Use env for flexibility
-  const API_URL =
-    import.meta.env.VITE_API_URL || "https://nex-pjq3.onrender.com";
+  const API_URL = "https://nex-pjq3.onrender.com";
 
   // Wake up server on mount (Render cold start fix)
   useEffect(() => {
