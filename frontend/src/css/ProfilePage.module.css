@@ -9,6 +9,8 @@
   color: #1a1a1a;
   min-height: 100vh;
   box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* ========= Profile Card (Left Section) ========= */
@@ -25,6 +27,7 @@
   top: 20px;
   height: fit-content;
   border: 1px solid rgba(200, 200, 200, 0.3);
+  box-sizing: border-box;
 }
 
 /* ========= Profile Header ========= */
@@ -34,6 +37,7 @@
   align-items: center;
   gap: 12px;
   text-align: center;
+  width: 100%;
 }
 
 .profileAvatar {
@@ -50,11 +54,13 @@
   font-weight: 700;
   margin: 5px 0 0 0;
   color: #1d1d1f;
+  word-break: break-word;
 }
 
 .username {
   font-size: 0.95rem;
   color: #0077ff;
+  word-break: break-word;
 }
 
 .profileBio {
@@ -62,6 +68,7 @@
   color: #555;
   line-height: 1.4;
   margin-top: 8px;
+  word-wrap: break-word;
 }
 
 /* ========= Option Buttons ========= */
@@ -71,6 +78,7 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 20px;
+  width: 100%;
 }
 
 .optionBox {
@@ -85,6 +93,7 @@
   font-size: 0.85rem;
   font-weight: 600;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .optionBox:hover {
@@ -107,6 +116,7 @@
   font-size: 0.95rem;
   margin: 8px 0;
   color: #333;
+  word-break: break-word;
 }
 
 .profileDetails strong {
@@ -134,6 +144,7 @@
   color: #0077ff;
   text-decoration: none;
   transition: 0.3s;
+  word-break: break-word;
 }
 
 .startupAffiliations a:hover {
@@ -189,6 +200,8 @@
   background: #fafafa;
   font-family: "Poppins", sans-serif;
   font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .saveBtn {
@@ -216,6 +229,8 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(200, 200, 200, 0.3);
   min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .postsSection h3 {
@@ -227,10 +242,12 @@
   padding-left: 10px;
 }
 
+/* ========= Post Grid ========= */
 .postGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 18px;
+  width: 100%;
 }
 
 .postCard {
@@ -239,6 +256,8 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
   overflow: hidden;
   transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .postCard:hover {
@@ -261,6 +280,7 @@
   font-size: 0.95rem;
   color: #333;
   line-height: 1.4;
+  word-wrap: break-word;
 }
 
 .postActions {
@@ -280,10 +300,13 @@
 }
 
 /* ========= Responsive ========= */
+
+/* Tablet */
 @media (max-width: 992px) {
   .profileContainer {
     flex-direction: column;
     padding: 20px 15px;
+    gap: 20px;
   }
 
   .profileCard {
@@ -302,10 +325,6 @@
     text-align: left;
   }
 
-  .profileInfo {
-    margin-top: 0;
-  }
-
   .profileOptions {
     justify-content: flex-start;
     flex-wrap: wrap;
@@ -313,12 +332,27 @@
 
   .postsSection {
     width: 100%;
+    padding: 20px;
+  }
+
+  .postGrid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 }
 
+/* Mobile */
 @media (max-width: 600px) {
   .profileContainer {
-    padding: 15px 10px;
+    flex-direction: column;
+    padding: 12px;
+    gap: 15px;
+    overflow-x: hidden;
+  }
+
+  .profileCard {
+    width: 100%;
+    padding: 15px;
+    border-radius: 16px;
   }
 
   .profileHeader {
@@ -328,15 +362,46 @@
   }
 
   .profileAvatar {
-    width: 90px;
-    height: 90px;
+    width: 85px;
+    height: 85px;
+  }
+
+  .profileInfo h2 {
+    font-size: 1.2rem;
+  }
+
+  .profileBio {
+    font-size: 0.85rem;
+  }
+
+  .profileOptions {
+    gap: 8px;
+  }
+
+  .optionBox {
+    font-size: 0.8rem;
+    padding: 7px 12px;
+  }
+
+  .postsSection {
+    padding: 15px;
+    border-radius: 16px;
   }
 
   .postGrid {
     grid-template-columns: 1fr;
+    gap: 14px;
   }
 
-  .postsSection {
-    padding: 18px;
+  .postImage {
+    height: 160px;
+  }
+
+  .postContent p {
+    font-size: 0.9rem;
+  }
+
+  .noPosts {
+    font-size: 0.85rem;
   }
 }
