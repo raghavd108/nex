@@ -8,6 +8,7 @@ import {
   FaHeart,
   FaComment,
   FaTrash,
+  FaShare,
 } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import axios from "axios";
@@ -501,29 +502,24 @@ export default function ProfilePage() {
                   <div className={styles.postContent}>
                     <p>{post.content}</p>
                     <div className={styles.postActions}>
-                      <span onClick={() => handleLike(post._id, isStartupPost)}>
+                      <span onClick={() => handleLike(post._id)}>
                         <FaHeart /> {post.likes?.length || 0}
                       </span>
-                      <span
-                        onClick={() => handleComment(post._id, isStartupPost)}
-                      >
+                      <span onClick={() => handleComment(post._id)}>
                         <FaComment /> {post.comments?.length || 0}
                       </span>
                       <FaShare />
-                      {!isStartupPost &&
-                        post.userId?._id === userProfile?._id && (
-                          <FaTrash
-                            onClick={() =>
-                              handleDeletePost(post._id, isStartupPost)
-                            }
-                            style={{
-                              marginLeft: "10px",
-                              color: "red",
-                              cursor: "pointer",
-                            }}
-                            title="Delete Post"
-                          />
-                        )}
+                      {isOwnProfile && (
+                        <FaTrash
+                          onClick={() => handleDeletePost(post._id)}
+                          style={{
+                            marginLeft: "10px",
+                            color: "red",
+                            cursor: "pointer",
+                          }}
+                          title="Delete Post"
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
