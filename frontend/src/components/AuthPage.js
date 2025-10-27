@@ -27,14 +27,18 @@ export default function AuthPage() {
       );
 
       if (!isLogin) {
+        // After registration, automatically log in
         const loginRes = await API.post(
           "auth/login",
           { email, password },
           { withCredentials: true }
         );
+
         login(loginRes.data.token);
         localStorage.setItem("userId", loginRes.data.userId);
-        navigate("/home");
+
+        // Redirect to Profile setup page
+        navigate("/profile");
       } else {
         login(res.data.token);
         localStorage.setItem("userId", res.data.userId);
