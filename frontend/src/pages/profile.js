@@ -409,7 +409,7 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className={styles.editInput}>
+              <div className={styles.editcheckbox}>
                 <label>Roles:</label>
                 {roleOptions.map((r) => (
                   <label key={r}>
@@ -451,7 +451,7 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className={styles.editInput}>
+              <div className={styles.editcheckbox}>
                 <label>Looking For:</label>
                 {lookingForOptions.map((opt) => (
                   <label key={opt}>
