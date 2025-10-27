@@ -39,6 +39,7 @@ export default function Home() {
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com/api";
 
+  // 🎨 Mood background gradients
   const moodGradients = {
     Creative: "linear-gradient(135deg, #ffafbd, #ffc3a0)",
     Ambitious: "linear-gradient(135deg, #ff416c, #ff4b2b)",
@@ -55,7 +56,7 @@ export default function Home() {
     }
   }, [selectedMood]);
 
-  // Fetch user profile
+  // ✅ Fetch user profile
   const fetchUserProfile = async () => {
     try {
       const res = await axios.get(`${API_URL}/profile/me`, {
@@ -67,7 +68,7 @@ export default function Home() {
     }
   };
 
-  // Fetch posts
+  // ✅ Fetch posts
   const fetchPosts = async () => {
     try {
       const res = await axios.get(`${API_URL}/posts`);
@@ -78,7 +79,7 @@ export default function Home() {
     }
   };
 
-  // Fetch stories
+  // ✅ Fetch stories
   const fetchStories = async () => {
     try {
       const res = await axios.get(`${API_URL}/story`);
@@ -95,6 +96,7 @@ export default function Home() {
     fetchStories();
   }, []);
 
+  // ✅ Handle mood change
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood.name);
     localStorage.setItem("lastMood", mood.name);
@@ -102,7 +104,7 @@ export default function Home() {
     fetchPosts();
   };
 
-  // ✅ Updated Combined Search Function
+  // ✅ Combined search
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -139,7 +141,7 @@ export default function Home() {
     navigate(`/startup/${id}`);
   };
 
-  // Create new post
+  // ✅ Create new post
   const handlePost = async () => {
     if (newPost.trim() === "" && !photo) return;
     setLoading(true);
@@ -169,6 +171,7 @@ export default function Home() {
     }
   };
 
+  // ✅ Like post
   const handleLike = async (postId) => {
     try {
       const res = await axios.post(
@@ -187,6 +190,7 @@ export default function Home() {
     }
   };
 
+  // ✅ Comment
   const handleComment = async (postId) => {
     const text = prompt("Write a comment:");
     if (!text) return;
@@ -203,6 +207,7 @@ export default function Home() {
     }
   };
 
+  // ✅ Delete post
   const handleDeletePost = async (postId) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this post?"
@@ -222,7 +227,7 @@ export default function Home() {
   return (
     <div
       className="home-page"
-      style={{ background: moodThemes[selectedMood], transition: "0.5s" }}
+      style={{ background: moodGradients[selectedMood], transition: "0.5s" }} // ✅ fixed here too
     >
       <MoodPopup onSelect={handleMoodSelect} />
 
@@ -235,7 +240,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ✅ Updated Search Overlay */}
+      {/* ✅ Search Overlay */}
       {isSearchOpen && (
         <div className="search-overlay">
           <div className="search-header">
@@ -307,7 +312,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Feed */}
+      {/* ✅ Feed */}
       <div className="feed-section">
         {Array.isArray(posts) &&
           posts.map((post) => (
@@ -351,6 +356,7 @@ export default function Home() {
           ))}
       </div>
 
+      {/* ✅ Create Post Popup */}
       <button
         className="open-post-btn"
         onClick={() => setIsPostPopupOpen(true)}
