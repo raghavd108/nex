@@ -98,7 +98,7 @@ export default function Home() {
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood.name);
     localStorage.setItem("lastMood", mood.name);
-    document.body.style.background = moodThemes[mood.name];
+    document.body.style.background = moodGradients[mood.name];
     fetchPosts();
   };
 
