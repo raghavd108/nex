@@ -18,8 +18,6 @@ router.post(
   profileController.uploadPhoto
 );
 
-router.get("/search", auth, profileController.searchProfiles);
-
 router.get("/:username", auth, profileController.getProfileByUsername);
 
 module.exports = router;
