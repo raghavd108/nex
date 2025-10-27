@@ -465,7 +465,7 @@ export default function ProfilePage() {
                 ))}
               </div>
 
-              <div className={styles.editInput}>
+              <div className={styles.editcheckbox}>
                 <label>
                   <input
                     type="checkbox"
