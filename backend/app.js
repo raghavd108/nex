@@ -58,6 +58,7 @@ app.use(express.json());
 app.use("/api/profile", profileRoutes);
 
 app.use("/api/startups", startupRoutes);
+app.use("/api/search", require("./routes/searchRoutes"));
 
 app.use("/api/posts", postsRoute);
 app.use("/api/likes", likeRoutes);

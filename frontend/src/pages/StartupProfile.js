@@ -161,25 +161,14 @@ export default function StartupProfile() {
     if (!query.trim()) return setSearchResults([]);
 
     try {
-      // Optionally pass excludeStartupId so backend can exclude current team members too
       const res = await axios.get(`${API_URL}/profile/search`, {
-        params: { q: query, excludeStartupId: id },
+        params: { q: query },
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      // Filter client-side defensively (in case backend didn't exclude team members)
       const results = Array.isArray(res.data)
-        ? res.data.filter((u) => {
-            // If startup.team exists, ensure u._id is not in team
-            if (!startup?.team?.length) return true;
-            return !startup.team.some((m) => {
-              const teamId =
-                typeof m.profileId === "string"
-                  ? m.profileId
-                  : m.profileId?._id || m.profileId?._id?.toString();
-              return teamId === u._id || teamId === String(u._id);
-            });
-          })
+        ? res.data.filter(
+            (u) => !startup.team?.some((m) => m.profileId?._id === u._id)
+          )
         : [];
       setSearchResults(results);
     } catch (err) {

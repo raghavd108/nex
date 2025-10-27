@@ -24,7 +24,10 @@ export default function Home() {
   );
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState({
+    profiles: [],
+    startups: [],
+  });
   const [posts, setPosts] = useState([]);
   const [stories, setStories] = useState([]);
   const [newPost, setNewPost] = useState("");
@@ -96,32 +99,41 @@ export default function Home() {
     fetchPosts();
   };
 
+  // ✅ Updated Combined Search Function
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
 
     if (query.trim() === "") {
-      setSearchResults([]);
+      setSearchResults({ profiles: [], startups: [] });
       return;
     }
 
     try {
-      const res = await axios.get(`${API_URL}/profile/search`, {
+      const res = await axios.get(`${API_URL}/search/all`, {
         params: { q: query },
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSearchResults(Array.isArray(res.data) ? res.data : []);
+
+      setSearchResults(res.data || { profiles: [], startups: [] });
     } catch (err) {
       console.error("Search failed", err);
-      setSearchResults([]);
+      setSearchResults({ profiles: [], startups: [] });
     }
   };
 
   const handleSelectUser = (username) => {
     setIsSearchOpen(false);
     setSearchQuery("");
-    setSearchResults([]);
+    setSearchResults({ profiles: [], startups: [] });
     navigate(`/profile/${username}`);
+  };
+
+  const handleSelectStartup = (id) => {
+    setIsSearchOpen(false);
+    setSearchQuery("");
+    setSearchResults({ profiles: [], startups: [] });
+    navigate(`/startup/${id}`);
   };
 
   // Create new post
@@ -220,12 +232,13 @@ export default function Home() {
         </div>
       </header>
 
+      {/* ✅ Updated Search Overlay */}
       {isSearchOpen && (
         <div className="search-overlay">
           <div className="search-header">
             <input
               type="text"
-              placeholder="Search users..."
+              placeholder="Search users or startups..."
               value={searchQuery}
               onChange={handleSearch}
               autoFocus
@@ -237,23 +250,56 @@ export default function Home() {
               ✕
             </button>
           </div>
+
           <div className="search-results-container">
-            {searchResults.length === 0 && searchQuery !== "" && (
-              <p className="no-results">No users found</p>
+            {/* Users Section */}
+            {searchResults.profiles?.length > 0 && (
+              <>
+                <h4 className="result-category">People</h4>
+                {searchResults.profiles.map((user) => (
+                  <div
+                    key={user._id}
+                    className="profile-preview"
+                    onClick={() => handleSelectUser(user.username)}
+                  >
+                    <img src={user.avatar} alt={user.username} />
+                    <div className="profile-info">
+                      <span className="name">{user.name || "Unnamed"}</span>
+                      <span className="username">@{user.username}</span>
+                    </div>
+                  </div>
+                ))}
+              </>
             )}
-            {searchResults.map((user) => (
-              <div
-                key={user._id}
-                className="profile-preview"
-                onClick={() => handleSelectUser(user.username)}
-              >
-                <img src={user.avatar} alt={user.username} />
-                <div className="profile-info">
-                  <span className="name">{user.name || "Unnamed"}</span>
-                  <span className="username">@{user.username}</span>
-                </div>
-              </div>
-            ))}
+
+            {/* Startups Section */}
+            {searchResults.startups?.length > 0 && (
+              <>
+                <h4 className="result-category">Startups</h4>
+                {searchResults.startups.map((startup) => (
+                  <div
+                    key={startup._id}
+                    className="profile-preview"
+                    onClick={() => handleSelectStartup(startup._id)}
+                  >
+                    <img src={startup.logo} alt={startup.name} />
+                    <div className="profile-info">
+                      <span className="name">{startup.name}</span>
+                      <span className="username">
+                        {startup.stage || "Startup"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {/* No Results */}
+            {searchQuery &&
+              !searchResults.profiles?.length &&
+              !searchResults.startups?.length && (
+                <p className="no-results">No users or startups found</p>
+              )}
           </div>
         </div>
       )}

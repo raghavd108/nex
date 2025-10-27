@@ -122,63 +122,6 @@ exports.uploadPhoto = async (req, res) => {
   }
 };
 
-// ✅ Search profiles by username or name (case-insensitive)
-// Search profiles by username or name (case-insensitive)
-exports.searchProfiles = async (req, res) => {
-  try {
-    const query = (req.query.q || "").trim();
-    if (!query) {
-      return res.status(400).json({ message: "Search query is required" });
-    }
-
-    // Find the current user's profile (to exclude it from results)
-    const myProfile = await Profile.findOne({ userId: req.userId });
-
-    // Build basic regex search
-    const regex = { $regex: query, $options: "i" };
-
-    // Base match for name/username
-    const match = {
-      $or: [{ username: regex }, { name: regex }],
-    };
-
-    // Only show public profiles by default
-    match.visibility = "public";
-
-    // Exclude current user's profile if found
-    if (myProfile) {
-      match._id = { $ne: myProfile._id };
-    }
-
-    // Optional: if frontend passes excludeStartupId, also exclude startup team members
-    if (req.query.excludeStartupId) {
-      const startupId = req.query.excludeStartupId;
-      const Startup = require("../models/Startup");
-      const startup = await Startup.findById(startupId).select("team");
-      if (startup && startup.team?.length) {
-        // collect profileIds (strings or ObjectIds)
-        const teamIds = startup.team.map((t) =>
-          typeof t.profileId === "string"
-            ? t.profileId
-            : t.profileId?.toString()
-        );
-        match._id = match._id
-          ? { $ne: myProfile ? myProfile._id : undefined, $nin: teamIds }
-          : { $nin: teamIds };
-      }
-    }
-
-    const results = await Profile.find(match)
-      .select("username name avatar roles industries skills")
-      .limit(30);
-
-    res.json(results);
-  } catch (err) {
-    console.error("Search error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
 // ✅ Get profile by username (public view)
 exports.getProfileByUsername = async (req, res) => {
   try {
