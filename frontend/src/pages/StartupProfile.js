@@ -161,16 +161,22 @@ export default function StartupProfile() {
     if (!query.trim()) return setSearchResults([]);
 
     try {
-      const res = await axios.get(`${API_URL}/profile/search`, {
+      const res = await axios.get(`${API_URL}/searchAll`, {
         params: { q: query },
         headers: { Authorization: `Bearer ${token}` },
       });
-      const results = Array.isArray(res.data)
-        ? res.data.filter(
-            (u) => !startup.team?.some((m) => m.profileId?._id === u._id)
-          )
+
+      // Extract only profiles
+      const profiles = Array.isArray(res.data.profiles)
+        ? res.data.profiles
         : [];
-      setSearchResults(results);
+
+      // Filter out users already in the startup team
+      const filtered = profiles.filter(
+        (u) => !startup.team?.some((m) => m.profileId?._id === u._id)
+      );
+
+      setSearchResults(filtered);
     } catch (err) {
       console.error("Search failed:", err);
       setSearchResults([]);
