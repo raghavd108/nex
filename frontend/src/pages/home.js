@@ -39,17 +39,20 @@ export default function Home() {
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com/api";
 
-  const moodThemes = {
-    Creative: "#FFB6C1",
-    Ambitious: "#FF6347",
-    Chill: "#87CEEB",
-    Brainstorm: "#FFD700",
-    Debate: "#8A2BE2",
-    Neutral: "#f5f5f5",
+  const moodGradients = {
+    Creative: "linear-gradient(135deg, #ffafbd, #ffc3a0)",
+    Ambitious: "linear-gradient(135deg, #ff416c, #ff4b2b)",
+    Chill: "linear-gradient(135deg, #89f7fe, #66a6ff)",
+    Brainstorm: "linear-gradient(135deg, #f9d423, #ff4e50)",
+    Debate: "linear-gradient(135deg, #a18cd1, #fbc2eb)",
+    Neutral: "linear-gradient(135deg, #e0e0e0, #ffffff)",
   };
 
   useEffect(() => {
-    document.body.style.background = moodThemes[selectedMood];
+    const page = document.querySelector(".home-page");
+    if (page) {
+      page.style.setProperty("--mood-gradient", moodGradients[selectedMood]);
+    }
   }, [selectedMood]);
 
   // Fetch user profile
