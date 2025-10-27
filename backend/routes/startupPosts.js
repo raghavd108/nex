@@ -33,21 +33,23 @@ router.post("/:startupId", auth, upload.single("image"), async (req, res) => {
       imageUrl = uploadRes.secure_url;
     }
 
+    // create post linked to both profile & startup
     const newPost = new Post({
       userId: profile._id,
+      startupId: startup._id,
       content,
       imageUrl,
       mood,
     });
 
     await newPost.save();
-    startup.posts.push(newPost._id);
+
+    startup.posts.unshift(newPost._id);
     await startup.save();
 
-    const populatedPost = await Post.findById(newPost._id).populate(
-      "userId",
-      "username name avatar"
-    );
+    const populatedPost = await Post.findById(newPost._id)
+      .populate("userId", "username name avatar")
+      .populate("startupId", "name logo");
 
     res.status(201).json(populatedPost);
   } catch (err) {
@@ -59,20 +61,29 @@ router.post("/:startupId", auth, upload.single("image"), async (req, res) => {
 // =================== Get All Posts for a Startup ===================
 router.get("/:startupId", async (req, res) => {
   try {
-    const startup = await Startup.findById(req.params.startupId).populate({
-      path: "posts",
-      populate: {
-        path: "userId",
-        select: "username name avatar",
-      },
-      options: { sort: { createdAt: -1 } },
-    });
+    const posts = await Post.find({ startupId: req.params.startupId })
+      .populate("userId", "username name avatar")
+      .populate("startupId", "name logo")
+      .sort({ createdAt: -1 });
 
-    if (!startup) return res.status(404).json({ message: "Startup not found" });
-
-    res.json(startup.posts || []);
+    res.json(posts);
   } catch (err) {
     console.error("Error fetching startup posts:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// =================== Get All Startup Posts for Home Feed ===================
+router.get("/", async (req, res) => {
+  try {
+    const posts = await Post.find({ startupId: { $exists: true } })
+      .populate("userId", "username name avatar")
+      .populate("startupId", "name logo")
+      .sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (err) {
+    console.error("Error fetching all startup posts:", err);
     res.status(500).json({ error: err.message });
   }
 });

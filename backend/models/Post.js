@@ -1,24 +1,46 @@
-// models/Post.js
 const mongoose = require("mongoose");
 
-const postSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Profile",
-    required: true,
-  },
-  content: String,
-  imageUrl: String,
-  mood: { type: String }, // e.g., "happy", "sad", "motivated"
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }],
-  comments: [
-    {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: "Profile" },
-      text: String,
-      createdAt: { type: Date, default: Date.now },
+const postSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile",
+      required: true, // Who created the post (a user profile)
     },
-  ],
-  createdAt: { type: Date, default: Date.now },
-});
+    startupId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Startup", // Link post to a specific startup
+      required: true,
+    },
+    content: {
+      type: String,
+      trim: true,
+      maxlength: 1000,
+    },
+    imageUrl: {
+      type: String,
+      default: "",
+    },
+    mood: {
+      type: String,
+      enum: ["happy", "sad", "motivated", "neutral", "excited"],
+      default: "neutral",
+    },
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Profile",
+      },
+    ],
+    comments: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "Profile" },
+        text: { type: String, trim: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("Post", postSchema);

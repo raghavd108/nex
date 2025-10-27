@@ -29,7 +29,6 @@ export default function Home() {
     startups: [],
   });
   const [posts, setPosts] = useState([]);
-  const [stories, setStories] = useState([]);
   const [newPost, setNewPost] = useState("");
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -68,40 +67,37 @@ export default function Home() {
     }
   };
 
-  // ✅ Fetch posts
-  const fetchPosts = async () => {
+  // ✅ Fetch both user posts and startup posts
+  const fetchAllPosts = async () => {
     try {
-      const res = await axios.get(`${API_URL}/posts`);
-      setPosts(Array.isArray(res.data) ? res.data : []);
+      const [userRes, startupRes] = await Promise.all([
+        axios.get(`${API_URL}/posts`),
+        axios.get(`${API_URL}/startupPosts`),
+      ]);
+
+      // Merge both types and sort by date (newest first)
+      const combined = [...userRes.data, ...startupRes.data].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      setPosts(combined);
     } catch (err) {
       console.error("Error loading posts:", err);
       setPosts([]);
     }
   };
 
-  // ✅ Fetch stories
-  const fetchStories = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/story`);
-      setStories(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error("Error loading stories:", err);
-      setStories([]);
-    }
-  };
-
   useEffect(() => {
     fetchUserProfile();
-    fetchPosts();
-    fetchStories();
+    fetchAllPosts();
   }, []);
 
-  // ✅ Handle mood change
+  // ✅ Handle mood select
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood.name);
     localStorage.setItem("lastMood", mood.name);
     document.body.style.background = moodGradients[mood.name];
-    fetchPosts();
+    fetchAllPosts();
   };
 
   // ✅ Combined search
@@ -119,7 +115,6 @@ export default function Home() {
         params: { q: query },
         headers: { Authorization: `Bearer ${token}` },
       });
-
       setSearchResults(res.data || { profiles: [], startups: [] });
     } catch (err) {
       console.error("Search failed", err);
@@ -141,7 +136,7 @@ export default function Home() {
     navigate(`/startup/${id}`);
   };
 
-  // ✅ Create new post
+  // ✅ Create new post (for user)
   const handlePost = async () => {
     if (newPost.trim() === "" && !photo) return;
     setLoading(true);
@@ -171,11 +166,11 @@ export default function Home() {
     }
   };
 
-  // ✅ Like post
-  const handleLike = async (postId) => {
+  // ✅ Like post (works for both users and startups)
+  const handleLike = async (postId, isStartupPost = false) => {
     try {
       const res = await axios.post(
-        `${API_URL}/posts/${postId}/like`,
+        `${API_URL}/${isStartupPost ? "startupPosts" : "posts"}/${postId}/like`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -190,34 +185,39 @@ export default function Home() {
     }
   };
 
-  // ✅ Comment
-  const handleComment = async (postId) => {
+  // ✅ Comment (works for both)
+  const handleComment = async (postId, isStartupPost = false) => {
     const text = prompt("Write a comment:");
     if (!text) return;
 
     try {
       const res = await axios.post(
-        `${API_URL}/posts/${postId}/comment`,
+        `${API_URL}/${
+          isStartupPost ? "startupPosts" : "posts"
+        }/${postId}/comment`,
         { text },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setPosts((prev) => prev.map((p) => (p._id === postId ? res.data : p)));
     } catch (err) {
       console.error("Error adding comment:", err);
     }
   };
 
-  // ✅ Delete post
-  const handleDeletePost = async (postId) => {
+  // ✅ Delete post (works for both)
+  const handleDeletePost = async (postId, isStartupPost = false) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this post?"
     );
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`${API_URL}/posts/${postId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `${API_URL}/${isStartupPost ? "startupPosts" : "posts"}/${postId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
       setPosts((prev) => prev.filter((p) => p._id !== postId));
     } catch (err) {
       console.error("Error deleting post:", err);
@@ -227,7 +227,7 @@ export default function Home() {
   return (
     <div
       className="home-page"
-      style={{ background: moodGradients[selectedMood], transition: "0.5s" }} // ✅ fixed here too
+      style={{ background: moodGradients[selectedMood], transition: "0.5s" }}
     >
       <MoodPopup onSelect={handleMoodSelect} />
 
@@ -240,7 +240,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ✅ Search Overlay */}
+      {/* 🔍 Search Overlay */}
       {isSearchOpen && (
         <div className="search-overlay">
           <div className="search-header">
@@ -260,7 +260,6 @@ export default function Home() {
           </div>
 
           <div className="search-results-container">
-            {/* Users Section */}
             {searchResults.profiles?.length > 0 && (
               <>
                 <h4 className="result-category">People</h4>
@@ -272,15 +271,13 @@ export default function Home() {
                   >
                     <img src={user.avatar} alt={user.username} />
                     <div className="profile-info">
-                      <span className="name">{user.name || "Unnamed"}</span>
+                      <span className="name">{user.name}</span>
                       <span className="username">@{user.username}</span>
                     </div>
                   </div>
                 ))}
               </>
             )}
-
-            {/* Startups Section */}
             {searchResults.startups?.length > 0 && (
               <>
                 <h4 className="result-category">Startups</h4>
@@ -301,27 +298,29 @@ export default function Home() {
                 ))}
               </>
             )}
-
-            {/* No Results */}
-            {searchQuery &&
-              !searchResults.profiles?.length &&
-              !searchResults.startups?.length && (
-                <p className="no-results">No users or startups found</p>
-              )}
           </div>
         </div>
       )}
 
-      {/* ✅ Feed */}
+      {/* 📰 Combined Feed */}
       <div className="feed-section">
-        {Array.isArray(posts) &&
-          posts.map((post) => (
+        {posts.map((post) => {
+          const isStartupPost = !!post.startupId;
+          const poster = isStartupPost ? post.startupId : post.userId;
+          const displayName = isStartupPost
+            ? post.startupId?.name
+            : post.userId?.name;
+          const avatar = isStartupPost
+            ? post.startupId?.logo
+            : post.userId?.avatar;
+
+          return (
             <div key={post._id} className="feed-card">
               <div className="feed-header">
-                <img src={post.userId?.avatar} alt={post.userId?.username} />
+                <img src={avatar || "/default-avatar.png"} alt="Avatar" />
                 <div>
-                  <h4>{post.userId?.name || "User"}</h4>
-                  <span>{post.mood || "Neutral"} mood</span>
+                  <h4>{displayName || "Unknown"}</h4>
+                  <span>{isStartupPost ? "Startup Post" : "User Post"}</span>
                 </div>
               </div>
 
@@ -331,18 +330,16 @@ export default function Home() {
               )}
 
               <div className="feed-actions">
-                <span onClick={() => handleLike(post._id)}>
-                  <FaHeart />{" "}
-                  {Array.isArray(post.likes) ? post.likes.length : 0}
+                <span onClick={() => handleLike(post._id, isStartupPost)}>
+                  <FaHeart /> {post.likes?.length || 0}
                 </span>
-                <span onClick={() => handleComment(post._id)}>
-                  <FaComment />{" "}
-                  {Array.isArray(post.comments) ? post.comments.length : 0}
+                <span onClick={() => handleComment(post._id, isStartupPost)}>
+                  <FaComment /> {post.comments?.length || 0}
                 </span>
                 <FaShare />
-                {post.userId?._id === userProfile?._id && (
+                {!isStartupPost && post.userId?._id === userProfile?._id && (
                   <FaTrash
-                    onClick={() => handleDeletePost(post._id)}
+                    onClick={() => handleDeletePost(post._id, isStartupPost)}
                     style={{
                       marginLeft: "10px",
                       color: "red",
@@ -353,10 +350,11 @@ export default function Home() {
                 )}
               </div>
             </div>
-          ))}
+          );
+        })}
       </div>
 
-      {/* ✅ Create Post Popup */}
+      {/* 📝 Create Post */}
       <button
         className="open-post-btn"
         onClick={() => setIsPostPopupOpen(true)}
