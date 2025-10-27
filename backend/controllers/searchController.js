@@ -4,27 +4,24 @@ const Startup = require("../models/Startup");
 
 exports.searchAll = async (req, res) => {
   try {
-    const query = req.query.q;
-    if (!query) return res.status(400).json({ message: "Query required" });
+    const query = req.query.q || ""; // allow empty query for all
 
-    // Search profiles
+    // Search profiles (all)
     const profiles = await Profile.find({
       $or: [
         { username: { $regex: query, $options: "i" } },
         { name: { $regex: query, $options: "i" } },
       ],
-      visibility: "public",
     })
       .select("username name avatar")
-      .limit(10);
+      .limit(20);
 
-    // Search startups
+    // Search startups (all)
     const startups = await Startup.find({
       name: { $regex: query, $options: "i" },
-      visibility: "public",
     })
       .select("name logo stage")
-      .limit(10);
+      .limit(20);
 
     res.json({ profiles, startups });
   } catch (err) {
