@@ -7,6 +7,7 @@ import {
   FaSave,
   FaHeart,
   FaComment,
+  FaTrash,
 } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import axios from "axios";
@@ -152,6 +153,62 @@ export default function ProfilePage() {
     "Other",
   ];
   const lookingForOptions = ["Co-founder", "Investor", "Mentor"];
+  const handleLike = async (postId, isStartupPost = false) => {
+    try {
+      const res = await axios.post(
+        `${API_URL}/${isStartupPost ? "startupPosts" : "posts"}/${postId}/like`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setPosts((prev) =>
+        prev.map((p) =>
+          p._id === postId ? { ...p, likes: res.data.likes } : p
+        )
+      );
+    } catch (err) {
+      console.error("Error liking post:", err);
+    }
+  };
+
+  // ✅ Comment (works for both)
+  const handleComment = async (postId, isStartupPost = false) => {
+    const text = prompt("Write a comment:");
+    if (!text) return;
+
+    try {
+      const res = await axios.post(
+        `${API_URL}/${
+          isStartupPost ? "startupPosts" : "posts"
+        }/${postId}/comment`,
+        { text },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setPosts((prev) => prev.map((p) => (p._id === postId ? res.data : p)));
+    } catch (err) {
+      console.error("Error adding comment:", err);
+    }
+  };
+
+  // ✅ Delete post (works for both)
+  const handleDeletePost = async (postId, isStartupPost = false) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(
+        `${API_URL}/${isStartupPost ? "startupPosts" : "posts"}/${postId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setPosts((prev) => prev.filter((p) => p._id !== postId));
+    } catch (err) {
+      console.error("Error deleting post:", err);
+    }
+  };
 
   return (
     <>
@@ -444,9 +501,29 @@ export default function ProfilePage() {
                   <div className={styles.postContent}>
                     <p>{post.content}</p>
                     <div className={styles.postActions}>
-                      <FaHeart /> {post.likes?.length || 0}
-                      <FaComment style={{ marginLeft: "10px" }} />{" "}
-                      {post.comments?.length || 0}
+                      <span onClick={() => handleLike(post._id, isStartupPost)}>
+                        <FaHeart /> {post.likes?.length || 0}
+                      </span>
+                      <span
+                        onClick={() => handleComment(post._id, isStartupPost)}
+                      >
+                        <FaComment /> {post.comments?.length || 0}
+                      </span>
+                      <FaShare />
+                      {!isStartupPost &&
+                        post.userId?._id === userProfile?._id && (
+                          <FaTrash
+                            onClick={() =>
+                              handleDeletePost(post._id, isStartupPost)
+                            }
+                            style={{
+                              marginLeft: "10px",
+                              color: "red",
+                              cursor: "pointer",
+                            }}
+                            title="Delete Post"
+                          />
+                        )}
                     </div>
                   </div>
                 </div>

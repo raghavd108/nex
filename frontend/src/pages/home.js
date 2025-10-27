@@ -11,7 +11,6 @@ import {
   FaImage,
   FaPlus,
   FaTimes,
-  FaTrash,
 } from "react-icons/fa";
 import axios from "axios";
 import MoodPopup from "../components/MoodPopup";
@@ -205,25 +204,6 @@ export default function Home() {
     }
   };
 
-  // ✅ Delete post (works for both)
-  const handleDeletePost = async (postId, isStartupPost = false) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this post?"
-    );
-    if (!confirmDelete) return;
-
-    try {
-      await axios.delete(
-        `${API_URL}/${isStartupPost ? "startupPosts" : "posts"}/${postId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setPosts((prev) => prev.filter((p) => p._id !== postId));
-    } catch (err) {
-      console.error("Error deleting post:", err);
-    }
-  };
-
   return (
     <div
       className="home-page"
@@ -337,17 +317,6 @@ export default function Home() {
                   <FaComment /> {post.comments?.length || 0}
                 </span>
                 <FaShare />
-                {!isStartupPost && post.userId?._id === userProfile?._id && (
-                  <FaTrash
-                    onClick={() => handleDeletePost(post._id, isStartupPost)}
-                    style={{
-                      marginLeft: "10px",
-                      color: "red",
-                      cursor: "pointer",
-                    }}
-                    title="Delete Post"
-                  />
-                )}
               </div>
             </div>
           );
