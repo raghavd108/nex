@@ -404,3 +404,159 @@
     font-size: 0.9rem;
   }
 }
+/* ======== Edit Modal Overlay ======== */
+/* Elegant Edit Modal */
+.edit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 20, 40, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+  padding: 15px;
+}
+
+.edit-modal {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Title with elegant gradient bar */
+.edit-modal h2 {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: #0052d4;
+  text-align: center;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.edit-modal h2::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 35%;
+  width: 30%;
+  height: 3px;
+  background: linear-gradient(135deg, #0052d4, #6fb1fc);
+  border-radius: 3px;
+}
+
+.edit-modal label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.edit-modal input,
+.edit-modal textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.edit-modal input:focus,
+.edit-modal textarea:focus {
+  border-color: #0052d4;
+  outline: none;
+}
+
+.edit-modal textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.edit-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #0052d4, #6fb1fc);
+  color: #fff;
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+}
+
+.cancel-btn {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background: #e2e2e2;
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .edit-modal {
+    max-width: 95%;
+    padding: 20px;
+  }
+
+  .edit-modal h2 {
+    font-size: 1.4rem;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ======== Responsive ======== */
+@media (max-width: 480px) {
+  .edit-modal {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .edit-modal h2 {
+    font-size: 1.3rem;
+  }
+
+  .save-btn,
+  .cancel-btn {
+    font-size: 0.9rem;
+    padding: 8px 0;
+  }
+}

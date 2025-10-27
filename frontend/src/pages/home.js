@@ -67,18 +67,25 @@ export default function Home() {
     }
   };
 
-  // ✅ Fetch both user posts and startup posts
+  // ✅ Fetch both user and startup posts safely
   const fetchAllPosts = async () => {
     try {
       const [userRes, startupRes] = await Promise.all([
-        axios.get(`${API_URL}/posts`),
-        axios.get(`${API_URL}/startupPosts`),
+        axios.get(`${API_URL}/posts`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`${API_URL}/startupPosts`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
       ]);
 
-      // Merge both types and sort by date (newest first)
-      const combined = [...userRes.data, ...startupRes.data].sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      // ✅ Combine and filter out unknown or broken posts
+      const combined = [...userRes.data, ...startupRes.data]
+        .filter(
+          (p) =>
+            (p.userId && p.userId.name) || (p.startupId && p.startupId.name)
+        )
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
       setPosts(combined);
     } catch (err) {
@@ -86,11 +93,6 @@ export default function Home() {
       setPosts([]);
     }
   };
-
-  useEffect(() => {
-    fetchUserProfile();
-    fetchAllPosts();
-  }, []);
 
   // ✅ Handle mood select
   const handleMoodSelect = (mood) => {

@@ -357,17 +357,22 @@ export default function StartupProfile() {
               <div key={post._id} className="post-card">
                 <div className="post-header">
                   <img
-                    src={post.userId?.avatar || "/default-avatar.png"}
-                    alt="user"
+                    src={
+                      post.startupId?.logo ||
+                      startup.logo ||
+                      "/default-logo.png"
+                    }
+                    alt="startup"
                     className="avatar"
                   />
                   <div>
-                    <strong>{post.userId?.name}</strong>
+                    <strong>{post.startupId?.name || startup.name}</strong>
                     <p className="date">
                       {new Date(post.createdAt).toLocaleString()}
                     </p>
                   </div>
                 </div>
+
                 <p className="content">{post.content}</p>
                 {post.imageUrl && (
                   <img src={post.imageUrl} alt="Post" className="post-image" />

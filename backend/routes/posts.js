@@ -53,16 +53,15 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
 });
 
 // ---------------------- GET ALL POSTS ----------------------
+
 router.get("/", async (req, res) => {
   try {
-    const posts = await Post.find()
-      .populate("userId", "username name avatar")
-      .populate("comments.userId", "username avatar")
+    const posts = await Post.find({ startupId: { $exists: false } }) // ✅ only user posts
+      .populate("userId", "name avatar username")
       .sort({ createdAt: -1 });
-
     res.json(posts);
   } catch (err) {
-    console.error("Error fetching posts:", err);
+    console.error("Error fetching user posts:", err);
     res.status(500).json({ error: err.message });
   }
 });
