@@ -279,7 +279,7 @@ export default function StartupProfile() {
         {/* ======= Create Post Button ======= */}
         {isFounder && (
           <button
-            className="open-post-btn"
+            className="open-post"
             onClick={() => setIsPostPopupOpen(true)}
           >
             <FaPlus /> Post
@@ -299,7 +299,7 @@ export default function StartupProfile() {
 
               <div className="popup-body">
                 {/* ======= Startup Identity ======= */}
-                <div className="composer-startup-info">
+                <div className="composer-startup">
                   <img
                     src={
                       typeof startup.logo === "string" && startup.logo
@@ -307,7 +307,6 @@ export default function StartupProfile() {
                         : "/default-logo.png"
                     }
                     alt="Startup Logo"
-                    className="startup-logo-small"
                   />
                   <div className="startup-name-info">
                     <h4>{startup.name}</h4>
