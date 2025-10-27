@@ -8,13 +8,22 @@ const startupController = require("../controllers/startupController");
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+// ==========================
+// 🌟 Startup Routes
+// ==========================
+
 // Create new startup
 router.post("/", auth, startupController.createStartup);
 
-// Update existing startup
-router.put("/:id", auth, startupController.updateStartup);
+// Update existing startup (with optional logo upload)
+router.put(
+  "/:id",
+  auth,
+  upload.single("logo"),
+  startupController.updateStartup
+);
 
-// Upload / update logo
+// Upload / update logo separately (if needed)
 router.post(
   "/:id/logo",
   auth,

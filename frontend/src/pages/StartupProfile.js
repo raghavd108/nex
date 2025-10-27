@@ -95,23 +95,34 @@ export default function StartupProfile() {
   };
 
   const handleFileChange = (e) => {
-    setFormData((prev) => ({ ...prev, logo: e.target.files[0] }));
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, logo: file }));
+    }
   };
 
+  // =================== Edit & Update ===================
   const handleUpdate = async () => {
     if (!token) return alert("Login required");
 
     try {
       const updatedData = new FormData();
-      Object.keys(formData).forEach((key) => {
-        if (Array.isArray(formData[key])) {
-          updatedData.append(key, JSON.stringify(formData[key]));
-        } else if (key === "logo" && formData.logo instanceof File) {
-          updatedData.append("logo", formData.logo);
-        } else {
-          updatedData.append(key, formData[key]);
-        }
-      });
+
+      // Append basic fields
+      updatedData.append("name", formData.name);
+      updatedData.append("mission", formData.mission);
+      updatedData.append("description", formData.description);
+      updatedData.append("stage", formData.stage);
+      updatedData.append("fundingInfo", formData.fundingInfo);
+
+      // Convert arrays properly
+      updatedData.append("industries", JSON.stringify(formData.industries));
+      updatedData.append("skills", JSON.stringify(formData.skills));
+
+      // ✅ Append logo file only if a new one is selected
+      if (formData.logo instanceof File) {
+        updatedData.append("logo", formData.logo);
+      }
 
       const res = await axios.put(`${API_URL}/startups/${id}`, updatedData, {
         headers: {
@@ -121,6 +132,7 @@ export default function StartupProfile() {
       });
 
       const updatedStartup = res.data.startup || res.data;
+
       setStartup(updatedStartup);
       setFormData({
         name: updatedStartup.name || "",
@@ -137,7 +149,7 @@ export default function StartupProfile() {
       alert("✅ Startup updated successfully!");
     } catch (err) {
       console.error("Error updating startup:", err);
-      alert("Failed to update startup.");
+      alert("❌ Failed to update startup.");
     }
   };
 
