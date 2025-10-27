@@ -4,6 +4,17 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import "../css/StartupProfile.css";
+import {
+  FaUserEdit,
+  FaUserPlus,
+  FaCheck,
+  FaUsers,
+  FaBullhorn,
+  FaFileAlt,
+  FaImage,
+  FaPlus,
+  FaTimes,
+} from "react-icons/fa";
 
 export default function StartupProfile() {
   const { id } = useParams();
@@ -14,6 +25,15 @@ export default function StartupProfile() {
   const [isFounder, setIsFounder] = useState(false);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({});
+  const [userProfile, setUserProfile] = useState(null);
+
+  // Post creation states
+  const [isPostPopupOpen, setIsPostPopupOpen] = useState(false);
+  const [newPost, setNewPost] = useState("");
+  const [photo, setPhoto] = useState(null);
+  const [posting, setPosting] = useState(false);
+
+  // Team and search
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
@@ -36,7 +56,10 @@ export default function StartupProfile() {
         ]);
 
         const startupData = startupRes.data;
-        const myProfileId = profileRes.data._id;
+        const profileData = profileRes.data;
+        setUserProfile(profileData);
+
+        const myProfileId = profileData._id;
 
         setStartup(startupData);
         setFormData({
@@ -60,6 +83,9 @@ export default function StartupProfile() {
           startupData.founderProfileId === myProfileId ||
             startupData.founderProfileId?._id === myProfileId
         );
+
+        const postsRes = await axios.get(`${API_URL}/startupPosts/${id}`);
+        setStartup((prev) => ({ ...prev, posts: postsRes.data || [] }));
       } catch (err) {
         console.error("Failed to fetch startup:", err);
         alert("Error fetching startup data.");
@@ -86,43 +112,20 @@ export default function StartupProfile() {
     }
   };
 
-  // =================== Edit & Update ===================
-  const handleEditClick = () => setEditing(true);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
+  // =================== Update Startup Info ===================
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setFormData((prev) => ({ ...prev, logo: file }));
-    }
+    if (file) setFormData((prev) => ({ ...prev, logo: file }));
   };
 
-  // =================== Edit & Update ===================
   const handleUpdate = async () => {
-    if (!token) return alert("Login required");
-
     try {
       const updatedData = new FormData();
-
-      // Append basic fields
-      updatedData.append("name", formData.name);
-      updatedData.append("mission", formData.mission);
-      updatedData.append("description", formData.description);
-      updatedData.append("stage", formData.stage);
-      updatedData.append("fundingInfo", formData.fundingInfo);
-
-      // Convert arrays properly
-      updatedData.append("industries", JSON.stringify(formData.industries));
-      updatedData.append("skills", JSON.stringify(formData.skills));
-
-      // ✅ Append logo file only if a new one is selected
-      if (formData.logo instanceof File) {
-        updatedData.append("logo", formData.logo);
-      }
+      Object.keys(formData).forEach((key) => {
+        if (Array.isArray(formData[key]))
+          updatedData.append(key, JSON.stringify(formData[key]));
+        else updatedData.append(key, formData[key]);
+      });
 
       const res = await axios.put(`${API_URL}/startups/${id}`, updatedData, {
         headers: {
@@ -131,20 +134,7 @@ export default function StartupProfile() {
         },
       });
 
-      const updatedStartup = res.data.startup || res.data;
-
-      setStartup(updatedStartup);
-      setFormData({
-        name: updatedStartup.name || "",
-        mission: updatedStartup.mission || "",
-        description: updatedStartup.description || "",
-        stage: updatedStartup.stage || "idea",
-        fundingInfo: updatedStartup.fundingInfo || "",
-        industries: updatedStartup.industries || [],
-        skills: updatedStartup.skills || [],
-        logo: updatedStartup.logo || "",
-      });
-
+      setStartup(res.data.startup || res.data);
       setEditing(false);
       alert("✅ Startup updated successfully!");
     } catch (err) {
@@ -153,83 +143,31 @@ export default function StartupProfile() {
     }
   };
 
-  // =================== Search Team Members ===================
-  const handleSearch = async (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
-    if (!query.trim()) return setSearchResults([]);
-
+  // =================== Create Post ===================
+  const handlePost = async () => {
+    if (!newPost.trim()) return alert("Write something!");
+    setPosting(true);
     try {
-      const res = await axios.get(`${API_URL}/searchAll`, {
-        params: { q: query },
+      const form = new FormData();
+      form.append("content", newPost);
+      if (photo) form.append("image", photo);
+
+      const res = await axios.post(`${API_URL}/startupPosts/${id}`, form, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Extract only profiles
-      const profiles = Array.isArray(res.data.profiles)
-        ? res.data.profiles
-        : [];
-
-      // Filter out users already in the startup team
-      const filtered = profiles.filter(
-        (u) => !startup.team?.some((m) => m.profileId?._id === u._id)
-      );
-
-      setSearchResults(filtered);
-    } catch (err) {
-      console.error("Search failed:", err);
-      setSearchResults([]);
-    }
-  };
-
-  const handleSelectMember = (user) => {
-    if (selectedMembers.some((m) => m._id === user._id)) return;
-    setSelectedMembers((prev) => [...prev, { ...user, role: "" }]);
-    setSearchQuery("");
-    setSearchResults([]);
-  };
-
-  const handleRoleChange = (id, value) => {
-    setSelectedMembers((prev) =>
-      prev.map((m) => (m._id === id ? { ...m, role: value } : m))
-    );
-  };
-
-  const handleRemoveMember = (id) => {
-    setSelectedMembers((prev) => prev.filter((m) => m._id !== id));
-  };
-
-  const handleSaveTeam = async () => {
-    if (selectedMembers.length === 0) return alert("Add at least one teammate");
-
-    try {
-      await Promise.all(
-        selectedMembers.map((m) =>
-          axios.post(
-            `${API_URL}/startups/${id}/addTeamMember`,
-            { profileId: m._id, role: m.role || "Member" },
-            { headers: { Authorization: `Bearer ${token}` } }
-          )
-        )
-      );
-
-      alert("🎉 Team members added successfully!");
       setStartup((prev) => ({
         ...prev,
-        team: [
-          ...(prev.team || []),
-          ...selectedMembers.map((m) => ({
-            profileId: m,
-            role: m.role || "Member",
-          })),
-        ],
+        posts: [res.data, ...(prev.posts || [])],
       }));
-
-      setSelectedMembers([]);
+      setNewPost("");
+      setPhoto(null);
+      setIsPostPopupOpen(false);
     } catch (err) {
-      console.error("Add members failed:", err);
-      alert("Failed to add team members");
+      console.error("Error creating post:", err);
+      alert("Failed to share post.");
+    } finally {
+      setPosting(false);
     }
   };
 
@@ -240,8 +178,6 @@ export default function StartupProfile() {
     <div>
       <Navbar />
       <div className="startup-profile-page">
-        <div className="banner"></div>
-
         <div className="profile-header">
           <img
             src={
@@ -260,196 +196,107 @@ export default function StartupProfile() {
 
           <div className="profile-actions">
             <button className="follow-btn" onClick={toggleFollow}>
-              {following ? "Following ✅" : "Follow +"}
+              {following ? <FaCheck /> : <FaUserPlus />}{" "}
+              {following ? "Following" : "Follow"}
             </button>
+
             {isFounder && (
-              <button className="edit-btn" onClick={handleEditClick}>
-                ✏️ Edit
+              <button className="edit-btn" onClick={() => setEditing(true)}>
+                <FaUserEdit /> Edit
               </button>
             )}
           </div>
         </div>
 
-        {/* ========= Edit Modal ========= */}
-        {editing && (
-          <div className="edit-modal-overlay">
-            <div className="edit-modal">
-              <h2>Edit Startup Profile</h2>
+        {/* ========= Post Button ========= */}
+        {isFounder && (
+          <button
+            className="open-post-btn"
+            onClick={() => setIsPostPopupOpen(true)}
+          >
+            <FaPlus /> New Post
+          </button>
+        )}
 
-              <label>Logo:</label>
-              <input type="file" onChange={handleFileChange} />
-
-              <label>Mission:</label>
-              <textarea
-                name="mission"
-                value={formData.mission || ""}
-                onChange={handleInputChange}
-              />
-
-              <label>Stage:</label>
-              <input
-                name="stage"
-                value={formData.stage || ""}
-                onChange={handleInputChange}
-              />
-
-              <label>Industries (comma separated):</label>
-              <input
-                name="industries"
-                value={formData.industries?.join(", ") || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    industries: e.target.value
-                      .split(",")
-                      .map((i) => i.trim())
-                      .filter(Boolean),
-                  })
-                }
-              />
-
-              <label>Funding Info:</label>
-              <input
-                name="fundingInfo"
-                value={formData.fundingInfo || ""}
-                onChange={handleInputChange}
-              />
-
-              <label>Skills (comma separated):</label>
-              <input
-                name="skills"
-                value={formData.skills?.join(", ") || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    skills: e.target.value
-                      .split(",")
-                      .map((s) => s.trim())
-                      .filter(Boolean),
-                  })
-                }
-              />
-
-              <div className="edit-btns">
-                <button className="save-btn" onClick={handleUpdate}>
-                  💾 Save Changes
+        {/* ========= Post Popup ========= */}
+        {isPostPopupOpen && (
+          <div className="post-popup-overlay">
+            <div className="post-popup">
+              <div className="popup-header">
+                <h3>
+                  <FaBullhorn /> Create Post
+                </h3>
+                <button onClick={() => setIsPostPopupOpen(false)}>
+                  <FaTimes />
                 </button>
-                <button
-                  className="cancel-btn"
-                  onClick={() => setEditing(false)}
-                >
-                  ❌ Cancel
-                </button>
+              </div>
+
+              <div className="popup-body">
+                <div className="composer-avatar">
+                  <img
+                    src={userProfile?.avatar || "/default-avatar.png"}
+                    alt="Avatar"
+                  />
+                </div>
+                <textarea
+                  placeholder="What's on your mind?"
+                  value={newPost}
+                  onChange={(e) => setNewPost(e.target.value)}
+                />
+                {photo && (
+                  <img
+                    src={URL.createObjectURL(photo)}
+                    alt="Preview"
+                    className="post-preview"
+                  />
+                )}
+                <div className="composer-actions">
+                  <label className="upload-btn">
+                    <FaImage /> Upload Image
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setPhoto(e.target.files[0])}
+                    />
+                  </label>
+                  <button onClick={handlePost} disabled={posting}>
+                    {posting ? "Posting..." : "Post"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* ========= Info Section ========= */}
-        <div className="info-section card">
-          <h3>About Startup</h3>
-          <p>
-            <strong>Stage:</strong> {startup.stage}
-          </p>
-          <p>
-            <strong>Industries:</strong>{" "}
-            {startup.industries?.join(", ") || "N/A"}
-          </p>
-          <p>
-            <strong>Funding:</strong> {startup.fundingInfo || "N/A"}
-          </p>
-          <p>
-            <strong>Skills:</strong> {startup.skills?.join(", ") || "N/A"}
-          </p>
-          <p>
-            <strong>Followers:</strong> {startup.followers?.length || 0}
-          </p>
-        </div>
-
-        {/* ========= Team Section ========= */}
-        <div className="team-section card">
-          <h3>Team Members 👥</h3>
-          {startup.team?.length ? (
-            <ul>
-              {startup.team.map((m, idx) => (
-                <li key={m._id || idx}>
-                  {m.profileId?.name || "Unknown"} - {m.role || "Member"}
-                </li>
-              ))}
-            </ul>
+        {/* ========= Posts Section ========= */}
+        <div className="posts-section card">
+          <h3>
+            <FaFileAlt /> Startup Updates
+          </h3>
+          {startup.posts && startup.posts.length > 0 ? (
+            startup.posts.map((post) => (
+              <div key={post._id} className="post-card">
+                <div className="post-header">
+                  <img
+                    src={post.userId?.avatar || "/default-avatar.png"}
+                    alt="user"
+                    className="avatar"
+                  />
+                  <div>
+                    <strong>{post.userId?.name}</strong>
+                    <p className="date">
+                      {new Date(post.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+                <p className="content">{post.content}</p>
+                {post.imageUrl && (
+                  <img src={post.imageUrl} alt="Post" className="post-image" />
+                )}
+              </div>
+            ))
           ) : (
-            <p>No team members yet.</p>
-          )}
-
-          {/* ========= Add Team Members ========= */}
-          {isFounder && (
-            <div className="add-member-box">
-              <h4>Add Team Members</h4>
-              <input
-                type="text"
-                placeholder="Search users by name..."
-                value={searchQuery}
-                onChange={handleSearch}
-              />
-
-              {searchResults.length > 0 && (
-                <div className="search-results-container">
-                  {searchResults.map((user) => (
-                    <div
-                      key={user._id}
-                      className="profile-preview"
-                      onClick={() => handleSelectMember(user)}
-                    >
-                      <img
-                        src={user.avatar || "/default-avatar.png"}
-                        alt={user.username}
-                      />
-                      <div className="profile-info">
-                        <span className="name">{user.name || "Unnamed"}</span>
-                        <span className="username">@{user.username}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {selectedMembers.length > 0 && (
-                <div className="selected-members">
-                  <h5>Selected Members</h5>
-                  {selectedMembers.map((m) => (
-                    <div key={m._id} className="selected-member">
-                      <img
-                        src={m.avatar || "/default-avatar.png"}
-                        alt={m.name}
-                        className="avatar"
-                      />
-                      <span>{m.name}</span>
-                      <input
-                        type="text"
-                        placeholder="Role (e.g., Designer)"
-                        value={m.role}
-                        onChange={(e) =>
-                          handleRoleChange(m._id, e.target.value)
-                        }
-                      />
-                      <button
-                        onClick={() => handleRemoveMember(m._id)}
-                        style={{
-                          marginLeft: "8px",
-                          color: "red",
-                          cursor: "pointer",
-                        }}
-                      >
-                        ❌
-                      </button>
-                    </div>
-                  ))}
-                  <button className="save-btn" onClick={handleSaveTeam}>
-                    💾 Save Team
-                  </button>
-                </div>
-              )}
-            </div>
+            <p>No posts yet.</p>
           )}
         </div>
       </div>

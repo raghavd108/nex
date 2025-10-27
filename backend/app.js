@@ -13,6 +13,7 @@ const themedRoom = require("./routes/themedRoom");
 const messageRoutes = require("./routes/messages");
 const chatSocket = require("./routes/messageSocket.js");
 const postsRoute = require("./routes/posts.js");
+const startupPosts = require("./routes/startupPosts");
 
 const startupRoutes = require("./routes/startupRoutes");
 
@@ -56,7 +57,7 @@ app.use(express.json());
 // });
 // ✅ Example API Route
 app.use("/api/profile", profileRoutes);
-
+app.use("/api/startupPosts", startupPosts);
 app.use("/api/startups", startupRoutes);
 app.use("/api/search", require("./routes/searchRoutes"));
 

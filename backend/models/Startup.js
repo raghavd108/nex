@@ -29,6 +29,7 @@ const startupSchema = new mongoose.Schema(
       },
     ],
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }],
+    posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     visibility: {
       type: String,
       enum: ["public", "private"],
