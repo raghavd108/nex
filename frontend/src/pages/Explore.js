@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../css/Explore.css";
 import Navbar from "../components/Navbar";
-import { FaPlus, FaHeart, FaComment, FaUsers } from "react-icons/fa";
+import { FaPlus, FaHeart, FaComment, FaUsers, FaImage } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -16,7 +16,11 @@ export default function Explore() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [creatingRoom, setCreatingRoom] = useState(false);
-  const [selectedPost, setSelectedPost] = useState(null); // Full post modal state
+  const [selectedPost, setSelectedPost] = useState(null);
+
+  // ✅ Added missing states
+  const [roomImage, setRoomImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
 
   const [newRoom, setNewRoom] = useState({
     name: "",
@@ -43,7 +47,7 @@ export default function Explore() {
     }
   };
 
-  // Fetch posts from users & startups
+  // Fetch Posts
   const fetchPosts = async () => {
     setLoading(true);
     try {
@@ -56,6 +60,7 @@ export default function Explore() {
         ...(userPosts.data || []),
         ...(startupPosts.data || []),
       ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
       setPosts(allPosts);
     } catch (err) {
       console.error("Error fetching posts:", err);
@@ -138,15 +143,11 @@ export default function Explore() {
         isStartupPost ? "startupPosts" : "posts"
       }/${postId}/like`;
       const res = await axios.put(endpoint, {}, { headers: getAuthHeaders() });
-      // backend returns updated post or likes array in different files — normalize
-      const likes =
-        res.data.likes ?? (res.data.likes?.length ? res.data.likes : []);
       setPosts((prev) =>
         prev.map((p) =>
           p._id === postId ? { ...p, likes: res.data.likes ?? p.likes } : p
         )
       );
-      // if selectedPost is open and same id, update it too
       if (selectedPost && selectedPost._id === postId) {
         setSelectedPost((sp) => ({ ...sp, likes: res.data.likes ?? sp.likes }));
       }
@@ -168,7 +169,6 @@ export default function Explore() {
         { text },
         { headers: getAuthHeaders() }
       );
-      // backend returns updated post
       setPosts((prev) => prev.map((p) => (p._id === postId ? res.data : p)));
       if (selectedPost && selectedPost._id === postId)
         setSelectedPost(res.data);
@@ -176,7 +176,8 @@ export default function Explore() {
       toast.error("Failed to add comment");
     }
   };
-  // Image Preview for Create Room
+
+  // ✅ Image Preview for Create Room
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setRoomImage(file);
@@ -198,7 +199,6 @@ export default function Explore() {
       <div className="explore-header">
         <h1 className="explore-title">🌍 Explore Nex</h1>
 
-        {/* Create button: header on desktop, floating on small screens (handled by CSS) */}
         <button
           className="create-btn"
           onClick={() => setShowCreateModal(true)}
@@ -209,7 +209,7 @@ export default function Explore() {
       </div>
 
       <div className="explore-wrapper">
-        {/* search */}
+        {/* Search */}
         <input
           type="search"
           className="room-search-input"
@@ -406,7 +406,7 @@ export default function Explore() {
         </div>
       )}
 
-      {/* Full Post Modal (Instagram-style) */}
+      {/* Full Post Modal */}
       {selectedPost && (
         <div
           className="post-modal-overlay"
