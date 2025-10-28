@@ -170,7 +170,7 @@ export default function Home() {
       const endpoint = `${API_URL}/${
         isStartupPost ? "startupPosts" : "posts"
       }/${postId}/like`;
-      const res = await axios.post(
+      const res = await axios.put(
         endpoint,
         {},
         {
@@ -178,7 +178,7 @@ export default function Home() {
         }
       );
 
-      // Update only that post’s like count
+      // Update that specific post’s likes instantly
       setPosts((prev) =>
         prev.map((p) =>
           p._id === postId ? { ...p, likes: res.data.likes || [] } : p
@@ -192,7 +192,7 @@ export default function Home() {
   // ✅ Comment (works for both)
   const handleComment = async (postId, isStartupPost = false) => {
     const text = prompt("Write a comment:");
-    if (!text) return;
+    if (!text.trim()) return;
 
     try {
       const endpoint = `${API_URL}/${
