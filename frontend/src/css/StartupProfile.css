@@ -608,3 +608,13 @@
   color: #ff416c;
   font-weight: 600;
 }
+.post-actions span {
+  align-items: center;
+
+  cursor: pointer;
+  display: flex;
+  gap: 4px;
+  opacity: 0.9;
+  color: black;
+  transition: 0.3s;
+}
