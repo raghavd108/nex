@@ -4,7 +4,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import "../css/StartupProfile.css";
-import { FaPlus, FaTimes, FaImage } from "react-icons/fa";
+import {
+  FaPlus,
+  FaTimes,
+  FaImage,
+  FaTrash,
+  FaHeart,
+  FaRegHeart,
+  FaComment,
+} from "react-icons/fa";
 
 export default function StartupProfile() {
   const { id } = useParams();
@@ -23,7 +31,7 @@ export default function StartupProfile() {
   const [photo, setPhoto] = useState(null);
   const [posting, setPosting] = useState(false);
 
-  // Team
+  // Team (future use)
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
@@ -159,6 +167,67 @@ export default function StartupProfile() {
       alert("Failed to share post.");
     } finally {
       setPosting(false);
+    }
+  };
+
+  // =================== Like Post ===================
+  const handleLike = async (postId) => {
+    try {
+      const res = await axios.put(
+        `${API_URL}/startupPosts/${postId}/like`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setStartup((prev) => ({
+        ...prev,
+        posts: prev.posts.map((p) => (p._id === postId ? res.data : p)),
+      }));
+    } catch (err) {
+      console.error("Error liking post:", err.response?.data || err.message);
+    }
+  };
+
+  // =================== Comment on Post ===================
+  const handleComment = async (postId) => {
+    const text = prompt("💬 Write a comment:");
+    if (!text?.trim()) return;
+
+    try {
+      const res = await axios.post(
+        `${API_URL}/startupPosts/${postId}/comment`,
+        { text },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setStartup((prev) => ({
+        ...prev,
+        posts: prev.posts.map((p) => (p._id === postId ? res.data : p)),
+      }));
+    } catch (err) {
+      console.error("Error commenting:", err.response?.data || err.message);
+    }
+  };
+
+  // =================== Delete Post ===================
+  const handleDeletePost = async (postId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`${API_URL}/startupPosts/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setStartup((prev) => ({
+        ...prev,
+        posts: prev.posts.filter((p) => p._id !== postId),
+      }));
+    } catch (err) {
+      console.error("Error deleting post:", err.response?.data || err.message);
+      alert("Failed to delete post.");
     }
   };
 
@@ -298,7 +367,6 @@ export default function StartupProfile() {
               </div>
 
               <div className="popup-body">
-                {/* ======= Startup Identity ======= */}
                 <div className="composer-startup">
                   <img
                     src={
@@ -314,14 +382,12 @@ export default function StartupProfile() {
                   </div>
                 </div>
 
-                {/* ======= Post Textarea ======= */}
                 <textarea
                   placeholder={`What's new at ${startup.name}?`}
                   value={newPost}
                   onChange={(e) => setNewPost(e.target.value)}
                 />
 
-                {/* ======= Image Preview ======= */}
                 {photo && (
                   <img
                     src={URL.createObjectURL(photo)}
@@ -330,7 +396,6 @@ export default function StartupProfile() {
                   />
                 )}
 
-                {/* ======= Actions ======= */}
                 <div className="composer-actions">
                   <label className="upload-btn">
                     <FaImage /> Upload Image
@@ -353,32 +418,71 @@ export default function StartupProfile() {
         <div className="posts-section card">
           <h3>Startup Updates 📢</h3>
           {startup.posts && startup.posts.length > 0 ? (
-            startup.posts.map((post) => (
-              <div key={post._id} className="post-card">
-                <div className="post-header">
-                  <img
-                    src={
-                      post.startupId?.logo ||
-                      startup.logo ||
-                      "/default-logo.png"
-                    }
-                    alt="startup"
-                    className="avatar"
-                  />
-                  <div>
-                    <strong>{post.startupId?.name || startup.name}</strong>
-                    <p className="date">
-                      {new Date(post.createdAt).toLocaleString()}
-                    </p>
+            startup.posts.map((post) => {
+              const isLiked = post.likes?.some(
+                (l) => (typeof l === "string" ? l : l._id) === userProfile?._id
+              );
+
+              return (
+                <div key={post._id} className="post-card">
+                  <div className="post-header">
+                    <img
+                      src={
+                        post.startupId?.logo ||
+                        startup.logo ||
+                        "/default-logo.png"
+                      }
+                      alt="startup"
+                      className="avatar"
+                    />
+                    <div>
+                      <strong>{post.startupId?.name || startup.name}</strong>
+                      <p className="date">
+                        {new Date(post.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+
+                    {isFounder && (
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeletePost(post._id)}
+                        title="Delete post"
+                      >
+                        <FaTrash />
+                      </button>
+                    )}
+                  </div>
+
+                  <p className="content">{post.content}</p>
+                  {post.imageUrl && (
+                    <img
+                      src={post.imageUrl}
+                      alt="Post"
+                      className="post-image"
+                    />
+                  )}
+
+                  <div className="post-actions">
+                    <button
+                      className={`like-btn ${isLiked ? "liked" : ""}`}
+                      onClick={() => handleLike(post._id)}
+                      title={isLiked ? "Unlike" : "Like"}
+                    >
+                      {isLiked ? <FaHeart /> : <FaRegHeart />}{" "}
+                      <span>{post.likes?.length || 0}</span>
+                    </button>
+
+                    <button
+                      className="comment-btn"
+                      onClick={() => handleComment(post._id)}
+                      title="Comment"
+                    >
+                      <FaComment /> <span>{post.comments?.length || 0}</span>
+                    </button>
                   </div>
                 </div>
-
-                <p className="content">{post.content}</p>
-                {post.imageUrl && (
-                  <img src={post.imageUrl} alt="Post" className="post-image" />
-                )}
-              </div>
-            ))
+              );
+            })
           ) : (
             <p>No posts yet.</p>
           )}
