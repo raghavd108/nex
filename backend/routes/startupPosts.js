@@ -95,65 +95,55 @@ router.get("/", async (req, res) => {
    ❤️ Like or Unlike Post
 =============================== */
 router.put("/:postId/like", auth, async (req, res) => {
-  try {
-    const profile = await Profile.findOne({ userId: req.user.id });
-    if (!profile) return res.status(404).json({ message: "Profile not found" });
+  const profile = await Profile.findOne({ userId: req.user.id });
+  if (!profile) return res.status(404).json({ message: "Profile not found" });
 
-    const post = await Post.findById(req.params.postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+  const post = await Post.findById(req.params.postId);
+  if (!post) return res.status(404).json({ message: "Post not found" });
 
-    const liked = post.likes.includes(profile._id);
+  const liked = post.likes.includes(profile._id);
 
-    if (liked) {
-      post.likes.pull(profile._id); // Unlike
-    } else {
-      post.likes.push(profile._id); // Like
-    }
-
-    await post.save();
-
-    const updated = await Post.findById(req.params.postId)
-      .populate("userId", "name avatar")
-      .populate("startupId", "name logo");
-
-    res.json(updated);
-  } catch (err) {
-    console.error("Error liking/unliking post:", err);
-    res.status(500).json({ error: err.message });
+  if (liked) {
+    post.likes.pull(profile._id);
+  } else {
+    post.likes.push(profile._id);
   }
+
+  await post.save();
+
+  const updated = await Post.findById(req.params.postId)
+    .populate("userId", "name avatar")
+    .populate("startupId", "name logo");
+
+  res.json(updated);
 });
 
 /* ===============================
    💬 Add Comment
 =============================== */
 router.post("/:postId/comment", auth, async (req, res) => {
-  try {
-    const { text } = req.body;
-    const profile = await Profile.findOne({ userId: req.user.id });
-    if (!profile) return res.status(404).json({ message: "Profile not found" });
+  const { text } = req.body;
+  const profile = await Profile.findOne({ userId: req.user.id });
+  if (!profile) return res.status(404).json({ message: "Profile not found" });
 
-    const post = await Post.findById(req.params.postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+  const post = await Post.findById(req.params.postId);
+  if (!post) return res.status(404).json({ message: "Post not found" });
 
-    const comment = {
-      userId: profile._id,
-      text,
-      createdAt: new Date(),
-    };
+  const comment = {
+    userId: profile._id,
+    text,
+    createdAt: new Date(),
+  };
 
-    post.comments.push(comment);
-    await post.save();
+  post.comments.push(comment);
+  await post.save();
 
-    const updated = await Post.findById(req.params.postId)
-      .populate("comments.userId", "name avatar")
-      .populate("userId", "name avatar")
-      .populate("startupId", "name logo");
+  const updated = await Post.findById(req.params.postId)
+    .populate("comments.userId", "name avatar")
+    .populate("userId", "name avatar")
+    .populate("startupId", "name logo");
 
-    res.json(updated);
-  } catch (err) {
-    console.error("Error adding comment:", err);
-    res.status(500).json({ error: err.message });
-  }
+  res.json(updated);
 });
 
 /* ===============================

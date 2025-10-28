@@ -1,4 +1,3 @@
-// routes/posts.js
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
@@ -15,7 +14,7 @@ const upload = multer({ storage });
 // ---------------------- CREATE POST ----------------------
 router.post("/", auth, upload.single("image"), async (req, res) => {
   try {
-    const { content, mood } = req.body;
+    const { content } = req.body;
 
     // Get the user's Profile (Post references Profile)
     const profile = await Profile.findOne({ userId: req.user.id });
@@ -36,7 +35,6 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
       userId: profile._id, // reference Profile
       content,
       imageUrl,
-      mood,
     });
 
     await newPost.save();
@@ -53,7 +51,6 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
 });
 
 // ---------------------- GET ALL POSTS ----------------------
-
 router.get("/", async (req, res) => {
   try {
     const posts = await Post.find({ startupId: { $exists: false } }) // ✅ only user posts
@@ -84,60 +81,34 @@ router.get("/:id", async (req, res) => {
 
 // ---------------------- LIKE POST ----------------------
 router.post("/:id/like", auth, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const post = await Post.findById(req.params.id);
+  const userId = req.user.id;
+  const post = await Post.findById(req.params.id);
+  if (!post) return res.status(404).json({ message: "Post not found" });
 
-    if (!post) return res.status(404).json({ message: "Post not found" });
-
-    const liked = post.likes.includes(userId);
-    if (liked) {
-      post.likes.pull(userId);
-    } else {
-      post.likes.push(userId);
-    }
-
-    await post.save();
-    res.json({ success: true, likes: post.likes.length });
-  } catch (err) {
-    console.error("Error liking post:", err);
-    res.status(500).json({ error: err.message });
+  const liked = post.likes.includes(userId);
+  if (liked) {
+    post.likes.pull(userId);
+  } else {
+    post.likes.push(userId);
   }
+
+  await post.save();
+  res.json({ success: true, likes: post.likes.length });
 });
 
 // ---------------------- COMMENT ON POST ----------------------
 router.post("/:id/comment", auth, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { text } = req.body;
+  const userId = req.user.id;
+  const { text } = req.body;
 
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+  const post = await Post.findById(req.params.id);
+  if (!post) return res.status(404).json({ message: "Post not found" });
 
-    post.comments.push({ userId, text });
-    await post.save();
+  post.comments.push({ userId, text });
+  await post.save();
+  await post.populate("comments.userId", "username avatar");
 
-    await post.populate("comments.userId", "username avatar");
-
-    res.json(post);
-  } catch (err) {
-    console.error("Error commenting on post:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ---------------------- GET POSTS BY MOOD ----------------------
-router.get("/mood/:mood", async (req, res) => {
-  try {
-    const posts = await Post.find({ mood: req.params.mood })
-      .populate("userId", "username name avatar")
-      .sort({ createdAt: -1 });
-
-    res.json(posts);
-  } catch (err) {
-    console.error("Error fetching mood posts:", err);
-    res.status(500).json({ error: err.message });
-  }
+  res.json(post);
 });
 
 // ---------------------- DELETE POST ----------------------
@@ -164,6 +135,7 @@ router.delete("/:id", auth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // ---------------------- GET POSTS BY USERNAME ----------------------
 router.get("/user/:username", async (req, res) => {
   try {

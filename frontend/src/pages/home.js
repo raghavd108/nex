@@ -143,7 +143,6 @@ export default function Home() {
     try {
       const formData = new FormData();
       formData.append("content", newPost);
-      formData.append("mood", selectedMood);
       if (photo) formData.append("image", photo);
 
       const res = await axios.post(`${API_URL}/posts`, formData, {
@@ -168,19 +167,25 @@ export default function Home() {
   // ✅ Like post (works for both users and startups)
   const handleLike = async (postId, isStartupPost = false) => {
     try {
+      const endpoint = `${API_URL}/${
+        isStartupPost ? "startupPosts" : "posts"
+      }/${postId}/like`;
       const res = await axios.post(
-        `${API_URL}/${isStartupPost ? "startupPosts" : "posts"}/${postId}/like`,
+        endpoint,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
+      // Update only that post’s like count
       setPosts((prev) =>
         prev.map((p) =>
-          p._id === postId ? { ...p, likes: res.data.likes } : p
+          p._id === postId ? { ...p, likes: res.data.likes || [] } : p
         )
       );
     } catch (err) {
-      console.error("Error liking post:", err);
+      console.error("Error liking post:", err.response?.data || err.message);
     }
   };
 
@@ -190,17 +195,21 @@ export default function Home() {
     if (!text) return;
 
     try {
+      const endpoint = `${API_URL}/${
+        isStartupPost ? "startupPosts" : "posts"
+      }/${postId}/comment`;
       const res = await axios.post(
-        `${API_URL}/${
-          isStartupPost ? "startupPosts" : "posts"
-        }/${postId}/comment`,
+        endpoint,
         { text },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
+      // Replace post with updated data from backend
       setPosts((prev) => prev.map((p) => (p._id === postId ? res.data : p)));
     } catch (err) {
-      console.error("Error adding comment:", err);
+      console.error("Error adding comment:", err.response?.data || err.message);
     }
   };
 
