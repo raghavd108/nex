@@ -204,10 +204,7 @@ export default function Explore() {
           onClick={() => setShowCreateModal(true)}
           aria-label="Create room"
         >
-          <span style={{ marginLeft: 6 }}>
-            <FaPlus />
-            Create Room
-          </span>
+          <FaPlus /> <span>Create Room</span>
         </button>
       </div>
 
