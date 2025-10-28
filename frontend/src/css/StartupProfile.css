@@ -139,7 +139,7 @@
   line-height: 1.5;
 }
 
-/* ========= POSTS SECTION ========= */
+/* ========= POSTS ========= */
 .posts-section {
   display: flex;
   flex-direction: column;
@@ -181,21 +181,6 @@
   margin: 0;
 }
 
-.delete-btn {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: #e74c3c;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: transform 0.2s ease, color 0.3s ease;
-}
-
-.delete-btn:hover {
-  transform: scale(1.1);
-  color: #c0392b;
-}
-
 .post-card p.content {
   font-size: 0.95rem;
   color: #333;
@@ -209,40 +194,6 @@
   margin-top: 10px;
   object-fit: cover;
   max-height: 400px;
-}
-
-/* ========= POST ACTIONS ========= */
-.post-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 15px;
-  margin-top: 10px;
-}
-
-.like-btn,
-.comment-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #444;
-  transition: all 0.25s ease;
-}
-
-.like-btn:hover,
-.comment-btn:hover {
-  color: #0052d4;
-  transform: translateY(-1px);
-}
-
-.like-btn.liked {
-  color: #ff416c;
-  font-weight: 600;
 }
 
 /* ========= POST POPUP ========= */
@@ -267,7 +218,6 @@
   gap: 12px;
   box-sizing: border-box;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  animation: popupSlideIn 0.3s ease;
 }
 
 .popup-header {
@@ -293,6 +243,12 @@
   gap: 10px;
 }
 
+.popup-body .composer-startup img {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+}
+
 .popup-body textarea {
   width: 100%;
   min-height: 80px;
@@ -309,7 +265,7 @@
   align-items: center;
 }
 
-.upload-btn {
+.popup-body .upload-btn {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -317,7 +273,7 @@
   cursor: pointer;
 }
 
-.upload-btn input {
+.popup-body .upload-btn input {
   display: none;
 }
 
@@ -335,11 +291,10 @@
 .popup-body button:hover {
   background: #ff4b2b;
 }
-
 /* ========= FLOATING POST BUTTON ========= */
 .open-post {
   position: fixed;
-  bottom: 85px;
+  bottom: 85px; /* stays above bottom nav */
   right: 25px;
   background: linear-gradient(135deg, #0052d4, #6fb1fc);
   color: #fff;
@@ -362,7 +317,95 @@
   box-shadow: 0 10px 24px rgba(0, 82, 212, 0.45);
 }
 
-/* ========= EDIT MODAL ========= */
+/* ========= ANIMATIONS ========= */
+@keyframes popupSlideIn {
+  from {
+    transform: translateY(25px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========= RESPONSIVE DESIGN ========= */
+@media (max-width: 1024px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 18px;
+  }
+  .profile-actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .startup-logo {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .post-popup {
+    width: 92%;
+    padding: 20px;
+  }
+
+  .open-post {
+    bottom: 70px;
+    right: 20px;
+    padding: 12px 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-header {
+    padding: 18px;
+  }
+
+  .follow-btn,
+  .edit-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .post-card p.content {
+    font-size: 0.9rem;
+  }
+
+  .popup-body textarea {
+    min-height: 80px;
+  }
+
+  .open-post {
+    bottom: 65px;
+    right: 15px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+/* ======== Edit Modal Overlay ======== */
+/* Elegant Edit Modal */
 .edit-modal-overlay {
   position: fixed;
   top: 0;
@@ -391,6 +434,7 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Title with elegant gradient bar */
 .edit-modal h2 {
   font-size: 1.6rem;
   margin-bottom: 20px;
@@ -475,67 +519,7 @@
   transform: translateY(-2px);
 }
 
-/* ========= ANIMATIONS ========= */
-@keyframes popupSlideIn {
-  from {
-    transform: translateY(25px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* ========= RESPONSIVE DESIGN ========= */
-@media (max-width: 1024px) {
-  .profile-header {
-    flex-direction: column;
-    text-align: center;
-    gap: 18px;
-  }
-  .profile-actions {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 768px) {
-  .startup-logo {
-    width: 100px;
-    height: 100px;
-  }
-
-  .profile-info h1 {
-    font-size: 1.5rem;
-  }
-
-  .card {
-    padding: 20px;
-  }
-
-  .post-popup {
-    width: 92%;
-    padding: 20px;
-  }
-
-  .open-post {
-    bottom: 70px;
-    right: 20px;
-    padding: 12px 22px;
-  }
-}
-
+/* Responsive Design */
 @media (max-width: 600px) {
   .edit-modal {
     max-width: 95%;
@@ -547,32 +531,20 @@
   }
 }
 
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ======== Responsive ======== */
 @media (max-width: 480px) {
-  .profile-header {
-    padding: 18px;
-  }
-
-  .follow-btn,
-  .edit-btn {
-    padding: 8px 16px;
-    font-size: 0.85rem;
-  }
-
-  .post-card p.content {
-    font-size: 0.9rem;
-  }
-
-  .popup-body textarea {
-    min-height: 80px;
-  }
-
-  .open-post {
-    bottom: 65px;
-    right: 15px;
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
-
   .edit-modal {
     width: 90%;
     padding: 20px;
@@ -587,4 +559,52 @@
     font-size: 0.9rem;
     padding: 8px 0;
   }
+}
+.delete-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+
+.delete-btn:hover {
+  transform: scale(1.1);
+  color: #c0392b;
+}
+
+/* ========= POST ACTIONS ========= */
+.post-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.like-btn,
+.comment-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #444;
+  transition: all 0.25s ease;
+}
+
+.like-btn:hover,
+.comment-btn:hover {
+  color: #0052d4;
+  transform: translateY(-1px);
+}
+
+.like-btn.liked {
+  color: #ff416c;
+  font-weight: 600;
 }
