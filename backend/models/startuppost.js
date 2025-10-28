@@ -1,13 +1,17 @@
 const mongoose = require("mongoose");
 
-const postSchema = new mongoose.Schema(
+const startupPostSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Profile",
       required: true, // Who created the post (a user profile)
     },
-
+    startupId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Startup",
+      required: true, // only startup posts have this
+    },
     content: {
       type: String,
       trim: true,
@@ -25,7 +29,7 @@ const postSchema = new mongoose.Schema(
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Profile",
+        ref: "Profile", // users can like startup posts too
       },
     ],
     comments: [
@@ -39,4 +43,4 @@ const postSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Post", postSchema);
+module.exports = mongoose.model("StartupPost", startupPostSchema);
