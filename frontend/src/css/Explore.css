@@ -1,3 +1,8 @@
+/* ===========================================================
+   🌐 EXPLORE + POSTS PAGE (Instagram-Style Responsive Grid)
+   Author: Raghav Dixit
+   =========================================================== */
+
 /* ===== Base Page ===== */
 .explore-page {
   font-family: "Poppins", sans-serif;
@@ -24,6 +29,7 @@
 .explore-title {
   font-size: 24px;
   font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .create-btn {
@@ -39,7 +45,6 @@
   cursor: pointer;
   transition: all 0.3s ease;
 }
-
 .create-btn:hover {
   background-color: #8225d1;
   transform: scale(1.05);
@@ -58,47 +63,45 @@
   display: block;
   max-width: 600px;
 }
-
 .room-search-input:focus {
   border-color: #6a0dad;
   box-shadow: 0 0 6px rgba(106, 13, 173, 0.3);
 }
 
-/* ===== Explore Grid ===== */
+/* ===== Explore Wrapper ===== */
 .explore-wrapper {
   padding: 10px 20px 60px;
 }
 
+/* ===== Instagram-Style Explore Grid ===== */
 .explore-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-auto-rows: 180px;
   gap: 10px;
-  justify-items: center;
+  justify-items: stretch;
+  align-items: stretch;
 }
 
 .explore-tile {
   position: relative;
   cursor: pointer;
   overflow: hidden;
-  border-radius: 12px;
-  aspect-ratio: 1 / 1;
+  border-radius: 14px;
   background: #eee;
-  width: 100%;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .explore-tile:hover {
   transform: scale(1.03);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .explore-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 12px;
   transition: opacity 0.3s;
 }
-
 .explore-tile:hover .explore-image {
   opacity: 0.85;
 }
@@ -113,9 +116,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  border-radius: 12px;
 }
-
 .explore-tile:hover .explore-overlay {
   opacity: 1;
 }
@@ -123,23 +124,49 @@
 .overlay-text {
   text-align: center;
   color: #fff;
-  padding: 10px;
+  padding: 12px;
   font-size: 13px;
 }
-
 .overlay-text h3 {
   margin: 0;
   font-size: 15px;
   font-weight: 600;
 }
-
 .overlay-text p {
   margin: 4px 0 0;
   font-size: 12px;
   opacity: 0.9;
 }
 
-/* ===== Modal ===== */
+/* ===== Dynamic Tile Sizes (Mosaic Layout) ===== */
+.explore-tile:nth-child(3n) {
+  grid-row: span 2;
+  grid-column: span 2;
+}
+.explore-tile:nth-child(7n) {
+  grid-column: span 2;
+}
+.explore-tile:nth-child(10n) {
+  grid-row: span 2;
+}
+.explore-tile:nth-child(3n) .explore-image,
+.explore-tile:nth-child(7n) .explore-image,
+.explore-tile:nth-child(10n) .explore-image {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+}
+
+/* ===== No Rooms / Loading ===== */
+.loading-text,
+.no-rooms {
+  text-align: center;
+  color: #777;
+  font-size: 16px;
+  margin-top: 40px;
+}
+
+/* ===== Modal (Create Room Form) ===== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -151,41 +178,54 @@
   justify-content: center;
   align-items: center;
   z-index: 999;
+  animation: fadeIn 0.3s ease;
 }
 
 .modal {
   background: #fff;
-  padding: 24px;
-  border-radius: 14px;
+  padding: 30px 25px;
+  border-radius: 20px;
   width: 90%;
-  max-width: 400px;
+  max-width: 420px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  animation: fadeIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: slideUp 0.4s ease;
 }
-
 .modal h2 {
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   color: #111;
+  font-size: 22px;
+  font-weight: 700;
 }
-
+.modal form {
+  width: 100%;
+}
 .modal input,
 .modal select {
   width: 100%;
-  padding: 12px;
-  border-radius: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
   border: 1px solid #ddd;
-  margin-bottom: 14px;
-  font-size: 14px;
+  margin-bottom: 16px;
+  font-size: 15px;
   background: #fafafa;
+  transition: all 0.3s ease;
 }
-
+.modal input:focus,
+.modal select:focus {
+  border-color: #6a0dad;
+  box-shadow: 0 0 6px rgba(106, 13, 173, 0.3);
+  outline: none;
+}
 .modal-actions {
   display: flex;
   gap: 10px;
   justify-content: center;
+  margin-top: 10px;
 }
-
 .cancel-btn {
   background: #eee;
   color: #333;
@@ -193,8 +233,8 @@
   padding: 10px 16px;
   border-radius: 10px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
-
 .cancel-btn:hover {
   background: #ddd;
 }
@@ -213,33 +253,217 @@
     padding: 0;
     z-index: 999;
   }
-
   .create-btn span {
     display: none;
   }
 }
 
-/* ===== Responsive Grid ===== */
-@media (min-width: 600px) {
+/* ===== Responsive Explore Grid ===== */
+@media (max-width: 768px) {
   .explore-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-auto-rows: 150px;
+  }
+  .explore-tile:nth-child(3n),
+  .explore-tile:nth-child(7n),
+  .explore-tile:nth-child(10n) {
+    grid-column: span 1;
+    grid-row: span 1;
   }
 }
-
-@media (min-width: 992px) {
+@media (min-width: 1200px) {
   .explore-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-auto-rows: 250px;
   }
 }
 
-/* ===== FadeIn Animation ===== */
+/* ===== POSTS SECTION (For Startup & User Posts) ===== */
+.posts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-top: 40px;
+  border-top: 1px solid #eee;
+}
+
+/* ===== Post Tiles ===== */
+.post-tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  background-color: #f0f0f0;
+  aspect-ratio: 1 / 1;
+}
+.post-tile:hover {
+  transform: scale(1.03);
+}
+
+/* Variable Sizes for Dynamic Explore Feel */
+.post-tile.large {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.post-tile.wide {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+.post-tile.tall {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
+/* ===== Post Image ===== */
+.post-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  transition: opacity 0.3s ease;
+}
+.post-tile:hover .post-img {
+  opacity: 0.85;
+}
+
+/* ===== Overlay Info ===== */
+.post-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px;
+  border-radius: inherit;
+}
+.post-tile:hover .post-overlay {
+  opacity: 1;
+}
+
+/* ===== Post Info ===== */
+.post-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.mini-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+}
+.post-info {
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.post-info h4 {
+  font-size: 15px;
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+.post-info p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* ===== Post Actions ===== */
+.post-actions {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  margin-top: 8px;
+}
+.post-actions span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #fff;
+  opacity: 0.9;
+}
+.post-actions span:hover {
+  color: #ffcb3c;
+  opacity: 1;
+}
+
+/* ===== Image Lightbox ===== */
+.image-lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.lightbox-img {
+  max-width: 90%;
+  max-height: 85vh;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* ===== Responsive Posts Layout ===== */
+@media (max-width: 600px) {
+  .posts-container {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+  }
+  .post-tile.large,
+  .post-tile.wide,
+  .post-tile.tall {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+  .post-overlay {
+    padding: 8px;
+  }
+  .mini-avatar {
+    width: 30px;
+    height: 30px;
+  }
+}
+@media (min-width: 601px) and (max-width: 991px) {
+  .posts-container {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+@media (min-width: 992px) {
+  .posts-container {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+/* ===== Animations ===== */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-15px);
   }
   to {
     opacity: 1;
+  }
+}
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
     transform: translateY(0);
+    opacity: 1;
   }
 }
