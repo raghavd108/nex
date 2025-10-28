@@ -154,44 +154,54 @@ export default function ProfilePage() {
     "Other",
   ];
   const lookingForOptions = ["Co-founder", "Investor", "Mentor"];
+  // ✅ Like post (works for both users and startups)
   const handleLike = async (postId, isStartupPost = false) => {
     try {
-      const res = await axios.post(
-        `${API_URL}/${isStartupPost ? "startupPosts" : "posts"}/${postId}/like`,
+      const endpoint = `${API_URL}/${
+        isStartupPost ? "startupPosts" : "posts"
+      }/${postId}/like`;
+      const res = await axios.put(
+        endpoint,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
+      // Update that specific post’s likes instantly
       setPosts((prev) =>
         prev.map((p) =>
-          p._id === postId ? { ...p, likes: res.data.likes } : p
+          p._id === postId ? { ...p, likes: res.data.likes || [] } : p
         )
       );
     } catch (err) {
-      console.error("Error liking post:", err);
+      console.error("Error liking post:", err.response?.data || err.message);
     }
   };
 
   // ✅ Comment (works for both)
   const handleComment = async (postId, isStartupPost = false) => {
     const text = prompt("Write a comment:");
-    if (!text) return;
+    if (!text.trim()) return;
 
     try {
+      const endpoint = `${API_URL}/${
+        isStartupPost ? "startupPosts" : "posts"
+      }/${postId}/comment`;
       const res = await axios.post(
-        `${API_URL}/${
-          isStartupPost ? "startupPosts" : "posts"
-        }/${postId}/comment`,
+        endpoint,
         { text },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
+      // Replace post with updated data from backend
       setPosts((prev) => prev.map((p) => (p._id === postId ? res.data : p)));
     } catch (err) {
-      console.error("Error adding comment:", err);
+      console.error("Error adding comment:", err.response?.data || err.message);
     }
   };
-
   // ✅ Delete post (works for both)
   const handleDeletePost = async (postId, isStartupPost = false) => {
     const confirmDelete = window.confirm(
@@ -201,8 +211,10 @@ export default function ProfilePage() {
 
     try {
       await axios.delete(
-        `${API_URL}/${isStartupPost ? "startupPosts" : "posts"}/${postId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `${API_URL}/api/${isStartupPost ? "startupPosts" : "posts"}/${postId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
       setPosts((prev) => prev.filter((p) => p._id !== postId));
