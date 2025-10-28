@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../css/Explore.css";
 import Navbar from "../components/Navbar";
-import { FaPlus, FaHeart, FaComment } from "react-icons/fa";
+import { FaPlus, FaHeart, FaComment, FaUsers } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -16,7 +16,7 @@ export default function Explore() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [creatingRoom, setCreatingRoom] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null); // For image preview modal
+  const [selectedPost, setSelectedPost] = useState(null); // Full post modal state
 
   const [newRoom, setNewRoom] = useState({
     name: "",
@@ -32,18 +32,18 @@ export default function Explore() {
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
-  // ✅ Fetch Rooms
+  // Fetch Rooms
   const fetchRooms = async () => {
     try {
       const res = await axios.get(`${API_BASE}/rooms`);
-      setPublicRooms(res.data);
-      setFilteredRooms(res.data);
+      setPublicRooms(res.data || []);
+      setFilteredRooms(res.data || []);
     } catch (err) {
       console.error("Error fetching rooms:", err);
     }
   };
 
-  // ✅ Fetch posts from both users & startups
+  // Fetch posts from users & startups
   const fetchPosts = async () => {
     setLoading(true);
     try {
@@ -52,9 +52,10 @@ export default function Explore() {
         axios.get(`${API_BASE}/startupPosts`),
       ]);
 
-      const allPosts = [...userPosts.data, ...startupPosts.data].sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      const allPosts = [
+        ...(userPosts.data || []),
+        ...(startupPosts.data || []),
+      ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setPosts(allPosts);
     } catch (err) {
       console.error("Error fetching posts:", err);
@@ -68,7 +69,7 @@ export default function Explore() {
     fetchPosts();
   }, []);
 
-  // ✅ Search filter for rooms
+  // Filter Rooms
   useEffect(() => {
     const term = searchTerm.trim().toLowerCase();
     setFilteredRooms(
@@ -82,7 +83,7 @@ export default function Explore() {
     );
   }, [searchTerm, publicRooms]);
 
-  // ✅ Join Room
+  // Join Room
   const handleJoinRoom = async (roomId) => {
     try {
       setJoiningRoomId(roomId);
@@ -99,7 +100,7 @@ export default function Explore() {
     }
   };
 
-  // ✅ Create Room
+  // Create Room
   const handleCreateRoom = async (e) => {
     e.preventDefault();
     setCreatingRoom(true);
@@ -118,28 +119,34 @@ export default function Explore() {
     }
   };
 
-  // ✅ Like post
+  // Like Post
   const handleLike = async (postId, isStartupPost = false) => {
     try {
       const endpoint = `${API_BASE}/${
         isStartupPost ? "startupPosts" : "posts"
       }/${postId}/like`;
       const res = await axios.put(endpoint, {}, { headers: getAuthHeaders() });
+      // backend returns updated post or likes array in different files — normalize
+      const likes =
+        res.data.likes ?? (res.data.likes?.length ? res.data.likes : []);
       setPosts((prev) =>
         prev.map((p) =>
-          p._id === postId ? { ...p, likes: res.data.likes || [] } : p
+          p._id === postId ? { ...p, likes: res.data.likes ?? p.likes } : p
         )
       );
+      // if selectedPost is open and same id, update it too
+      if (selectedPost && selectedPost._id === postId) {
+        setSelectedPost((sp) => ({ ...sp, likes: res.data.likes ?? sp.likes }));
+      }
     } catch (err) {
       toast.error("Failed to like post");
     }
   };
 
-  // ✅ Comment on post
+  // Comment on Post
   const handleComment = async (postId, isStartupPost = false) => {
     const text = prompt("Write a comment:");
-    if (!text.trim()) return;
-
+    if (!text || !text.trim()) return;
     try {
       const endpoint = `${API_BASE}/${
         isStartupPost ? "startupPosts" : "posts"
@@ -149,7 +156,10 @@ export default function Explore() {
         { text },
         { headers: getAuthHeaders() }
       );
+      // backend returns updated post
       setPosts((prev) => prev.map((p) => (p._id === postId ? res.data : p)));
+      if (selectedPost && selectedPost._id === postId)
+        setSelectedPost(res.data);
     } catch (err) {
       toast.error("Failed to add comment");
     }
@@ -160,15 +170,22 @@ export default function Explore() {
       <ToastContainer position="top-right" autoClose={3000} />
       <Navbar />
 
+      {/* Header */}
       <div className="explore-header">
         <h1 className="explore-title">🌍 Explore Nex</h1>
-        <button className="create-btn" onClick={() => setShowCreateModal(true)}>
-          <FaPlus /> Create Room
+
+        {/* Create button: header on desktop, floating on small screens (handled by CSS) */}
+        <button
+          className="create-btn"
+          onClick={() => setShowCreateModal(true)}
+          aria-label="Create room"
+        >
+          <FaPlus /> <span style={{ marginLeft: 6 }}>Create Room</span>
         </button>
       </div>
 
-      {/* Search */}
       <div className="explore-wrapper">
+        {/* search */}
         <input
           type="search"
           className="room-search-input"
@@ -177,67 +194,118 @@ export default function Explore() {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        {loading ? (
-          <p className="loading-text">Loading content...</p>
+        {/* Themed Rooms */}
+        <h2 style={{ margin: "20px 10px 10px", fontWeight: 600 }}>
+          🎨 Themed Rooms
+        </h2>
+        {filteredRooms.length > 0 ? (
+          <div className="explore-grid">
+            {filteredRooms.map((room) => (
+              <div
+                key={room._id}
+                className="explore-tile"
+                onClick={() => handleJoinRoom(room._id)}
+              >
+                <img
+                  src={
+                    room.image ||
+                    "https://via.placeholder.com/400x400?text=Room+Image"
+                  }
+                  alt={room.name}
+                  className="explore-image"
+                />
+                <div className="explore-overlay">
+                  <div className="overlay-text">
+                    <h3>{room.name}</h3>
+                    <p>{room.topic}</p>
+                    <div
+                      className="post-actions"
+                      style={{ justifyContent: "center", marginTop: 8 }}
+                    >
+                      <span>
+                        <FaUsers /> {room.members?.length || 0}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
-          <>
-            {/* 🌟 Explore Feed Section */}
-            <div className="explore-grid">
-              {posts.map((post) => {
-                const isStartupPost = !!post.startupId;
-                const poster = isStartupPost ? post.startupId : post.userId;
-                const avatar = isStartupPost
-                  ? poster?.logo
-                  : poster?.avatar || "/default-avatar.png";
+          <p className="no-rooms">No themed rooms found.</p>
+        )}
 
-                return (
-                  <div key={post._id} className="explore-tile post-tile">
-                    <img
-                      src={
-                        post.imageUrl ||
-                        "https://via.placeholder.com/400x400?text=No+Image"
-                      }
-                      alt="Post"
-                      className="explore-image"
-                      onClick={() => setSelectedImage(post.imageUrl)}
-                    />
-                    <div className="explore-overlay">
-                      <div className="overlay-text">
-                        <img
-                          src={avatar}
-                          alt="avatar"
-                          className="mini-avatar"
-                        />
-                        <h4>{poster?.name || "User"}</h4>
-                        <p>{post.content?.slice(0, 60)}...</p>
-                        <div className="post-actions">
-                          <span
-                            onClick={() => handleLike(post._id, isStartupPost)}
-                          >
-                            <FaHeart /> {post.likes?.length || 0}
-                          </span>
-                          <span
-                            onClick={() =>
-                              handleComment(post._id, isStartupPost)
-                            }
-                          >
-                            <FaComment /> {post.comments?.length || 0}
-                          </span>
-                        </div>
+        {/* Latest Posts */}
+        <h2 style={{ margin: "30px 10px 10px", fontWeight: 600 }}>
+          🔥 Latest Posts
+        </h2>
+
+        {loading ? (
+          <p className="loading-text">Loading posts...</p>
+        ) : posts.length > 0 ? (
+          <div className="explore-grid">
+            {posts.map((post) => {
+              const isStartupPost = !!post.startupId;
+              const poster = isStartupPost ? post.startupId : post.userId;
+              const avatar = isStartupPost
+                ? poster?.logo
+                : poster?.avatar || "/default-avatar.png";
+
+              return (
+                <div key={post._id} className="explore-tile post-tile">
+                  <img
+                    src={
+                      post.imageUrl ||
+                      "https://via.placeholder.com/400x400?text=No+Image"
+                    }
+                    alt="Post"
+                    className="explore-image"
+                    onClick={() => setSelectedPost(post)}
+                  />
+                  <div className="explore-overlay">
+                    <div className="overlay-text">
+                      <img src={avatar} alt="avatar" className="mini-avatar" />
+                      <h4>{poster?.name || "User"}</h4>
+                      <p>{post.content?.slice(0, 60)}...</p>
+                      <div
+                        className="post-actions"
+                        style={{ justifyContent: "center", marginTop: 8 }}
+                      >
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLike(post._id, isStartupPost);
+                          }}
+                        >
+                          <FaHeart /> {post.likes?.length || 0}
+                        </span>
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleComment(post._id, isStartupPost);
+                          }}
+                        >
+                          <FaComment /> {post.comments?.length || 0}
+                        </span>
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="no-rooms">No posts yet.</p>
         )}
       </div>
 
-      {/* 🏗️ Create Room Modal */}
+      {/* Create Room Modal */}
       {showCreateModal && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div
+          className="modal-overlay"
+          onClick={() => setShowCreateModal(false)}
+        >
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h2>Create a Room</h2>
             <form onSubmit={handleCreateRoom}>
               <input
@@ -288,10 +356,78 @@ export default function Explore() {
         </div>
       )}
 
-      {/* 🖼️ Image Lightbox */}
-      {selectedImage && (
-        <div className="image-lightbox" onClick={() => setSelectedImage(null)}>
-          <img src={selectedImage} alt="Full View" className="lightbox-img" />
+      {/* Full Post Modal (Instagram-style) */}
+      {selectedPost && (
+        <div
+          className="post-modal-overlay"
+          onClick={() => setSelectedPost(null)}
+        >
+          <div className="post-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="post-modal-left">
+              <img
+                src={
+                  selectedPost.imageUrl ||
+                  "https://via.placeholder.com/900x900?text=No+Image"
+                }
+                alt="Post"
+              />
+            </div>
+
+            <div className="post-modal-right">
+              <div className="post-header">
+                <img
+                  className="post-avatar"
+                  src={
+                    selectedPost.startupId
+                      ? selectedPost.startupId?.logo
+                      : selectedPost.userId?.avatar || "/default-avatar.png"
+                  }
+                  alt="avatar"
+                />
+                <h4>
+                  {selectedPost.startupId
+                    ? selectedPost.startupId.name
+                    : selectedPost.userId?.name || "User"}
+                </h4>
+              </div>
+
+              <div className="post-content">
+                <p>{selectedPost.content}</p>
+              </div>
+
+              <div className="post-actions-modal">
+                <span
+                  onClick={() =>
+                    handleLike(selectedPost._id, !!selectedPost.startupId)
+                  }
+                >
+                  <FaHeart /> {selectedPost.likes?.length || 0}
+                </span>
+                <span
+                  onClick={() =>
+                    handleComment(selectedPost._id, !!selectedPost.startupId)
+                  }
+                >
+                  <FaComment /> {selectedPost.comments?.length || 0}
+                </span>
+              </div>
+
+              <div className="post-comments">
+                {selectedPost.comments?.length > 0 ? (
+                  selectedPost.comments.map((c, i) => (
+                    <div key={i} className="comment-item">
+                      <strong>
+                        {c.user?.name || c.userId?.name || "User"}:
+                      </strong>{" "}
+                      {c.text}
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-comments">No comments yet.</p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
