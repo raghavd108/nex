@@ -25,13 +25,11 @@ export default function Explore() {
   const navigate = useNavigate();
   const API_BASE = "https://nex-pjq3.onrender.com/api/rooms";
 
-  // Get auth headers
   const getAuthHeaders = () => {
     const token = localStorage.getItem("token");
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
-  // Fetch public rooms
   const fetchRooms = async () => {
     setLoading(true);
     try {
@@ -50,7 +48,6 @@ export default function Explore() {
     fetchRooms();
   }, []);
 
-  // Filter rooms based on search
   useEffect(() => {
     const term = searchTerm.trim().toLowerCase();
     setFilteredRooms(
@@ -64,7 +61,6 @@ export default function Explore() {
     );
   }, [searchTerm, publicRooms]);
 
-  // Join room
   const handleJoinRoom = async (roomId) => {
     try {
       setJoiningRoomId(roomId);
@@ -82,7 +78,6 @@ export default function Explore() {
     }
   };
 
-  // Create room
   const handleCreateRoom = async (e) => {
     e.preventDefault();
     setCreatingRoom(true);
@@ -119,8 +114,6 @@ export default function Explore() {
 
       <div className="explore-wrapper">
         <section className="explore-section">
-          <h2>🧩 Join a Public Room</h2>
-
           <input
             type="search"
             className="room-search-input"
@@ -131,40 +124,31 @@ export default function Explore() {
           />
 
           {loading ? (
-            <p>Loading public rooms...</p>
+            <p className="loading-text">Loading public rooms...</p>
           ) : filteredRooms.length === 0 ? (
-            <p>No public rooms found.</p>
+            <p className="no-rooms">No public rooms found.</p>
           ) : (
-            <div className="room-list">
+            <div className="explore-grid">
               {filteredRooms.map((room) => (
-                <div key={room._id} className="room-card">
-                  <div className="room-card-header">
-                    {room.createdBy?.avatar && (
-                      <img
-                        src={room.createdBy.avatar}
-                        alt={`${room.createdBy.name}'s avatar`}
-                        className="host-avatar"
-                      />
-                    )}
-                    <div>
-                      <h3 className="room-name">{room.name}</h3>
-                      <p className="room-theme">Theme: {room.topic}</p>
+                <div
+                  key={room._id}
+                  className="explore-tile"
+                  onClick={() => handleJoinRoom(room._id)}
+                >
+                  <img
+                    src={
+                      room.createdBy?.avatar ||
+                      "https://via.placeholder.com/300x300?text=Nex+Room"
+                    }
+                    alt={room.name}
+                    className="explore-image"
+                  />
+                  <div className="explore-overlay">
+                    <div className="overlay-text">
+                      <h3>{room.name}</h3>
+                      <p>{room.topic}</p>
                     </div>
                   </div>
-
-                  {room.createdBy && (
-                    <p className="room-host">
-                      Host: <strong>{room.createdBy.name}</strong>
-                    </p>
-                  )}
-
-                  <button
-                    className="join-btnn"
-                    onClick={() => handleJoinRoom(room._id)}
-                    disabled={joiningRoomId === room._id}
-                  >
-                    {joiningRoomId === room._id ? "Joining..." : "🚀 Join Room"}
-                  </button>
                 </div>
               ))}
             </div>
