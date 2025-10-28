@@ -1,19 +1,26 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+
 const {
   createRoom,
   getRooms,
   joinRoom,
 } = require("../controllers/roomController");
+
 const authMiddleware = require("../middleware/authMiddleware");
 
-// Create a room
-router.post("/", authMiddleware, createRoom);
+// ✅ Multer memory storage for image uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-// Get all public rooms
+// ✅ Create a room (with optional image upload)
+router.post("/", authMiddleware, upload.single("image"), createRoom);
+
+// ✅ Get all public rooms
 router.get("/", getRooms);
 
-// Join a room by roomId
+// ✅ Join a room by ID
 router.post("/:roomId/join", authMiddleware, joinRoom);
 
 module.exports = router;

@@ -105,12 +105,24 @@ export default function Explore() {
     e.preventDefault();
     setCreatingRoom(true);
     try {
-      await axios.post(`${API_BASE}/rooms`, newRoom, {
-        headers: getAuthHeaders(),
+      const formData = new FormData();
+      formData.append("name", newRoom.name);
+      formData.append("topic", newRoom.topic);
+      formData.append("type", newRoom.type);
+      if (roomImage) formData.append("image", roomImage);
+
+      await axios.post(`${API_BASE}/rooms`, formData, {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "multipart/form-data",
+        },
       });
+
       toast.success("Room created successfully!");
       setShowCreateModal(false);
       setNewRoom({ name: "", topic: "", type: "public" });
+      setRoomImage(null);
+      setPreviewImage(null);
       fetchRooms();
     } catch (err) {
       toast.error(err.response?.data?.message || "Unable to create room.");
@@ -162,6 +174,18 @@ export default function Explore() {
         setSelectedPost(res.data);
     } catch (err) {
       toast.error("Failed to add comment");
+    }
+  };
+  // Image Preview for Create Room
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setRoomImage(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPreviewImage(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewImage(null);
     }
   };
 
@@ -307,7 +331,7 @@ export default function Explore() {
         >
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h2>Create a Room</h2>
-            <form onSubmit={handleCreateRoom}>
+            <form onSubmit={handleCreateRoom} encType="multipart/form-data">
               <input
                 type="text"
                 placeholder="Room Name"
@@ -335,6 +359,32 @@ export default function Explore() {
                 <option value="public">Public</option>
                 <option value="private">Private</option>
               </select>
+
+              {/* Image Upload */}
+              <label className="upload-label">
+                <FaImage /> Upload Room Image
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+              </label>
+              {previewImage && (
+                <div className="image-preview">
+                  <img
+                    src={previewImage}
+                    alt="Preview"
+                    style={{
+                      width: "100%",
+                      maxHeight: 200,
+                      borderRadius: 10,
+                      marginTop: 10,
+                      objectFit: "cover",
+                    }}
+                  />
+                </div>
+              )}
+
               <div className="modal-actions">
                 <button
                   type="submit"
