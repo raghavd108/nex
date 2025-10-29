@@ -378,7 +378,6 @@ export default function StartupProfile() {
                   />
                   <div className="startup-name-info">
                     <h4>{startup.name}</h4>
-                    <p>Posting as {startup.name}</p>
                   </div>
                 </div>
 

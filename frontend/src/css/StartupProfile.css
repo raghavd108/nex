@@ -251,12 +251,26 @@
 
 .popup-body textarea {
   width: 100%;
-  min-height: 80px;
-  padding: 10px;
+  min-height: 100px;
+  max-height: 200px;
+  padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid #ccc;
-  resize: none;
+  border: 1px solid #ddd;
+  background: #f9fafc;
   font-family: "Poppins", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #333;
+  resize: vertical; /* allow only vertical resize */
+  box-sizing: border-box;
+  overflow-y: auto; /* keeps text inside if it grows */
+}
+
+.popup-body textarea:focus {
+  border-color: #ff416c;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 65, 108, 0.15);
+  background: #fff;
 }
 
 .popup-body .composer-actions {
