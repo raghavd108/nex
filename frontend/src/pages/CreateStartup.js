@@ -30,7 +30,6 @@ export default function CreateStartup() {
     skills: [],
   });
   const [logos, setLogos] = useState([]); // multiple logos
-  const [pitchDecks, setPitchDecks] = useState([]); // multiple pitch decks
   const [loading, setLoading] = useState(false);
   const [profileId, setProfileId] = useState(null);
 
@@ -118,23 +117,7 @@ export default function CreateStartup() {
         mainLogoUrl = logoRes.data[0]?.url || "";
       }
 
-      // Step 3: Upload multiple pitch decks
-      if (pitchDecks.length > 0) {
-        const deckFormData = new FormData();
-        pitchDecks.forEach((file) => deckFormData.append("pitchDecks", file));
-        await axios.post(
-          `${API_URL}/api/startups/${startupId}/pitchdecks`,
-          deckFormData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-      }
-
-      // Step 4: Update startup with main logo
+      // Step 3: Update startup with main logo
       if (mainLogoUrl) {
         await axios.put(
           `${API_URL}/api/startups/${startupId}`,
@@ -143,7 +126,7 @@ export default function CreateStartup() {
         );
       }
 
-      // Step 5: Navigate to startup profile
+      // Step 4: Navigate to startup profile
       navigate(`/startup/${startupId}`);
     } catch (err) {
       console.error("Error creating startup:", err);
@@ -271,17 +254,6 @@ export default function CreateStartup() {
           accept="image/*"
           multiple
           onChange={handleFileChange(setLogos)}
-        />
-      ),
-    },
-    {
-      label: "Upload Pitch Decks (Multiple)",
-      field: (
-        <input
-          type="file"
-          accept=".pdf,.ppt,.pptx"
-          multiple
-          onChange={handleFileChange(setPitchDecks)}
         />
       ),
     },
