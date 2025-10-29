@@ -51,12 +51,12 @@ export default function Navbar() {
               <span>Explore</span>
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link to="/video" className={isActive("/video") ? "active" : ""}>
               <i className="fas fa-heartbeat"></i>
               <span>Match</span>
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               to="/profile"
