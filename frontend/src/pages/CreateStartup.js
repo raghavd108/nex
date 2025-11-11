@@ -14,7 +14,6 @@ const rolesList = [
   "Designer",
   "Marketer",
 ];
-const industriesList = ["AI", "Fintech", "Health", "Edtech", "E-commerce"];
 
 export default function CreateStartup() {
   const navigate = useNavigate();
@@ -26,22 +25,19 @@ export default function CreateStartup() {
     stage: "idea",
     fundingInfo: "",
     roles: [],
-    industries: [],
     skills: [],
   });
-  const [logos, setLogos] = useState([]); // multiple logos
+  const [logos, setLogos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [profileId, setProfileId] = useState(null);
 
   const token = localStorage.getItem("token");
   const API_URL = "https://nex-pjq3.onrender.com";
 
-  // Wake up server (Render cold start)
   useEffect(() => {
     axios.get(`${API_URL}/api/health`).catch(() => {});
-  }, [API_URL]);
+  }, []);
 
-  // Fetch logged-in user profile
   useEffect(() => {
     if (!token) return;
     const fetchProfile = async () => {
@@ -55,7 +51,7 @@ export default function CreateStartup() {
       }
     };
     fetchProfile();
-  }, [token, API_URL]);
+  }, [token]);
 
   const handleNext = () => setStep((s) => s + 1);
   const handlePrev = () => setStep((s) => s - 1);
@@ -66,12 +62,12 @@ export default function CreateStartup() {
   };
 
   const handleMultiSelect = (name, value) => {
-    setForm((prev) => {
-      const arr = prev[name];
-      return arr.includes(value)
-        ? { ...prev, [name]: arr.filter((v) => v !== value) }
-        : { ...prev, [name]: [...arr, value] };
-    });
+    setForm((prev) => ({
+      ...prev,
+      [name]: prev[name].includes(value)
+        ? prev[name].filter((v) => v !== value)
+        : [...prev[name], value],
+    }));
   };
 
   const handleFileChange = (setter) => (e) => {
@@ -81,25 +77,29 @@ export default function CreateStartup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!profileId) {
+      alert("Profile is still loading, please wait 1 second.");
+      return;
+    }
+
     setLoading(true);
     try {
-      // Step 1: Create startup with arrays normalized
       const payload = {
         ...form,
         founderProfileId: profileId,
-        industries: form.industries || [],
-        skills: form.skills || [],
         roles: form.roles || [],
+        skills: form.skills || [],
       };
 
       const res = await axios.post(`${API_URL}/api/startups`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const startupId = res.data._id;
 
       let mainLogoUrl = "";
 
-      // Step 2: Upload multiple logos
       if (logos.length > 0) {
         const logoFormData = new FormData();
         logos.forEach((file) => logoFormData.append("logos", file));
@@ -113,11 +113,9 @@ export default function CreateStartup() {
             },
           }
         );
-        // Take first logo as main
         mainLogoUrl = logoRes.data[0]?.url || "";
       }
 
-      // Step 3: Update startup with main logo
       if (mainLogoUrl) {
         await axios.put(
           `${API_URL}/api/startups/${startupId}`,
@@ -126,7 +124,6 @@ export default function CreateStartup() {
         );
       }
 
-      // Step 4: Navigate to startup profile
       navigate(`/startup/${startupId}`);
     } catch (err) {
       console.error("Error creating startup:", err);
@@ -156,7 +153,7 @@ export default function CreateStartup() {
           name="mission"
           value={form.mission}
           onChange={handleChange}
-          placeholder="Mission"
+          placeholder="Your mission"
           required
         />
       ),
@@ -168,7 +165,7 @@ export default function CreateStartup() {
           name="description"
           value={form.description}
           onChange={handleChange}
-          placeholder="Describe your idea"
+          placeholder="Describe your startup idea"
           required
         />
       ),
@@ -195,7 +192,7 @@ export default function CreateStartup() {
       ),
     },
     {
-      label: "Roles",
+      label: "Roles Needed",
       field: (
         <div className="checkbox-group">
           {rolesList.map((r) => (
@@ -206,23 +203,6 @@ export default function CreateStartup() {
                 onChange={() => handleMultiSelect("roles", r)}
               />{" "}
               {r}
-            </label>
-          ))}
-        </div>
-      ),
-    },
-    {
-      label: "Industries",
-      field: (
-        <div className="checkbox-group">
-          {industriesList.map((i) => (
-            <label key={i}>
-              <input
-                type="checkbox"
-                checked={form.industries.includes(i)}
-                onChange={() => handleMultiSelect("industries", i)}
-              />{" "}
-              {i}
             </label>
           ))}
         </div>
@@ -247,7 +227,7 @@ export default function CreateStartup() {
       ),
     },
     {
-      label: "Upload Logos (Multiple)",
+      label: "Upload Logos (Multiple Allowed)",
       field: (
         <input
           type="file"
@@ -258,6 +238,13 @@ export default function CreateStartup() {
       ),
     },
   ];
+
+  if (!profileId)
+    return (
+      <div className="create-startup-container">
+        <h2>Loading profile...</h2>
+      </div>
+    );
 
   return (
     <div
@@ -279,7 +266,7 @@ export default function CreateStartup() {
             </button>
           )}
           {step === steps.length - 1 && (
-            <button type="submit" disabled={loading}>
+            <button type="submit" disabled={loading || !profileId}>
               {loading ? "Creating..." : "Create Startup 🚀"}
             </button>
           )}
