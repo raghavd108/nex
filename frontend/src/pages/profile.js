@@ -157,9 +157,10 @@ export default function ProfilePage() {
   // ✅ Like post (works for both users and startups)
   const handleLike = async (postId, isStartupPost = false) => {
     try {
-      const endpoint = `${API_URL}/${
+      const endpoint = `${API_URL}/api/${
         isStartupPost ? "startupPosts" : "posts"
       }/${postId}/like`;
+
       const res = await axios.put(
         endpoint,
         {},
@@ -168,7 +169,7 @@ export default function ProfilePage() {
         }
       );
 
-      // Update that specific post’s likes instantly
+      // Update UI immediately
       setPosts((prev) =>
         prev.map((p) =>
           p._id === postId ? { ...p, likes: res.data.likes || [] } : p
