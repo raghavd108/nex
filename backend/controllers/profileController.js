@@ -22,12 +22,33 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// ✅ Update user profile
+// ✅ Update or create user profile
 exports.updateProfile = async (req, res) => {
   try {
-    const profile = await Profile.findOne({ userId: req.userId });
+    // Check if profile exists
+    let profile = await Profile.findOne({ userId: req.userId });
+
+    // If no profile, create one (first-time setup)
     if (!profile) {
-      return res.status(404).json({ message: "Profile not found" });
+      const newProfileData = {
+        userId: req.userId,
+        ...req.body,
+      };
+
+      // Ensure interests array is properly formatted
+      if (typeof newProfileData.interests === "string") {
+        newProfileData.interests = newProfileData.interests
+          .split(",")
+          .map((i) => i.trim());
+      }
+
+      profile = new Profile(newProfileData);
+      await profile.save();
+
+      // Mark user as profile completed
+      await User.findByIdAndUpdate(req.userId, { isProfileCompleted: true });
+
+      return res.json(profile);
     }
 
     // 🚫 Prevent username change once set
@@ -49,7 +70,7 @@ exports.updateProfile = async (req, res) => {
       }
     }
 
-    // Allowed fields the user can update
+    // Allowed fields to update
     const allowedFields = [
       "name",
       "bio",
@@ -77,17 +98,24 @@ exports.updateProfile = async (req, res) => {
       updateData.username = req.body.username;
     }
 
+    // Format interests if string
+    if (updateData.interests && typeof updateData.interests === "string") {
+      updateData.interests = updateData.interests
+        .split(",")
+        .map((i) => i.trim());
+    }
+
     // Update timestamp
     updateData.updatedAt = Date.now();
 
-    // ✔ Update Profile
+    // Update profile
     const updatedProfile = await Profile.findOneAndUpdate(
       { userId: req.userId },
       updateData,
       { new: true }
     ).populate("startupAffiliations.startupId", "name logo stage");
 
-    // ⭐ Mark User Profile as Completed
+    // Mark user profile as completed
     await User.findByIdAndUpdate(req.userId, { isProfileCompleted: true });
 
     res.json(updatedProfile);
