@@ -80,20 +80,41 @@ router.get("/:id", async (req, res) => {
 });
 
 // ---------------------- LIKE POST ----------------------
-router.post("/:id/like", auth, async (req, res) => {
-  const userId = req.user.id;
-  const post = await Post.findById(req.params.id);
-  if (!post) return res.status(404).json({ message: "Post not found" });
 
-  const liked = post.likes.includes(userId);
-  if (liked) {
-    post.likes.pull(userId);
-  } else {
-    post.likes.push(userId);
+router.put("/:id/like", auth, async (req, res) => {
+  try {
+    // Get profile id (we store profile._id in post.userId and in likes)
+    const profile = await Profile.findOne({ userId: req.user.id });
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
+
+    const profileId = profile._id;
+
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    // Check if profileId already in likes (compare strings)
+    const alreadyLiked = post.likes.some(
+      (l) => l.toString() === profileId.toString()
+    );
+
+    if (alreadyLiked) {
+      // remove like
+      post.likes = post.likes.filter(
+        (l) => l.toString() !== profileId.toString()
+      );
+    } else {
+      // add like
+      post.likes.push(profileId);
+    }
+
+    await post.save();
+
+    // Return the updated likes array (so frontend can replace it)
+    res.json({ success: true, likes: post.likes });
+  } catch (err) {
+    console.error("Error toggling like:", err);
+    res.status(500).json({ error: err.message });
   }
-
-  await post.save();
-  res.json({ success: true, likes: post.likes.length });
 });
 
 // ---------------------- COMMENT ON POST ----------------------

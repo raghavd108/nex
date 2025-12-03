@@ -160,7 +160,6 @@ export default function ProfilePage() {
       const endpoint = `${API_URL}/api/${
         isStartupPost ? "startupPosts" : "posts"
       }/${postId}/like`;
-
       const res = await axios.put(
         endpoint,
         {},
@@ -169,11 +168,11 @@ export default function ProfilePage() {
         }
       );
 
-      // Update UI immediately
+      // res.data.likes is an array of profile ids — update likes on that post
+      const updatedLikes = res.data.likes || [];
+
       setPosts((prev) =>
-        prev.map((p) =>
-          p._id === postId ? { ...p, likes: res.data.likes || [] } : p
-        )
+        prev.map((p) => (p._id === postId ? { ...p, likes: updatedLikes } : p))
       );
     } catch (err) {
       console.error("Error liking post:", err.response?.data || err.message);
