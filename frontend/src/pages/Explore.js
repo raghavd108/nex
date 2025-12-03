@@ -18,7 +18,6 @@ export default function Explore() {
   const [creatingRoom, setCreatingRoom] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
 
-  // ✅ Added missing states
   const [roomImage, setRoomImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
 
@@ -177,7 +176,7 @@ export default function Explore() {
     }
   };
 
-  // ✅ Image Preview for Create Room
+  // Image Preview for Create Room
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setRoomImage(file);
@@ -190,6 +189,9 @@ export default function Explore() {
     }
   };
 
+  // Filter posts to only include posts with images
+  const imagePosts = posts.filter((post) => post.imageUrl);
+
   return (
     <div className="explore-page">
       <ToastContainer position="top-right" autoClose={3000} />
@@ -198,7 +200,6 @@ export default function Explore() {
       {/* Header */}
       <div className="explore-header">
         <h1 className="explore-title">🌍 Explore Nex</h1>
-
         <button
           className="create-btn"
           onClick={() => setShowCreateModal(true)}
@@ -266,9 +267,9 @@ export default function Explore() {
 
         {loading ? (
           <p className="loading-text">Loading posts...</p>
-        ) : posts.length > 0 ? (
+        ) : imagePosts.length > 0 ? (
           <div className="explore-grid">
-            {posts.map((post) => {
+            {imagePosts.map((post) => {
               const isStartupPost = !!post.startupId;
               const poster = isStartupPost ? post.startupId : post.userId;
               const avatar = isStartupPost
@@ -278,10 +279,7 @@ export default function Explore() {
               return (
                 <div key={post._id} className="explore-tile post-tile">
                   <img
-                    src={
-                      post.imageUrl ||
-                      "https://via.placeholder.com/400x400?text=No+Image"
-                    }
+                    src={post.imageUrl}
                     alt="Post"
                     className="explore-image"
                     onClick={() => setSelectedPost(post)}
@@ -319,7 +317,7 @@ export default function Explore() {
             })}
           </div>
         ) : (
-          <p className="no-rooms">No posts yet.</p>
+          <p className="no-rooms">No posts with images yet.</p>
         )}
       </div>
 
@@ -360,7 +358,6 @@ export default function Explore() {
                 <option value="private">Private</option>
               </select>
 
-              {/* Image Upload */}
               <label className="upload-label">
                 <FaImage /> Upload Room Image
                 <input
