@@ -1,5 +1,6 @@
 const Profile = require("../models/Profile");
-const cloudinary = require("../config/cloudinary"); // ✅ Cloudinary config import
+const User = require("../models/User"); // ⭐ Import User model
+const cloudinary = require("../config/cloudinary");
 
 // ✅ Get or create a user's profile
 exports.getProfile = async (req, res) => {
@@ -40,7 +41,7 @@ exports.updateProfile = async (req, res) => {
         .json({ message: "Username cannot be changed once set" });
     }
 
-    // ✅ Validate username if setting for the first time
+    // ✅ Check username availability when setting first time
     if (!profile.username && req.body.username) {
       const existing = await Profile.findOne({ username: req.body.username });
       if (existing) {
@@ -48,7 +49,7 @@ exports.updateProfile = async (req, res) => {
       }
     }
 
-    // ✅ Allowed fields for update (prevents overwriting system fields)
+    // Allowed fields the user can update
     const allowedFields = [
       "name",
       "bio",
@@ -71,19 +72,23 @@ exports.updateProfile = async (req, res) => {
       }
     });
 
-    // Handle username only if not already set
+    // Handle first-time username
     if (!profile.username && req.body.username) {
       updateData.username = req.body.username;
     }
 
-    // Update `updatedAt`
+    // Update timestamp
     updateData.updatedAt = Date.now();
 
+    // ✔ Update Profile
     const updatedProfile = await Profile.findOneAndUpdate(
       { userId: req.userId },
       updateData,
       { new: true }
     ).populate("startupAffiliations.startupId", "name logo stage");
+
+    // ⭐ Mark User Profile as Completed
+    await User.findByIdAndUpdate(req.userId, { isProfileCompleted: true });
 
     res.json(updatedProfile);
   } catch (err) {
@@ -99,7 +104,7 @@ exports.uploadPhoto = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // Convert buffer to a data URI for Cloudinary
+    // Convert buffer to base64
     const dataUri = `data:${
       req.file.mimetype
     };base64,${req.file.buffer.toString("base64")}`;
@@ -108,12 +113,15 @@ exports.uploadPhoto = async (req, res) => {
       folder: "nex_avatars",
     });
 
-    // Save Cloudinary URL
+    // Save in DB
     const updated = await Profile.findOneAndUpdate(
       { userId: req.userId },
       { avatar: result.secure_url },
       { new: true }
     );
+
+    // ⭐ Mark profile completed when photo added
+    await User.findByIdAndUpdate(req.userId, { isProfileCompleted: true });
 
     res.json(updated);
   } catch (err) {
@@ -122,10 +130,11 @@ exports.uploadPhoto = async (req, res) => {
   }
 };
 
-// ✅ Get profile by username (public view)
+// ✅ Public profile by username
 exports.getProfileByUsername = async (req, res) => {
   try {
     const { username } = req.params;
+
     const profile = await Profile.findOne({ username }).populate(
       "startupAffiliations.startupId",
       "name logo stage"

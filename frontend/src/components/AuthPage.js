@@ -20,30 +20,29 @@ export default function AuthPage() {
     const endpoint = isLogin ? "auth/login" : "auth/register";
 
     try {
-      const res = await API.post(
-        endpoint,
-        { email, password },
-        { withCredentials: true }
-      );
+      const res = await API.post(endpoint, { email, password });
 
+      // After registration → login
       if (!isLogin) {
-        // After registration, automatically log in
-        const loginRes = await API.post(
-          "auth/login",
-          { email, password },
-          { withCredentials: true }
+        const loginRes = await API.post("auth/login", { email, password });
+
+        login(
+          loginRes.data.token,
+          loginRes.data.userId,
+          loginRes.data.isProfileCompleted
         );
 
-        login(loginRes.data.token);
-        localStorage.setItem("userId", loginRes.data.userId);
+        // Redirect based on completion
+        navigate(
+          loginRes.data.isProfileCompleted ? "/home" : "/complete-profile"
+        );
 
-        // Redirect to Profile setup page
-        navigate("/profile");
-      } else {
-        login(res.data.token);
-        localStorage.setItem("userId", res.data.userId);
-        navigate("/home");
+        return;
       }
+
+      // Normal login
+      login(res.data.token, res.data.userId, res.data.isProfileCompleted);
+      navigate(res.data.isProfileCompleted ? "/home" : "/complete-profile");
     } catch (err) {
       setError(
         err.response?.data?.message || "Server error. Please try again later."
@@ -53,7 +52,7 @@ export default function AuthPage() {
 
   return (
     <div className={styles.container}>
-      {/* Left photo collage */}
+      {/* LEFT PHOTO SECTION */}
       <div className={styles.photoSection}>
         <div className={styles.photoFrame}>
           <img
@@ -75,7 +74,7 @@ export default function AuthPage() {
         </div>
       </div>
 
-      {/* Right auth form */}
+      {/* RIGHT AUTH FORM */}
       <div className={styles.authContainer}>
         <h1 className={styles.brand}>Nex</h1>
         {error && <p className={styles.error}>{error}</p>}
@@ -102,7 +101,6 @@ export default function AuthPage() {
 
         <div className={styles.divider}>OR</div>
 
-        {/* Fix: valid, navigable link using React Router */}
         <Link to="/forgot-password" className={styles.forgot}>
           Forgotten your password?
         </Link>

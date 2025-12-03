@@ -18,6 +18,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import ThemedRoom from "./pages/ThemedRoom";
 import CreateStartup from "./pages/CreateStartup";
 import StartupProfile from "./pages/StartupProfile";
+import CompleteProfile from "./pages/CompleteProfile";
 
 function App() {
   return (
@@ -109,6 +110,14 @@ function App() {
             element={
               <PrivateRoute>
                 <StartupProfile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/complete-profile"
+            element={
+              <PrivateRoute>
+                <CompleteProfile />
               </PrivateRoute>
             }
           />

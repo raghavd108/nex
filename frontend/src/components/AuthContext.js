@@ -3,50 +3,73 @@ import { createContext, useState, useContext, useEffect } from "react";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  // Use null as the initial state. The useEffect hook will populate it.
   const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isProfileCompleted, setIsProfileCompleted] = useState(false);
 
-  // 💡 This is the crucial loading state that prevents the redirect.
+  // Prevent UI flicker on refresh
   const [isLoading, setIsLoading] = useState(true);
 
-  const login = (tok, uid) => {
-    localStorage.setItem("token", tok);
+  // ----------------------------------------
+  // LOGIN FUNCTION
+  // ----------------------------------------
+  const login = (tokenValue, uid, profileCompleted) => {
+    localStorage.setItem("token", tokenValue);
     localStorage.setItem("userId", uid);
-    setToken(tok);
+    localStorage.setItem("isProfileCompleted", profileCompleted);
+
+    setToken(tokenValue);
     setUserId(uid);
+    setIsProfileCompleted(profileCompleted);
     setIsAuthenticated(true);
   };
 
+  // ----------------------------------------
+  // LOGOUT FUNCTION
+  // ----------------------------------------
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+    localStorage.removeItem("isProfileCompleted");
+
     setToken(null);
     setUserId(null);
+    setIsProfileCompleted(false);
     setIsAuthenticated(false);
   };
 
-  // The useEffect now handles all initial state checking.
+  // ----------------------------------------
+  // LOAD USER DATA ON REFRESH
+  // ----------------------------------------
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUserId = localStorage.getItem("userId");
+    const storedProfileStatus =
+      localStorage.getItem("isProfileCompleted") === "true";
 
     if (storedToken && storedUserId) {
       setToken(storedToken);
       setUserId(storedUserId);
+      setIsProfileCompleted(storedProfileStatus);
       setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
     }
 
-    // 💡 IMPORTANT: Set loading to false *after* the check is complete.
     setIsLoading(false);
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ token, userId, login, logout, isAuthenticated, isLoading }}
+      value={{
+        token,
+        userId,
+        login,
+        logout,
+        isAuthenticated,
+        isProfileCompleted,
+        setIsProfileCompleted, // ⭐ useful when profile is completed later
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>
