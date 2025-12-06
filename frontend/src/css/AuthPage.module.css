@@ -4,14 +4,14 @@
   justify-content: center;
   min-height: 100vh;
   width: 100%;
-  background: #f9fafb; /* light background */
+  background: #f9fafb;
   color: #111;
   padding: 20px;
   box-sizing: border-box;
-  gap: 40px; /* spacing between photos & form */
+  gap: 40px;
 }
 
-/* ====== Photo Section (Balanced Stacked Cards) ====== */
+/* ====== Photo Section ====== */
 .photoSection {
   position: relative;
   width: 320px;
@@ -38,15 +38,16 @@
   object-fit: cover;
 }
 
-/* Symmetrical stacked layout */
 .photoFrame:nth-child(1) {
   transform: rotate(-6deg) translateX(-60px);
   z-index: 1;
 }
+
 .photoFrame:nth-child(2) {
   transform: rotate(0deg);
   z-index: 3;
 }
+
 .photoFrame:nth-child(3) {
   transform: rotate(6deg) translateX(60px);
   z-index: 2;
@@ -62,13 +63,13 @@
 .reaction.heart {
   bottom: 15%;
   left: -30px;
-  color: #e11d48; /* pinkish red */
+  color: #e11d48;
 }
 
 .reaction.star {
   top: 12%;
   right: -30px;
-  color: #16a34a; /* green */
+  color: #16a34a;
 }
 
 .reaction.bubble {
@@ -83,27 +84,20 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-/* ====== Auth Container (Symmetrical with Photos) ====== */
+/* ====== Auth Container ====== */
 .authContainer {
   flex: 1;
   max-width: 360px;
+  width: 100%;
   padding: 30px 25px;
   border-radius: 18px;
-  background: linear-gradient(145deg, #ffffff, #f3f4f6); /* light gradient */
+  background: linear-gradient(145deg, #ffffff, #f3f4f6);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
   text-align: center;
   transition: all 0.3s ease-in-out;
   color: #111;
+  box-sizing: border-box;
+  overflow: hidden; /* ✅ Prevent content overflow */
 }
 
 .authContainer:hover {
@@ -123,9 +117,13 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
 }
 
 .authForm input {
+  width: 100%; /* ✅ Fix overflow */
+  max-width: 100%;
+  box-sizing: border-box; /* ✅ Fix padding overflow */
   padding: 10px 14px;
   font-size: 15px;
   border: 1px solid #d1d5db;
@@ -146,6 +144,9 @@
 }
 
 .authForm button {
+  width: 100%; /* ✅ Fix overflow */
+  max-width: 100%;
+  box-sizing: border-box;
   background-color: #3b82f6;
   color: white;
   border: none;
@@ -168,18 +169,6 @@
   color: #6b7280;
 }
 
-.fbLogin {
-  background: transparent;
-  border: none;
-  color: #2563eb;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.fbLogin:hover {
-  text-decoration: underline;
-}
-
 .forgot {
   display: block;
   margin: 12px 0;
@@ -192,7 +181,6 @@
   text-decoration: underline;
 }
 
-/* ====== Toggle Text ====== */
 .toggleText {
   margin-top: 15px;
   font-size: 13px;
@@ -226,6 +214,7 @@
     opacity: 0;
     transform: translateY(-5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -252,6 +241,7 @@
   .photoFrame:nth-child(1) {
     transform: rotate(-5deg) translateX(-40px);
   }
+
   .photoFrame:nth-child(3) {
     transform: rotate(5deg) translateX(40px);
   }
@@ -262,23 +252,19 @@
   }
 }
 
-@media (max-width: 480px) {
+/* ✅ Hide image section completely on mobile */
+@media (max-width: 600px) {
   .photoSection {
-    height: 260px;
+    display: none;
   }
 
-  .photoFrame {
-    width: 130px;
-    height: 200px;
+  .container {
+    gap: 0;
+    padding: 10px;
   }
+}
 
-  .photoFrame:nth-child(1) {
-    transform: rotate(-4deg) translateX(-25px);
-  }
-  .photoFrame:nth-child(3) {
-    transform: rotate(4deg) translateX(25px);
-  }
-
+@media (max-width: 480px) {
   .authContainer {
     padding: 20px 15px;
   }
